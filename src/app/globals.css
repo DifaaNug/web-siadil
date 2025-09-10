@@ -1,4 +1,54 @@
-@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer utilities {
+  @keyframes custom-pulse {
+    0%, 100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 0.7;
+      transform: scale(1.15);
+    }
+  }
+}
+
+@keyframes ping-notif {
+  0% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  70% {
+    transform: scale(2.5);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(2.5);
+    opacity: 0;
+  }
+}
+.ping-notif {
+  position: absolute;
+  top: 0.25rem; /* sama dengan top-1 */
+  right: 0.25rem; /* sama dengan right-1 */
+  width: 0.5rem; /* sama dengan w-2 */
+  height: 0.5rem; /* sama dengan h-2 */
+  border-radius: 9999px;
+  background: #22c55e; /* bg-green-500 */
+  animation: ping-notif 1s cubic-bezier(0, 0, 0.2, 1) infinite;
+  z-index: 0;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+.blink {
+  animation: blink 1s infinite;
+}
 
 :root {
   --background: #ffffff;
