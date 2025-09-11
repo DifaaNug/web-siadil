@@ -8,6 +8,9 @@ module.exports = {
       colors: {
         demplon: '#01793b',
       },
+      fontFamily: {
+        poppins: ['Poppins', 'sans-serif'],
+      },
     },
   },
   darkMode: 'class',
