@@ -3,8 +3,12 @@
 import Image from 'next/image';
 import { useState } from 'react';
 
-const Sidebar = () => {
-  const [activeMenu, setActiveMenu] = useState('');
+interface SidebarProps {
+  activeMenu: string;
+  onMenuChange: (menu: string) => void;
+}
+
+const Sidebar = ({ activeMenu, onMenuChange }: SidebarProps) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [showArrow, setShowArrow] = useState(false);
   
@@ -90,11 +94,11 @@ const Sidebar = () => {
             {/* Home */}
             <li>
               <button
-                onClick={() => setActiveMenu('Home')}
+                onClick={() => onMenuChange('Home')}
                 className={`w-full flex items-center ${isCollapsed ? 'justify-center px-2' : 'space-x-3 px-3'} py-2 transition-all duration-300 text-sm rounded-md ${
                   activeMenu === 'Home'
                     ? 'text-white'
-                    : 'text-gray-950 hover:text-gray-900 hover:bg-gray-50'
+                    : 'text-gray-950'
                 }`}
                 style={activeMenu === 'Home' ? { backgroundColor: '#01793b' } : {}}
                 title={isCollapsed ? 'Home' : ''}
@@ -109,11 +113,11 @@ const Sidebar = () => {
             {/* Profile */}
             <li>
               <button
-                onClick={() => setActiveMenu('Profile')}
+                onClick={() => onMenuChange('Profile')}
                 className={`w-full flex items-center ${isCollapsed ? 'justify-center px-2' : 'space-x-3 px-3'} py-2 transition-all duration-300 text-sm rounded-md ${
                   activeMenu === 'Profile'
                     ? 'text-white'
-                    : 'text-gray-950 hover:text-gray-900 hover:bg-gray-50'
+                    : 'text-gray-950'
                 }`}
                 style={activeMenu === 'Profile' ? { backgroundColor: '#01793b' } : {}}
                 title={isCollapsed ? 'Profile' : ''}
@@ -128,11 +132,11 @@ const Sidebar = () => {
             {/* Employment */}
             <li>
               <button
-                onClick={() => setActiveMenu('Employment')}
+                onClick={() => onMenuChange('Employment')}
                 className={`w-full flex items-center ${isCollapsed ? 'justify-center px-2' : 'space-x-3 px-3'} py-2 transition-all duration-300 text-sm rounded-md ${
                   activeMenu === 'Employment'
                     ? 'text-white'
-                    : 'text-gray-950 hover:text-gray-900 hover:bg-gray-50'
+                    : 'text-gray-950'
                 }`}
                 style={activeMenu === 'Employment' ? { backgroundColor: '#01793b' } : {}}
                 title={isCollapsed ? 'Employment' : ''}
@@ -158,11 +162,11 @@ const Sidebar = () => {
             {/* Kehadiran, Koreksi, Cuti, dan Dinas */}
             <li>
               <button
-                onClick={() => setActiveMenu('Kehadiran')}
+                onClick={() => onMenuChange('Kehadiran')}
                 className={`w-full flex items-center ${isCollapsed ? 'justify-center px-2' : 'space-x-3 px-3'} py-2 transition-all duration-300 text-sm rounded-md ${
                   activeMenu === 'Kehadiran'
                     ? 'text-white'
-                    : 'text-gray-950 hover:text-gray-900 hover:bg-gray-50'
+                    : 'text-gray-950'
                 }`}
                 style={activeMenu === 'Kehadiran' ? { backgroundColor: '#01793b' } : {}}
                 title={isCollapsed ? 'Kehadiran, Koreksi, Cuti, dan Dinas' : ''}
@@ -190,11 +194,11 @@ const Sidebar = () => {
             {/* SIADIL */}
             <li>
               <button
-                onClick={() => setActiveMenu('SIADIL')}
+                onClick={() => onMenuChange('SIADIL')}
                 className={`w-full flex items-center ${isCollapsed ? 'justify-center px-2' : 'space-x-3 px-3'} py-2 transition-all duration-300 text-sm rounded-md ${
                   activeMenu === 'SIADIL'
                     ? 'text-white'
-                    : 'text-gray-950 hover:text-gray-900 hover:bg-gray-50'
+                    : 'text-gray-950'
                 }`}
                 style={activeMenu === 'SIADIL' ? { backgroundColor: '#01793b' } : {}}
                 title={isCollapsed ? 'SIADIL' : ''}
