@@ -48,7 +48,7 @@ const SiadilHeader = () => {
             {/* Efek ping */}
             <span className="ping-notif"></span>
             {/* Bulatan hijau tetap */}
-            <span className="bg-green-600 absolute top-1 right-1 block h-2 w-2 rounded-full ring-2 ring-white"></span>
+            <span className="bg-green-700 absolute top-1 right-1 block h-2 w-2 rounded-full ring-2 ring-white"></span>
             <svg
               xmlns="http://www.w3.org/2000/svg"
               className="h-5 w-5 text-gray-900"
