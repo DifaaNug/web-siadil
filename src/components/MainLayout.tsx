@@ -1,24 +1,24 @@
-'use client';
+"use client";
 
-import { ReactNode, useState } from 'react';
-import Sidebar from './Sidebar';
-import SiadilContent from './SiadilContent';
-import SiadilHeader from './SiadilHeader';
+import { ReactNode, useState } from "react";
+import Sidebar from "./Sidebar";
+import SiadilContent from "./SiadilContent";
+import SiadilHeader from "./SiadilHeader";
 
 interface MainLayoutProps {
   children: ReactNode;
 }
 
 const MainLayout = ({ children }: MainLayoutProps) => {
-  const [activeMenu, setActiveMenu] = useState('');
+  const [activeMenu, setActiveMenu] = useState("");
 
   const renderContent = () => {
     switch (activeMenu) {
-      case 'SIADIL':
+      case "SIADIL":
         return <SiadilContent />;
-      case 'Home':
+      case "Home":
         return children;
-      case 'Profile':
+      case "Profile":
         return (
           <div className="min-h-screen">
             <SiadilHeader />
@@ -28,7 +28,7 @@ const MainLayout = ({ children }: MainLayoutProps) => {
             </div>
           </div>
         );
-      case 'Employment':
+      case "Employment":
         return (
           <div className="min-h-screen">
             <SiadilHeader />
@@ -38,13 +38,17 @@ const MainLayout = ({ children }: MainLayoutProps) => {
             </div>
           </div>
         );
-      case 'Kehadiran':
+      case "Kehadiran":
         return (
           <div className="min-h-screen">
             <SiadilHeader />
             <div className="p-4 text-black">
-              <h1 className="text-2xl font-bold">Kehadiran, Koreksi, Cuti, dan Dinas</h1>
-              <p className="mt-2">Halaman Kehadiran, Koreksi, Cuti, dan Dinas</p>
+              <h1 className="text-2xl font-bold">
+                Kehadiran, Koreksi, Cuti, dan Dinas
+              </h1>
+              <p className="mt-2">
+                Halaman Kehadiran, Koreksi, Cuti, dan Dinas
+              </p>
             </div>
           </div>
         );
@@ -56,9 +60,7 @@ const MainLayout = ({ children }: MainLayoutProps) => {
   return (
     <div className="flex min-h-screen bg-white">
       <Sidebar activeMenu={activeMenu} onMenuChange={setActiveMenu} />
-      <main className="flex-1">
-        {renderContent()}
-      </main>
+      <main className="flex-1">{renderContent()}</main>
     </div>
   );
 };
