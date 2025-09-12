@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 // import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import "./transitions.css";
 import { Poppins } from "next/font/google";
 
 const poppins = Poppins({
@@ -30,12 +31,23 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body
-        className={`${poppins.variable} antialiased`}
-      >
-        {children}
-      </body>
+    <html lang="en" className="font-loading">
+      <head>
+        <style
+          dangerouslySetInnerHTML={{
+            __html: `
+            /* Prevent FOUC */
+            html, body { 
+              margin: 0; 
+              padding: 0; 
+              background-color: white; 
+              font-family: system-ui, -apple-system, sans-serif;
+            }
+          `,
+          }}
+        />
+      </head>
+      <body className={`${poppins.variable} antialiased`}>{children}</body>
     </html>
   );
 }

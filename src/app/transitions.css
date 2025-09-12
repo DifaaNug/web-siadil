@@ -1,0 +1,145 @@
+/* Prevent layout shift saat refresh */
+.dashboard-container {
+  min-height: 100vh;
+  display: flex;
+  background-color: white;
+}
+
+.sidebar-container {
+  width: 240px; /* Default width */
+  min-width: 240px;
+  flex-shrink: 0;
+  background-color: white;
+  border-right: 1px solid #f3f4f6;
+  transition: width 0.3s ease-in-out, min-width 0.3s ease-in-out;
+}
+
+.sidebar-container.collapsed {
+  width: 80px;
+  min-width: 80px;
+}
+
+.main-content {
+  flex: 1;
+  min-width: 0; /* Prevent flex overflow */
+  transition: margin-left 0.3s ease-in-out;
+}
+
+/* Skeleton untuk sidebar saat loading */
+.sidebar-skeleton {
+  padding: 1rem;
+}
+
+.skeleton-logo {
+  width: 150px;
+  height: 150px;
+  background-color: #f3f4f6;
+  border-radius: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.skeleton-user {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.skeleton-avatar {
+  width: 40px;
+  height: 40px;
+  background-color: #f3f4f6;
+  border-radius: 50%;
+  margin-right: 0.75rem;
+}
+
+.skeleton-text {
+  height: 12px;
+  background-color: #f3f4f6;
+  border-radius: 0.25rem;
+  margin-bottom: 0.5rem;
+}
+
+.skeleton-text.name {
+  width: 100px;
+}
+
+.skeleton-text.id {
+  width: 60px;
+}
+
+.skeleton-menu {
+  height: 36px;
+  background-color: #f3f4f6;
+  border-radius: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+/* Prevent flash of unstyled content */
+html {
+  background-color: white;
+}
+
+body {
+  background-color: white;
+  margin: 0;
+  padding: 0;
+}
+
+/* Font loading optimization */
+.font-loading {
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+/* Smooth transitions only after load */
+.loaded * {
+  transition: all 0.2s ease-in-out;
+}
+
+/* Page Transition Animations */
+.page-enter {
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+.page-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 300ms ease-in-out, transform 300ms ease-in-out;
+}
+
+.page-exit {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.page-exit-active {
+  opacity: 0;
+  transform: translateY(-10px);
+  transition: opacity 200ms ease-in-out, transform 200ms ease-in-out;
+}
+
+/* Smooth loading overlay */
+.loading-overlay {
+  backdrop-filter: blur(4px);
+  animation: fadeIn 200ms ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Content transition */
+.content-transition {
+  transition: all 300ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.content-loading {
+  opacity: 0.6;
+  transform: scale(0.98);
+  filter: blur(1px);
+}
