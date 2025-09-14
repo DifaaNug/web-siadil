@@ -1,73 +1,30 @@
+// src/app/dashboard/layout.tsx
+
 "use client";
 
-import { ReactNode, useState, useEffect } from "react";
-import { usePathname, useRouter } from "next/navigation";
+import { useState } from "react";
 import Sidebar from "@/components/Sidebar";
+import SiadilHeader from "@/components/SiadilHeader";
 
-interface DashboardLayoutProps {
-  children: ReactNode;
-}
-
-export default function DashboardLayout({ children }: DashboardLayoutProps) {
-  const pathname = usePathname();
-  const router = useRouter();
-  const [isLoaded, setIsLoaded] = useState(false);
+export default function DashboardLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 
-  // Function untuk mendapatkan active menu berdasarkan pathname
-  const getActiveMenuFromPath = (path: string) => {
-    if (path === "/dashboard") return "Home";
-    if (path === "/dashboard/profile") return "Profile";
-    if (path === "/dashboard/employment") return "Employment";
-    if (path === "/dashboard/kehadiran") return "Kehadiran";
-    if (path === "/dashboard/siadil") return "SIADIL";
-    return "Home";
-  };
-
-  const [activeMenu, setActiveMenu] = useState(() =>
-    getActiveMenuFromPath(pathname)
-  );
-
-  // Update active menu saat pathname berubah
-  useEffect(() => {
-    const newActiveMenu = getActiveMenuFromPath(pathname);
-    setActiveMenu(newActiveMenu);
-  }, [pathname]);
-
-  // Set loaded state untuk enable smooth transitions
-  useEffect(() => {
-    const timer = setTimeout(() => setIsLoaded(true), 100);
-    return () => clearTimeout(timer);
-  }, []);
-
-  const handleMenuChange = (menu: string) => {
-    const routes: { [key: string]: string } = {
-      Home: "/dashboard",
-      Profile: "/dashboard/profile",
-      Employment: "/dashboard/employment",
-      Kehadiran: "/dashboard/kehadiran",
-      SIADIL: "/dashboard/siadil",
-    };
-
-    if (routes[menu] && routes[menu] !== pathname) {
-      setActiveMenu(menu);
-      router.push(routes[menu]);
-    }
-  };
-
   return (
-    <div className={`dashboard-container ${isLoaded ? "loaded" : ""}`}>
+    <div className="flex h-screen bg-white overflow-hidden">
       <div
-        className={`sidebar-container ${
-          isSidebarCollapsed ? "collapsed" : ""
+        className={`sticky top-0 h-full transition-all duration-300 shrink-0 ${
+          isSidebarCollapsed ? "w-20" : "w-60"
         }`}>
-        <Sidebar
-          activeMenu={activeMenu}
-          onMenuChange={handleMenuChange}
-          onCollapseChange={setIsSidebarCollapsed}
-        />
+        <Sidebar onCollapseChange={setIsSidebarCollapsed} />
       </div>
-      <main className="main-content">{children}</main>
+      <main className="flex-1 flex flex-col min-w-0">
+        <SiadilHeader />
+        <div className="p-6 flex-1 overflow-y-auto">{children}</div>
+      </main>
     </div>
   );
 }
