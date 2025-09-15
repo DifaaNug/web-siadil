@@ -2,9 +2,42 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Ganti blok .custom-scrollbar yang lama dengan yang ini */
+
+/* Default state: scrollbar transparan */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: transparent;
+  border-radius: 10px;
+  transition: background-color 0.3s ease-in-out; /* Animasi halus saat muncul/hilang */
+}
+
+/* State saat scrolling: scrollbar muncul */
+.custom-scrollbar.scrolling::-webkit-scrollbar-thumb {
+  background-color: #a1a1aa;
+}
+
+/* Pengaturan untuk Firefox */
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+}
+
+.custom-scrollbar.scrolling {
+  scrollbar-color: #a1a1aa transparent;
+}
+
 @layer utilities {
   @keyframes custom-pulse {
-    0%, 100% {
+    0%,
+    100% {
       opacity: 1;
       transform: scale(1);
     }
@@ -42,8 +75,13 @@
 }
 
 @keyframes blink {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0; }
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
 }
 
 .blink {
@@ -72,5 +110,5 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: 'Poppins', Arial, Helvetica, sans-serif;
+  font-family: "Poppins", Arial, Helvetica, sans-serif;
 }
