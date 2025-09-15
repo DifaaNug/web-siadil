@@ -12,7 +12,7 @@ import {
 import ReactDOM from "react-dom";
 import Breadcrumb from "@/components/Breadcrumb";
 
-// Tipe data
+// Tipe data (tidak ada perubahan)
 type Contributor = { name: string; role: string };
 type Archive = { id: string; name: string; code: string; parentId: string };
 type Document = {
@@ -51,7 +51,7 @@ type NewDocumentData = {
   file: File | null;
 };
 
-// Data Dummy (tidak berubah)
+// Data Dummy (tidak ada perubahan)
 const allArchives: Archive[] = [
   {
     id: "tik",
@@ -153,6 +153,7 @@ const reminders = [
   },
 ];
 
+// Hooks & Komponen utilitas (tidak ada perubahan)
 function useOnClickOutside(
   ref: React.RefObject<HTMLElement | null>,
   handler: (event: MouseEvent | TouchEvent) => void,
@@ -255,9 +256,8 @@ const ArchiveCard = ({
     onClick={onClick}
     className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-5 transition-all duration-200 ease-in-out hover:shadow-lg hover:-translate-y-1 cursor-pointer flex items-center min-h-[110px]">
     <div className="flex items-center space-x-4">
-      <div
-        className="w-10 h-10 rounded-lg flex items-center justify-center"
-        style={{ backgroundColor: "#01793B" }}>
+      {/* PERBAIKAN 3: Mengganti inline style dengan Tailwind class */}
+      <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-green-600">
         <svg
           className="w-5 h-5 text-white"
           width="24"
@@ -303,10 +303,8 @@ type FilterPopoverProps = {
   expireFilterMethod: "range" | "period";
   setExpireFilterMethod: (method: "range" | "period") => void;
 };
-// GANTI KOMPONEN FilterPopover LAMA DENGAN INI
 
 // GANTI SELURUH KOMPONEN FilterPopover LAMA DENGAN INI
-
 const FilterPopover = forwardRef<HTMLDivElement, FilterPopoverProps>(
   (
     {
@@ -327,17 +325,21 @@ const FilterPopover = forwardRef<HTMLDivElement, FilterPopoverProps>(
       "text-gray-500 dark:text-gray-400 border-b-2 border-transparent hover:border-gray-300 dark:hover:border-gray-600 hover:text-gray-700 dark:hover:text-gray-200";
 
     return (
+      // PERBAIKAN 1: Menggunakan class max-h-[85vh] dan menghapus inline style
       <div
         ref={ref}
-        className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl w-full max-w-md flex flex-col"
-        style={{ maxHeight: "85vh" }}>
+        className="flex w-full max-w-md flex-col rounded-lg border border-gray-200 bg-white shadow-xl dark:border-gray-700 dark:bg-gray-800 max-h-[85vh]">
+        {/* === HEADER (Tetap) === */}
         <div className="p-5 border-b border-gray-200 dark:border-gray-700">
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
             Filter Dokumen
           </h3>
         </div>
-        <div className="flex-grow overflow-y-auto min-h-0">
-          <div className="p-5 space-y-8">
+
+        {/* === BODY (Dibuat Scrollable) === */}
+        {/* PERBAIKAN 2: Wrapper ini dibuat overflow-y-auto agar hanya kontennya yang scroll */}
+        <div className="overflow-y-auto p-5">
+          <div className="space-y-8">
             <div className="space-y-5">
               <div>
                 <label
@@ -345,7 +347,6 @@ const FilterPopover = forwardRef<HTMLDivElement, FilterPopoverProps>(
                   className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
                   Pencarian Utama
                 </label>
-                {/* PERBAIKAN: Menambahkan px-3 py-2 */}
                 <input
                   type="text"
                   id="keyword"
@@ -362,7 +363,6 @@ const FilterPopover = forwardRef<HTMLDivElement, FilterPopoverProps>(
                   className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
                   Arsip
                 </label>
-                {/* PERBAIKAN: Menambahkan px-3 py-2 */}
                 <select
                   id="archive-filter"
                   name="archive"
@@ -393,7 +393,6 @@ const FilterPopover = forwardRef<HTMLDivElement, FilterPopoverProps>(
                   Tanggal Dokumen
                 </label>
                 <div className="flex items-center gap-3">
-                  {/* PERBAIKAN: Menambahkan px-3 py-2 */}
                   <input
                     type="date"
                     name="docDateStart"
@@ -402,7 +401,6 @@ const FilterPopover = forwardRef<HTMLDivElement, FilterPopoverProps>(
                     className="w-full text-sm border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 rounded-md focus:ring-green-500 focus:border-green-500 text-gray-900 dark:text-gray-200 px-3 py-2"
                   />
                   <span className="text-gray-500 text-sm">to</span>
-                  {/* PERBAIKAN: Menambahkan px-3 py-2 */}
                   <input
                     type="date"
                     name="docDateEnd"
@@ -439,7 +437,6 @@ const FilterPopover = forwardRef<HTMLDivElement, FilterPopoverProps>(
                 <div>
                   {expireFilterMethod === "range" && (
                     <div className="flex items-center gap-3">
-                      {/* PERBAIKAN: Menambahkan px-3 py-2 */}
                       <input
                         type="date"
                         name="expireDateStart"
@@ -448,7 +445,6 @@ const FilterPopover = forwardRef<HTMLDivElement, FilterPopoverProps>(
                         className="w-full text-sm border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 rounded-md focus:ring-green-500 focus:border-green-500 text-gray-900 dark:text-gray-200 px-3 py-2"
                       />
                       <span className="text-gray-500 text-sm">to</span>
-                      {/* PERBAIKAN: Menambahkan px-3 py-2 */}
                       <input
                         type="date"
                         name="expireDateEnd"
@@ -485,6 +481,7 @@ const FilterPopover = forwardRef<HTMLDivElement, FilterPopoverProps>(
           </div>
         </div>
 
+        {/* === FOOTER (Tetap) === */}
         <div className="flex-shrink-0 p-4 bg-gray-50 dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 flex justify-end items-center space-x-3">
           <button
             onClick={onReset}
@@ -493,8 +490,7 @@ const FilterPopover = forwardRef<HTMLDivElement, FilterPopoverProps>(
           </button>
           <button
             onClick={onApply}
-            className="px-4 py-2 text-sm font-semibold rounded-lg text-white transition-opacity hover:opacity-90"
-            style={{ backgroundColor: "#01793B" }}>
+            className="px-4 py-2 text-sm font-semibold rounded-lg text-white transition-colors bg-green-600 hover:bg-green-700">
             Apply Filters
           </button>
         </div>
@@ -893,10 +889,8 @@ const FolderIcon = () => (
   </svg>
 );
 
-// GANTI SELURUH KOMPONEN AddDocumentModal LAMA DENGAN INI
-
+// --- PERBAIKAN 1: Menerapkan solusi scroll pada AddDocumentModal ---
 type AddDocumentModalProps = {
-  isOpen: boolean;
   onClose: () => void;
   onSave: () => void;
   newDocument: NewDocumentData;
@@ -907,15 +901,12 @@ type AddDocumentModalProps = {
 };
 
 const AddDocumentModal = ({
-  isOpen,
   onClose,
   onSave,
   newDocument,
   setNewDocument,
   archives,
 }: AddDocumentModalProps) => {
-  if (!isOpen) return null;
-
   const handleInputChange = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
@@ -933,21 +924,23 @@ const AddDocumentModal = ({
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 transition-opacity duration-300">
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-3xl">
-        <div className="flex items-start justify-between p-5 border-b border-gray-200 dark:border-gray-700 rounded-t-lg">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4 transition-opacity duration-300">
+      {/* Tambahkan max-h-[90vh] untuk membatasi tinggi modal */}
+      <div className="flex w-full max-w-xl flex-col rounded-lg bg-white shadow-xl dark:bg-gray-800 max-h-[90vh]">
+        {/* === HEADER === */}
+        <div className="flex items-start justify-between rounded-t-lg border-b border-gray-200 p-5 dark:border-gray-700">
           <div>
             <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
               Add New Document
             </h3>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
               Add new document here. Click save when youre done.
             </p>
           </div>
           <button
             onClick={onClose}
-            className="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-gray-600 dark:hover:text-white">
-            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+            className="ml-auto inline-flex items-center rounded-lg bg-transparent p-1.5 text-sm text-gray-400 hover:bg-gray-200 hover:text-gray-900 dark:hover:bg-gray-600 dark:hover:text-white">
+            <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
               <path
                 fillRule="evenodd"
                 d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
@@ -957,21 +950,23 @@ const AddDocumentModal = ({
           </button>
         </div>
 
-        <div className="p-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-6">
-            <div className="relative">
+        {/* === BODY === */}
+        {/* Tambahkan overflow-y-auto agar bagian ini bisa di-scroll */}
+        <div className="overflow-y-auto p-5">
+          <div className="grid grid-cols-1 gap-x-6 gap-y-5 md:grid-cols-2">
+            {/* --- Archive --- */}
+            <div className="relative md:col-span-2">
               <label
                 htmlFor="archive"
-                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
                 Archive
               </label>
-              {/* PERBAIKAN: Menambahkan px-3 py-2 */}
               <select
                 name="archive"
                 id="archive"
                 value={newDocument.archive}
                 onChange={handleInputChange}
-                className="w-full text-sm border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 rounded-md focus:ring-green-500 focus:border-green-500 text-gray-900 dark:text-gray-200 appearance-none pr-8 px-3 py-2">
+                className="w-full appearance-none rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:border-green-500 focus:ring-green-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200">
                 <option value="" disabled>
                   Select Archive
                 </option>
@@ -981,9 +976,9 @@ const AddDocumentModal = ({
                   </option>
                 ))}
               </select>
-              <div className="pointer-events-none absolute inset-y-0 right-0 top-6 flex items-center px-2 text-gray-700 dark:text-gray-400">
+              <div className="pointer-events-none absolute inset-y-0 right-0 top-7 flex items-center px-2 text-gray-700 dark:text-gray-400">
                 <svg
-                  className="fill-current h-4 w-4"
+                  className="h-4 w-4 fill-current"
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 20 20">
                   <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
@@ -991,13 +986,13 @@ const AddDocumentModal = ({
               </div>
             </div>
 
-            <div>
+            {/* --- Number --- */}
+            <div className="md:col-span-2">
               <label
                 htmlFor="number"
-                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
                 Number
               </label>
-              {/* PERBAIKAN: Menambahkan px-3 py-2 */}
               <input
                 type="text"
                 name="number"
@@ -1005,20 +1000,20 @@ const AddDocumentModal = ({
                 value={newDocument.number}
                 onChange={handleInputChange}
                 placeholder="Enter Number"
-                className="w-full text-sm border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 rounded-md focus:ring-green-500 focus:border-green-500 text-gray-900 dark:text-gray-200 px-3 py-2"
+                className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:border-green-500 focus:ring-green-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200"
               />
               <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
                 Seperti nomor Memo/PR/PO/dsb.
               </p>
             </div>
 
+            {/* --- Title --- */}
             <div className="md:col-span-2">
               <label
                 htmlFor="title"
-                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
                 Title
               </label>
-              {/* PERBAIKAN: Menambahkan px-3 py-2 */}
               <input
                 type="text"
                 name="title"
@@ -1026,20 +1021,20 @@ const AddDocumentModal = ({
                 value={newDocument.title}
                 onChange={handleInputChange}
                 placeholder="Enter Title"
-                className="w-full text-sm border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 rounded-md focus:ring-green-500 focus:border-green-500 text-gray-900 dark:text-gray-200 px-3 py-2"
+                className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:border-green-500 focus:ring-green-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200"
               />
               <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
                 Judul dokumen
               </p>
             </div>
 
+            {/* --- Description --- */}
             <div className="md:col-span-2">
               <label
                 htmlFor="description"
-                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
                 Description
               </label>
-              {/* PERBAIKAN: Menambahkan px-3 py-2 */}
               <textarea
                 name="description"
                 id="description"
@@ -1047,99 +1042,136 @@ const AddDocumentModal = ({
                 value={newDocument.description}
                 onChange={handleInputChange}
                 placeholder="Enter Description"
-                className="w-full text-sm border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 rounded-md focus:ring-green-500 focus:border-green-500 text-gray-900 dark:text-gray-200 px-3 py-2"
+                className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:border-green-500 focus:ring-green-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200"
               />
               <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
                 Deskripsikan dokumen secara singkat
               </p>
             </div>
 
+            {/* --- Document Date --- */}
             <div>
               <label
                 htmlFor="documentDate"
-                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
                 Document Date
               </label>
-              {/* PERBAIKAN: Menambahkan px-3 py-2 */}
               <input
                 type="date"
                 name="documentDate"
                 id="documentDate"
                 value={newDocument.documentDate}
                 onChange={handleInputChange}
-                className="w-full text-sm border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 rounded-md focus:ring-green-500 focus:border-green-500 text-gray-900 dark:text-gray-200 px-3 py-2"
+                className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:border-green-500 focus:ring-green-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200"
               />
               <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
                 Tanggal dokumen
               </p>
             </div>
 
+            {/* --- Expire Date --- */}
             <div>
               <label
                 htmlFor="expireDate"
-                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
                 Document Expire Date
               </label>
-              {/* PERBAIKAN: Menambahkan px-3 py-2 */}
               <input
                 type="date"
                 name="expireDate"
                 id="expireDate"
                 value={newDocument.expireDate}
                 onChange={handleInputChange}
-                className="w-full text-sm border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 rounded-md focus:ring-green-500 focus:border-green-500 text-gray-900 dark:text-gray-200 px-3 py-2"
+                className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:border-green-500 focus:ring-green-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200"
               />
               <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
                 Tanggal akhir dokumen berlaku
               </p>
             </div>
 
+            {/* --- File Input --- */}
             <div className="md:col-span-2">
               <label
-                htmlFor="file"
-                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                htmlFor="file-upload"
+                className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
                 File
               </label>
-              <input
-                type="file"
-                name="file"
-                id="file"
-                onChange={handleInputChange}
-                className="w-full text-sm text-gray-900 dark:text-gray-200 border border-gray-300 dark:border-gray-600 rounded-lg cursor-pointer bg-gray-50 dark:bg-gray-700 focus:outline-none"
-              />
+              <div className="mt-1 flex justify-center rounded-lg border-2 border-dashed border-gray-300 px-6 pb-6 pt-5 dark:border-gray-600">
+                <div className="text-center">
+                  <svg
+                    className="mx-auto h-12 w-12 text-gray-400"
+                    stroke="currentColor"
+                    fill="none"
+                    viewBox="0 0 48 48"
+                    aria-hidden="true">
+                    <path
+                      d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                  <div className="mt-4 flex text-sm text-gray-600 dark:text-gray-400">
+                    <label
+                      htmlFor="file"
+                      className="relative cursor-pointer rounded-md bg-white font-medium text-green-600 focus-within:outline-none focus-within:ring-2 focus-within:ring-green-500 focus-within:ring-offset-2 hover:text-green-500 dark:bg-gray-800">
+                      <span>Upload a file</span>
+                      <input
+                        id="file"
+                        name="file"
+                        type="file"
+                        onChange={handleInputChange}
+                        className="sr-only"
+                      />
+                    </label>
+                    <p className="pl-1">or drag and drop</p>
+                  </div>
+                  {newDocument.file ? (
+                    <p className="mt-2 text-sm font-semibold text-green-700 dark:text-green-400">
+                      {newDocument.file.name}
+                    </p>
+                  ) : (
+                    <p className="text-xs text-gray-500">
+                      PNG, JPG, PDF up to 10MB
+                    </p>
+                  )}
+                </div>
+              </div>
             </div>
           </div>
         </div>
 
-        <div className="flex items-center justify-end p-4 bg-gray-50 dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 rounded-b-lg space-x-2">
+        {/* === FOOTER === */}
+        <div className="flex items-center justify-end space-x-2 rounded-b-lg border-t border-gray-200 bg-gray-50 p-5 dark:border-gray-700 dark:bg-gray-800">
           <button
             onClick={onClose}
-            className="px-4 py-2 text-sm font-semibold border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600">
+            className="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-semibold text-gray-800 hover:bg-gray-100 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600">
             Cancel
           </button>
           <button
             onClick={onSave}
-            className="px-4 py-2 text-sm font-semibold rounded-lg text-white flex items-center gap-2"
-            style={{ backgroundColor: "#01793B" }}>
+            className="flex items-center gap-2 rounded-lg bg-green-600 px-4 py-2 text-sm font-semibold text-white hover:bg-green-700">
             <svg
-              className="w-4 h-4"
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-4 w-4"
               fill="none"
+              viewBox="0 0 24 24"
               stroke="currentColor"
-              viewBox="0 0 24 24">
+              strokeWidth={2}>
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                strokeWidth={2}
                 d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V3"
               />
             </svg>
-            Save
+            Save Document
           </button>
         </div>
       </div>
     </div>
   );
 };
+
 export default function SiadilPage() {
   const [isSearchPopupOpen, setIsSearchPopupOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -1399,9 +1431,8 @@ export default function SiadilPage() {
           <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
             Archives
           </h2>
-          <button
-            className="text-white px-3 py-1.5 rounded-md text-sm font-medium flex items-center space-x-1.5 transition-colors hover:opacity-90"
-            style={{ backgroundColor: "#01793B" }}>
+          {/* PERBAIKAN 3: Mengganti inline style dengan Tailwind class */}
+          <button className="text-white px-3 py-1.5 rounded-md text-sm font-medium flex items-center space-x-1.5 transition-colors bg-green-600 hover:bg-green-700">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
               <path
                 d="M12 5V19M5 12H19"
@@ -1455,10 +1486,10 @@ export default function SiadilPage() {
               </svg>
               <span>Search Document</span>
             </button>
+            {/* PERBAIKAN 3: Mengganti inline style dengan Tailwind class */}
             <button
               onClick={() => setIsAddModalOpen(true)}
-              className="text-white px-3 py-1.5 rounded-md text-sm font-medium flex items-center space-x-1.5 transition-colors hover:opacity-90"
-              style={{ backgroundColor: "#01793B" }}>
+              className="text-white px-3 py-1.5 rounded-md text-sm font-medium flex items-center space-x-1.5 transition-colors bg-green-600 hover:bg-green-700">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
                 <path
                   d="M12 5V19M5 12H19"
@@ -1645,14 +1676,17 @@ export default function SiadilPage() {
           </div>
         </div>
       )}
-      <AddDocumentModal
-        isOpen={isAddModalOpen}
-        onClose={() => setIsAddModalOpen(false)}
-        onSave={handleSaveDocument}
-        newDocument={newDocument}
-        setNewDocument={setNewDocument}
-        archives={allArchives}
-      />
+
+      {/* PERBAIKAN 2: Hanya render modal jika isAddModalOpen adalah true */}
+      {isAddModalOpen && (
+        <AddDocumentModal
+          onClose={() => setIsAddModalOpen(false)}
+          onSave={handleSaveDocument}
+          newDocument={newDocument}
+          setNewDocument={setNewDocument}
+          archives={allArchives}
+        />
+      )}
     </>
   );
 }
