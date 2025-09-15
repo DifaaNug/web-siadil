@@ -1,8 +1,6 @@
-// src/app/dashboard/layout.tsx
-
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import Sidebar from "@/components/Sidebar";
 import SiadilHeader from "@/components/SiadilHeader";
 
@@ -12,6 +10,39 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+
+  // logika pendeteksi scroll
+  const [isScrolling, setIsScrolling] = useState(false);
+  const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const contentRef = useRef<HTMLDivElement>(null); // Ref untuk div konten
+
+  useEffect(() => {
+    const contentElement = contentRef.current;
+
+    const handleScroll = () => {
+      setIsScrolling(true);
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current);
+      }
+      scrollTimeoutRef.current = setTimeout(() => {
+        setIsScrolling(false);
+      }, 1000); // Scrollbar akan hilang setelah 1 detik tidak scroll
+    };
+
+    if (contentElement) {
+      contentElement.addEventListener("scroll", handleScroll);
+    }
+
+    // Cleanup function
+    return () => {
+      if (contentElement) {
+        contentElement.removeEventListener("scroll", handleScroll);
+      }
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current);
+      }
+    };
+  }, []); // [] berarti efek ini hanya berjalan sekali
 
   return (
     <div className="flex h-screen bg-white overflow-hidden">
@@ -23,7 +54,14 @@ export default function DashboardLayout({
       </div>
       <main className="flex-1 flex flex-col min-w-0">
         <SiadilHeader />
-        <div className="p-6 flex-1 overflow-y-auto">{children}</div>
+        {/* 3. Terapkan 'ref' dan kelas-kelasnya di sini */}
+        <div
+          ref={contentRef}
+          className={`p-6 flex-1 overflow-y-auto custom-scrollbar ${
+            isScrolling ? "scrolling" : ""
+          }`}>
+          {children}
+        </div>
       </main>
     </div>
   );
