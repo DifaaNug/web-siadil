@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react"; // Import hooks
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -15,200 +15,299 @@ const Sidebar = ({ onCollapseChange }: SidebarProps) => {
   const [showArrow, setShowArrow] = useState(false);
   const pathname = usePathname();
 
+  // --- LOGIKA BARU UNTUK DETEKSI SCROLL ---
+  const [isScrolling, setIsScrolling] = useState(false);
+  const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const sidebarRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const sidebarElement = sidebarRef.current;
+
+    const handleScroll = () => {
+      setIsScrolling(true);
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current);
+      }
+      scrollTimeoutRef.current = setTimeout(() => {
+        setIsScrolling(false);
+      }, 1000); // Scrollbar akan hilang setelah 1 detik tidak scroll
+    };
+
+    if (sidebarElement) {
+      sidebarElement.addEventListener("scroll", handleScroll);
+    }
+
+    // Cleanup function
+    return () => {
+      if (sidebarElement) {
+        sidebarElement.removeEventListener("scroll", handleScroll);
+      }
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current);
+      }
+    };
+  }, []); // [] berarti efek ini hanya berjalan sekali saat komponen mount
+
   const handleCollapseToggle = () => {
     const newCollapsed = !isCollapsed;
     setIsCollapsed(newCollapsed);
     onCollapseChange?.(newCollapsed);
   };
 
+  // --- STRUKTUR JSX BARU ---
   return (
+    // 1. Div Pembungkus Baru dengan 'relative'
     <div
-      className={`min-h-screen border-r bg-white transition-all duration-300 relative ${
-        isCollapsed ? "w-20" : "w-60"
-      }`}
+      className="relative h-screen"
       onMouseEnter={() => setShowArrow(true)}
       onMouseLeave={() => setShowArrow(false)}>
-      {/* Bagian Logo & Profile (Tidak ada perubahan) */}
-      <div className="px-3 py-4 relative">
-        <div
-          className={`flex ${
-            isCollapsed ? "justify-center items-center" : "flex-col"
-          } space-y-2`}>
-          <Image
-            src="/logo-demplon.png"
-            alt="Demplon Logo"
-            width={isCollapsed ? 60 : 150}
-            height={isCollapsed ? 60 : 150}
-            className="rounded transition-all duration-300"
-            priority
-          />
-        </div>
-        {/* Tombol Toggle Arrow - PERUBAHAN DI SINI */}
-        {showArrow && (
-          <button
-            onClick={handleCollapseToggle}
-            // --- Perubahan Rounded Corner (rounded-lg -> rounded-md) ---
-            className="absolute -right-2.5 top-5 bg-white border border-gray-200 rounded-md p-0.5 transition-all duration-200 z-10 flex items-center justify-center" // rounded-md
-          >
-            <svg
-              className={` w-4 h-4 text-gray-800 transition-transform duration-200  ${
-                isCollapsed ? "rotate-180" : ""
-              }`}
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 19l-7-7m0 0l7-7m-7 7h13"
-              />
-            </svg>
-          </button>
-        )}
-      </div>
+      {/* 2. Div Sidebar Lama, sekarang hanya fokus pada layout & scroll */}
       <div
-        className={`${
-          isCollapsed ? "px-2" : "px-4"
-        } py-3 transition-all duration-300`}>
-        <div
-          className={`flex items-center ${
-            isCollapsed ? "justify-center" : "space-x-3"
-          }`}>
-          <div className="w-10 h-10 bg-red-500 rounded-full flex items-center justify-center shrink-0">
-            <span className="text-white font-semibold text-sm">DF</span>
-          </div>
-          {!isCollapsed && (
-            <div className="opacity-100 transition-opacity duration-300">
-              <div className="font-medium text-gray-900 text-sm">
-                Difa Nugraha
-              </div>
-              <div className="text-xs text-gray-600">10122059</div>
+        ref={sidebarRef} // ref untuk event listener
+        className={`custom-scrollbar max-h-screen overflow-y-auto overflow-x-hidden border-r bg-white transition-all duration-300 ${
+          isCollapsed ? "w-20" : "w-60"
+        } ${isScrolling ? "scrolling" : ""}`} // Tambah kelas 'scrolling'
+      >
+        <div className="w-full">
+          {/* Bagian Logo */}
+          <div className="px-3 py-4 relative">
+            <div
+              className={`flex ${
+                isCollapsed ? "justify-center items-center" : "flex-col"
+              } space-y-2`}>
+              <Image
+                src="/logo-demplon.png"
+                alt="Demplon Logo"
+                width={isCollapsed ? 60 : 150}
+                height={isCollapsed ? 60 : 150}
+                className="rounded transition-all duration-300"
+                priority
+              />
             </div>
-          )}
+          </div>
+
+          {/* Bagian Profile */}
+          <div
+            className={`${
+              isCollapsed ? "px-2" : "px-4"
+            } py-3 transition-all duration-300`}>
+            <div
+              className={`flex items-center ${
+                isCollapsed ? "justify-center" : "space-x-3"
+              }`}>
+              <div className="w-10 h-10 bg-red-500 rounded-full flex items-center justify-center shrink-0">
+                <span className="text-white font-semibold text-sm">DF</span>
+              </div>
+              {!isCollapsed && (
+                <div className="opacity-100 transition-opacity duration-300">
+                  <div className="font-medium text-gray-900 text-sm">
+                    Difa Nugraha
+                  </div>
+                  <div className="text-xs text-gray-600">10122059</div>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Navigation Menu (TIDAK ADA PERUBAHAN DI DALAM <nav>) */}
+          <nav
+            className={`${
+              isCollapsed ? "px-2" : "px-4"
+            } py-4 transition-all duration-300`}>
+            {/* ... semua kode menu Anda ... */}
+            {/* GENERALS Section */}
+            <div>
+              <div className="h-8 flex items-center">
+                <div
+                  className={`text-xs font-semibold text-gray-500 uppercase tracking-wider px-2 transition-opacity duration-200 ${
+                    isCollapsed ? "opacity-0" : "opacity-100"
+                  }`}>
+                  GENERALS
+                </div>
+              </div>
+              <ul className="space-y-1">
+                <MenuItemLink
+                  href="/dashboard"
+                  currentPath={pathname}
+                  isCollapsed={isCollapsed}
+                  icon={<HomeIcon isCollapsed={isCollapsed} />}>
+                  Home
+                </MenuItemLink>
+                <MenuItemLink
+                  href="/dashboard/profile"
+                  currentPath={pathname}
+                  isCollapsed={isCollapsed}
+                  icon={<ProfileIcon isCollapsed={isCollapsed} />}>
+                  Profile
+                </MenuItemLink>
+                <MenuItemLink
+                  href="/dashboard/employment"
+                  currentPath={pathname}
+                  isCollapsed={isCollapsed}
+                  icon={<EmploymentIcon isCollapsed={isCollapsed} />}>
+                  Employment
+                </MenuItemLink>
+                <MenuItemLink
+                  href="/dashboard/kehadiran"
+                  currentPath={pathname}
+                  isCollapsed={isCollapsed}
+                  icon={<ClockIcon isCollapsed={isCollapsed} />}
+                  title="Kehadiran, Koreksi, Cuti, dan Dinas">
+                  Kehadiran, Koreksi, Cuti, dan Dinas
+                </MenuItemLink>
+              </ul>
+            </div>
+
+            {/* MAIN MENU Section */}
+            <div className="mt-4">
+              <div className="h-8 flex items-center">
+                <div
+                  className={`text-xs font-semibold text-gray-500 uppercase tracking-wider px-2 transition-opacity duration-200 ${
+                    isCollapsed ? "opacity-0" : "opacity-100"
+                  }`}>
+                  MAIN MENU
+                </div>
+              </div>
+              <ul className="space-y-1">
+                <MenuItemLink
+                  href="/dashboard/portal"
+                  currentPath={pathname}
+                  isCollapsed={isCollapsed}
+                  icon={<PackageIcon isCollapsed={isCollapsed} />}>
+                  Portal Aplikasi
+                </MenuItemLink>
+                <MenuItemLink
+                  href="/dashboard/kujang-ai"
+                  currentPath={pathname}
+                  isCollapsed={isCollapsed}
+                  icon={<SparklesIcon isCollapsed={isCollapsed} />}>
+                  Kujang Ai
+                </MenuItemLink>
+                <MenuItemLink
+                  href="/dashboard/library"
+                  currentPath={pathname}
+                  isCollapsed={isCollapsed}
+                  icon={<LibraryIcon isCollapsed={isCollapsed} />}>
+                  Library
+                </MenuItemLink>
+                <MenuItemLink
+                  href="/dashboard/shortlink"
+                  currentPath={pathname}
+                  isCollapsed={isCollapsed}
+                  icon={<LinkIcon isCollapsed={isCollapsed} />}>
+                  Shortlink
+                </MenuItemLink>
+              </ul>
+            </div>
+
+            {/* APPS & FEATURE Section */}
+            <div className="mt-4">
+              <div className="h-8 flex items-center">
+                <div
+                  className={`text-xs font-semibold text-gray-500 uppercase tracking-wider px-2 transition-opacity duration-200 ${
+                    isCollapsed ? "opacity-0" : "opacity-100"
+                  }`}>
+                  APPS & FEATURE
+                </div>
+              </div>
+              <ul className="space-y-1">
+                <MenuItemLink
+                  href="/dashboard/e-prosedure"
+                  currentPath={pathname}
+                  isCollapsed={isCollapsed}
+                  icon={<EprosedureIcon isCollapsed={isCollapsed} />}>
+                  E-Prosedure
+                </MenuItemLink>
+                <MenuItemLink
+                  href="/dashboard/employe-directory"
+                  currentPath={pathname}
+                  isCollapsed={isCollapsed}
+                  icon={<EmployeDictoryIcon isCollapsed={isCollapsed} />}>
+                  Employee Directory
+                </MenuItemLink>
+                <MenuItemLink
+                  href="/dashboard/siadil"
+                  currentPath={pathname}
+                  isCollapsed={isCollapsed}
+                  icon={<FileIcon isCollapsed={isCollapsed} />}>
+                  SIADIL
+                </MenuItemLink>
+                <MenuItemLink
+                  href="/dashboard/test1"
+                  currentPath={pathname}
+                  isCollapsed={isCollapsed}
+                  icon={<SystikIccon isCollapsed={isCollapsed} />}>
+                  SYSTIK
+                </MenuItemLink>
+                <MenuItemLink
+                  href="/dashboard/test2"
+                  currentPath={pathname}
+                  isCollapsed={isCollapsed}
+                  icon={<KonsumsiIcon isCollapsed={isCollapsed} />}>
+                  Konsumsi
+                </MenuItemLink>
+                <MenuItemLink
+                  href="/dashboard/test3"
+                  currentPath={pathname}
+                  isCollapsed={isCollapsed}
+                  icon={<DokumenkuIcon isCollapsed={isCollapsed} />}>
+                  DokumenKu
+                </MenuItemLink>
+                <MenuItemLink
+                  href="/dashboard/test4"
+                  currentPath={pathname}
+                  isCollapsed={isCollapsed}
+                  icon={<MystatementIcon isCollapsed={isCollapsed} />}>
+                  Mystatement
+                </MenuItemLink>
+                <MenuItemLink
+                  href="/dashboard/test5"
+                  currentPath={pathname}
+                  isCollapsed={isCollapsed}
+                  icon={<WorkAreaIcon isCollapsed={isCollapsed} />}>
+                  Work Area
+                </MenuItemLink>
+                <MenuItemLink
+                  href="/dashboard/test6"
+                  currentPath={pathname}
+                  isCollapsed={isCollapsed}
+                  icon={<PeraturanPerundanganIcon isCollapsed={isCollapsed} />}>
+                  Peraturan Perundangan
+                </MenuItemLink>
+              </ul>
+            </div>
+          </nav>
         </div>
       </div>
 
-      {/* Navigation Menu */}
-      <nav
-        className={`${
-          isCollapsed ? "px-2" : "px-4"
-        } py-4 transition-all duration-300`}>
-        {/* --- PERUBAHAN STRUKTUR UTAMA ADA DI SINI --- */}
-
-        {/* GENERALS Section */}
-        <div>
-          {/* Judul ini sekarang punya tinggi tetap (h-8) */}
-          <div className="h-8 flex items-center">
-            <div
-              className={`text-xs font-semibold text-gray-500 uppercase tracking-wider px-2 transition-opacity duration-200 ${
-                isCollapsed ? "opacity-0" : "opacity-100"
-              }`}>
-              GENERALS
-            </div>
-          </div>
-          <ul className="space-y-1">
-            <MenuItemLink
-              href="/dashboard"
-              currentPath={pathname}
-              isCollapsed={isCollapsed}
-              icon={<HomeIcon isCollapsed={isCollapsed} />}>
-              Home
-            </MenuItemLink>
-            <MenuItemLink
-              href="/dashboard/profile"
-              currentPath={pathname}
-              isCollapsed={isCollapsed}
-              icon={<ProfileIcon isCollapsed={isCollapsed} />}>
-              Profile
-            </MenuItemLink>
-            <MenuItemLink
-              href="/dashboard/employment"
-              currentPath={pathname}
-              isCollapsed={isCollapsed}
-              icon={<EmploymentIcon isCollapsed={isCollapsed} />}>
-              Employment
-            </MenuItemLink>
-            <MenuItemLink
-              href="/dashboard/kehadiran"
-              currentPath={pathname}
-              isCollapsed={isCollapsed}
-              icon={<ClockIcon isCollapsed={isCollapsed} />}
-              title="Kehadiran, Koreksi, Cuti, dan Dinas">
-              Kehadiran, Koreksi, Cuti, dan Dinas
-            </MenuItemLink>
-          </ul>
-        </div>
-
-        {/* MAIN MENU Section */}
-        <div className="mt-4">
-          {" "}
-          {/* Menggunakan margin-top untuk jarak antar section */}
-          <div className="h-8 flex items-center">
-            <div
-              className={`text-xs font-semibold text-gray-500 uppercase tracking-wider px-2 transition-opacity duration-200 ${
-                isCollapsed ? "opacity-0" : "opacity-100"
-              }`}>
-              MAIN MENU
-            </div>
-          </div>
-          <ul className="space-y-1">
-            <MenuItemLink
-              href="/dashboard/portal"
-              currentPath={pathname}
-              isCollapsed={isCollapsed}
-              icon={<PackageIcon isCollapsed={isCollapsed} />}>
-              Portal Aplikasi
-            </MenuItemLink>
-            <MenuItemLink
-              href="/dashboard/kujang-ai"
-              currentPath={pathname}
-              isCollapsed={isCollapsed}
-              icon={<SparklesIcon isCollapsed={isCollapsed} />}>
-              Kujang Ai
-            </MenuItemLink>
-            <MenuItemLink
-              href="/dashboard/library"
-              currentPath={pathname}
-              isCollapsed={isCollapsed}
-              icon={<LibraryIcon isCollapsed={isCollapsed} />}>
-              Library
-            </MenuItemLink>
-            <MenuItemLink
-              href="/dashboard/shortlink"
-              currentPath={pathname}
-              isCollapsed={isCollapsed}
-              icon={<LinkIcon isCollapsed={isCollapsed} />}>
-              Shortlink
-            </MenuItemLink>
-          </ul>
-        </div>
-
-        {/* APPS & FEATURE Section */}
-        <div className="mt-4">
-          <div className="h-8 flex items-center">
-            <div
-              className={`text-xs font-semibold text-gray-500 uppercase tracking-wider px-2 transition-opacity duration-200 ${
-                isCollapsed ? "opacity-0" : "opacity-100"
-              }`}>
-              APPS & FEATURE
-            </div>
-          </div>
-          <ul className="space-y-1">
-            <MenuItemLink
-              href="/dashboard/siadil"
-              currentPath={pathname}
-              isCollapsed={isCollapsed}
-              icon={<FileIcon isCollapsed={isCollapsed} />}>
-              SIADIL
-            </MenuItemLink>
-          </ul>
-        </div>
-      </nav>
+      {/* 3. Tombol Panah, sekarang anak dari 'div' pembungkus */}
+      {showArrow && (
+        <button
+          onClick={handleCollapseToggle}
+          // Posisi diatur ulang sedikit agar pas
+          className={`absolute top-5 transition-all duration-300 z-30 bg-white border border-gray-200 rounded-md p-0.5 flex items-center justify-center
+            ${isCollapsed ? "left-[70px]" : "left-[230px]"}`}>
+          <svg
+            className={`w-4 h-4 text-gray-800 transition-transform duration-200 ${
+              isCollapsed ? "rotate-180" : ""
+            }`}
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24">
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M12 19l-7-7m0 0l7-7m-7 7h13"
+            />
+          </svg>
+        </button>
+      )}
     </div>
   );
 };
 
+// ... Sisa kode (MenuItemLink, Icon, dll.) tidak ada perubahan ...
 // Komponen Helper untuk membuat kode menu lebih bersih dan bisa dipakai ulang
 interface MenuItemLinkProps {
   href: string;
@@ -238,7 +337,6 @@ const MenuItemLink = ({
     <li>
       <Link
         href={href}
-        // --- PERUBAHAN UTAMA ADA DI BARIS INI ---
         className={`w-full flex items-center ${
           isCollapsed ? "justify-center px-2" : "justify-between" // Dinamis: center saat collapsed
         } py-2 transition-all duration-300 text-sm rounded-md ${
@@ -256,7 +354,7 @@ const MenuItemLink = ({
           }`}>
           {icon}
           {!isCollapsed && (
-            <span className="text-left opacity-100 transition-opacity duration-300">
+            <span className="text-left opacity-100 transition-opacity duration-300 whitespace-normal leading-snug">
               {children}
             </span>
           )}
@@ -301,7 +399,8 @@ const Icon = ({
 
 const HomeIcon = ({ isCollapsed }: { isCollapsed: boolean }) => (
   <Icon isCollapsed={isCollapsed}>
-    <path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+    <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+    <polyline points="9 22 9 12 15 12 15 22"></polyline>
   </Icon>
 );
 const ProfileIcon = ({ isCollapsed }: { isCollapsed: boolean }) => (
@@ -361,6 +460,22 @@ const LinkIcon = ({ isCollapsed }: { isCollapsed: boolean }) => (
     <line x1="8" x2="16" y1="12" y2="12"></line>
   </Icon>
 );
+
+const EprosedureIcon = ({ isCollapsed }: { isCollapsed: boolean }) => (
+  <Icon isCollapsed={isCollapsed}>
+    <path d="M15 6v12a3 3 0 1 0 3-3H6a3 3 0 1 0 3 3V6a3 3 0 1 0-3 3h12a3 3 0 1 0-3-3"></path>
+  </Icon>
+);
+
+const EmployeDictoryIcon = ({ isCollapsed }: { isCollapsed: boolean }) => (
+  <Icon isCollapsed={isCollapsed}>
+    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+    <circle cx="9" cy="7" r="4"></circle>
+    <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
+    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+  </Icon>
+);
+
 const FileIcon = ({ isCollapsed }: { isCollapsed: boolean }) => (
   <Icon isCollapsed={isCollapsed}>
     <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path>
@@ -368,6 +483,55 @@ const FileIcon = ({ isCollapsed }: { isCollapsed: boolean }) => (
     <line x1="16" x2="8" y1="13" y2="13"></line>
     <line x1="16" x2="8" y1="17" y2="17"></line>
     <line x1="10" x2="8" y1="9" y2="9"></line>
+  </Icon>
+);
+
+const SystikIccon = ({ isCollapsed }: { isCollapsed: boolean }) => (
+  <Icon isCollapsed={isCollapsed}>
+    <circle cx="12" cy="12" r="10"></circle>
+  </Icon>
+);
+
+const KonsumsiIcon = ({ isCollapsed }: { isCollapsed: boolean }) => (
+  <Icon isCollapsed={isCollapsed}>
+    <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+    <polyline points="2 17 12 22 22 17"></polyline>
+    <polyline points="2 12 12 17 22 12"></polyline>
+  </Icon>
+);
+
+const DokumenkuIcon = ({ isCollapsed }: { isCollapsed: boolean }) => (
+  <Icon isCollapsed={isCollapsed}>
+    <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path>
+    <polyline points="14 2 14 8 20 8"></polyline>
+  </Icon>
+);
+
+const MystatementIcon = ({ isCollapsed }: { isCollapsed: boolean }) => (
+  <Icon isCollapsed={isCollapsed}>
+    <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path>
+    <polyline points="14 2 14 8 20 8"></polyline>
+    <line x1="16" x2="8" y1="13" y2="13"></line>
+    <line x1="16" x2="8" y1="17" y2="17"></line>
+    <line x1="10" x2="8" y1="9" y2="9"></line>
+  </Icon>
+);
+
+const WorkAreaIcon = ({ isCollapsed }: { isCollapsed: boolean }) => (
+  <Icon isCollapsed={isCollapsed}>
+    <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path>
+    <circle cx="12" cy="10" r="3"></circle>
+  </Icon>
+);
+
+const PeraturanPerundanganIcon = ({
+  isCollapsed,
+}: {
+  isCollapsed: boolean;
+}) => (
+  <Icon isCollapsed={isCollapsed}>
+    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+    <path d="m9 12 2 2 4-4"></path>
   </Icon>
 );
 
