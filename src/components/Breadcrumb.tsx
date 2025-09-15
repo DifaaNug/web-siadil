@@ -35,7 +35,7 @@ const Breadcrumb: React.FC<BreadcrumbProps> = ({ items }) => {
               ) : (
                 // Tampilkan sebagai teks biasa jika INI item terakhir (halaman aktif)
                 <span
-                  className="flex items-center space-x-1.5 rounded-md border border-gray-300 bg-gray-100 px-2 py-1 text-sm font-semibold text-gray-800 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                  className="flex items-center space-x-1.5 text-sm font-semibold text-gray-800 dark:text-gray-200"
                   aria-current="page">
                   {item.icon && (
                     <span className="flex-shrink-0">{item.icon}</span>
