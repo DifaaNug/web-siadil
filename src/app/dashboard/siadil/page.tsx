@@ -7,6 +7,7 @@ import {
   ReactNode,
   useRef,
   useEffect,
+  forwardRef,
 } from "react";
 import ReactDOM from "react-dom";
 import Breadcrumb from "@/components/Breadcrumb";
@@ -35,9 +36,22 @@ type Filters = {
   archive: string;
   docDateStart: string;
   docDateEnd: string;
+  expireDateStart: string;
+  expireDateEnd: string;
+  expireIn: string[];
 };
 
-// Data Dummy untuk arsip
+type NewDocumentData = {
+  number: string;
+  title: string;
+  description: string;
+  documentDate: string;
+  archive: string;
+  expireDate: string;
+  file: File | null;
+};
+
+// Data Dummy (tidak berubah)
 const allArchives: Archive[] = [
   {
     id: "tik",
@@ -62,8 +76,6 @@ const allArchives: Archive[] = [
     parentId: "tik",
   },
 ];
-
-// Dummy function untuk generate data dokumen
 const generateDummyData = (count: number): Document[] => {
   const generatedDocs: Document[] = [];
   const sampleTitles = [
@@ -130,9 +142,7 @@ const generateDummyData = (count: number): Document[] => {
   }
   return generatedDocs;
 };
-
 const allDocuments: Document[] = generateDummyData(100);
-console.log("1. Total Dokumen yang Dibuat:", allDocuments.length, allDocuments);
 const reminders = [
   {
     id: "ssl-1",
@@ -143,58 +153,95 @@ const reminders = [
   },
 ];
 
-// Helper Component untuk toggle view mode
+function useOnClickOutside(
+  ref: React.RefObject<HTMLElement | null>,
+  handler: (event: MouseEvent | TouchEvent) => void,
+  buttonRef?: React.RefObject<HTMLElement | null>
+) {
+  useEffect(() => {
+    const listener = (event: MouseEvent | TouchEvent) => {
+      if (
+        !ref.current ||
+        ref.current.contains(event.target as Node) ||
+        (buttonRef?.current && buttonRef.current.contains(event.target as Node))
+      ) {
+        return;
+      }
+      handler(event);
+    };
+    document.addEventListener("mousedown", listener);
+    document.addEventListener("touchstart", listener);
+    return () => {
+      document.removeEventListener("mousedown", listener);
+      document.removeEventListener("touchstart", listener);
+    };
+  }, [ref, handler, buttonRef]);
+}
 const ViewModeToggle = ({
   viewMode,
   setViewMode,
 }: {
   viewMode: "list" | "grid";
   setViewMode: (mode: "list" | "grid") => void;
-}) => (
-  <div className="flex items-center bg-gray-100 dark:bg-gray-700 rounded-lg p-0.5">
-    <button
-      onClick={() => setViewMode("list")}
-      className={`px-3 py-1 text-sm rounded-md transition-colors ${
-        viewMode === "list"
-          ? "bg-white dark:bg-gray-800 shadow-sm text-gray-900 dark:text-white font-semibold"
-          : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
-      }`}>
-      <svg
-        className="w-5 h-5"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor">
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M4 6h16M4 10h16M4 14h16M4 18h16"
-        />
-      </svg>
-    </button>
-    <button
-      onClick={() => setViewMode("grid")}
-      className={`px-3 py-1 text-sm rounded-md transition-colors ${
-        viewMode === "grid"
-          ? "bg-white dark:bg-gray-800 shadow-sm text-gray-900 dark:text-white font-semibold"
-          : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
-      }`}>
-      <svg
-        className="w-5 h-5"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor">
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"
-        />
-      </svg>
-    </button>
-  </div>
-);
+}) => {
+  const CheckmarkIcon = () => (
+    <svg
+      className="w-4 h-4 mr-1 flex-shrink-0"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+      strokeWidth={2.5}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+    </svg>
+  );
 
+  return (
+    <div className="flex items-center bg-gray-100 dark:bg-gray-700 rounded-lg p-0.5">
+      <button
+        onClick={() => setViewMode("list")}
+        className={`flex items-center justify-center px-3 py-1 text-sm rounded-md transition-colors ${
+          viewMode === "list"
+            ? "bg-white dark:bg-gray-900 shadow-sm text-gray-800 dark:text-white font-semibold"
+            : "text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-white"
+        }`}>
+        {viewMode === "list" && <CheckmarkIcon />}
+        <svg
+          className="w-5 h-5 flex-shrink-0"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor">
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M4 6h16M4 10h16M4 14h16M4 18h16"
+          />
+        </svg>
+      </button>
+      <button
+        onClick={() => setViewMode("grid")}
+        className={`flex items-center justify-center px-3 py-1 text-sm rounded-md transition-colors ${
+          viewMode === "grid"
+            ? "bg-white dark:bg-gray-900 shadow-sm text-gray-800 dark:text-white font-semibold"
+            : "text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-white"
+        }`}>
+        {viewMode === "grid" && <CheckmarkIcon />}
+        <svg
+          className="w-5 h-5 flex-shrink-0"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor">
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"
+          />
+        </svg>
+      </button>
+    </div>
+  );
+};
 const ArchiveCard = ({
   archive,
   docCount,
@@ -206,17 +253,17 @@ const ArchiveCard = ({
 }) => (
   <div
     onClick={onClick}
-    className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-5 hover:shadow-md transition-shadow cursor-pointer">
-    <div className="flex items-center space-x-3">
+    className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-5 transition-all duration-200 ease-in-out hover:shadow-lg hover:-translate-y-1 cursor-pointer flex items-center min-h-[110px]">
+    <div className="flex items-center space-x-4">
       <div
         className="w-10 h-10 rounded-lg flex items-center justify-center"
         style={{ backgroundColor: "#01793B" }}>
         <svg
-          width="20"
-          height="20"
+          className="w-5 h-5 text-white"
+          width="24"
+          height="24"
           viewBox="0 0 24 24"
-          fill="none"
-          style={{ color: "#ffffff" }}>
+          fill="none">
           <path
             d="M3 7V17C3 18.1046 3.89543 19 5 19H19C20.1046 19 21 18.1046 21 17V9C21 7.89543 20.1046 7 19 7H9L7 5H5C3.89543 5 3 5.89543 3 7Z"
             stroke="currentColor"
@@ -236,6 +283,226 @@ const ArchiveCard = ({
     </div>
   </div>
 );
+const expireInOptions = [
+  { id: "1w", label: "In 1 Week" },
+  { id: "2w", label: "In 2 Weeks" },
+  { id: "1m", label: "In 1 Month" },
+  { id: "3m", label: "In 3 Months" },
+  { id: "6m", label: "In 6 Months" },
+  { id: "expired", label: "Already Expired" },
+];
+type FilterPopoverProps = {
+  filters: Filters;
+  archives: Archive[];
+  onFilterChange: (
+    e: ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => void;
+  onCheckboxChange: (e: ChangeEvent<HTMLInputElement>) => void;
+  onReset: () => void;
+  onApply: () => void;
+  expireFilterMethod: "range" | "period";
+  setExpireFilterMethod: (method: "range" | "period") => void;
+};
+// GANTI KOMPONEN FilterPopover LAMA DENGAN INI
+
+// GANTI SELURUH KOMPONEN FilterPopover LAMA DENGAN INI
+
+const FilterPopover = forwardRef<HTMLDivElement, FilterPopoverProps>(
+  (
+    {
+      filters,
+      archives,
+      onFilterChange,
+      onCheckboxChange,
+      onReset,
+      onApply,
+      expireFilterMethod,
+      setExpireFilterMethod,
+    },
+    ref
+  ) => {
+    const activeTabClass =
+      "text-green-600 dark:text-green-400 border-b-2 border-green-600";
+    const inactiveTabClass =
+      "text-gray-500 dark:text-gray-400 border-b-2 border-transparent hover:border-gray-300 dark:hover:border-gray-600 hover:text-gray-700 dark:hover:text-gray-200";
+
+    return (
+      <div
+        ref={ref}
+        className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl w-full max-w-md flex flex-col"
+        style={{ maxHeight: "85vh" }}>
+        <div className="p-5 border-b border-gray-200 dark:border-gray-700">
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+            Filter Dokumen
+          </h3>
+        </div>
+        <div className="flex-grow overflow-y-auto min-h-0">
+          <div className="p-5 space-y-8">
+            <div className="space-y-5">
+              <div>
+                <label
+                  htmlFor="keyword"
+                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                  Pencarian Utama
+                </label>
+                {/* PERBAIKAN: Menambahkan px-3 py-2 */}
+                <input
+                  type="text"
+                  id="keyword"
+                  name="keyword"
+                  value={filters.keyword}
+                  onChange={onFilterChange}
+                  placeholder="Cari berdasarkan nomor, judul..."
+                  className="w-full text-sm border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 rounded-md focus:ring-green-500 focus:border-green-500 text-gray-900 dark:text-gray-200 placeholder-gray-500 dark:placeholder-gray-400 px-3 py-2"
+                />
+              </div>
+              <div className="relative">
+                <label
+                  htmlFor="archive-filter"
+                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                  Arsip
+                </label>
+                {/* PERBAIKAN: Menambahkan px-3 py-2 */}
+                <select
+                  id="archive-filter"
+                  name="archive"
+                  value={filters.archive}
+                  onChange={onFilterChange}
+                  className="w-full text-sm border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 rounded-md focus:ring-green-500 focus:border-green-500 text-gray-900 dark:text-gray-200 appearance-none pr-8 px-3 py-2">
+                  <option value="All">Semua Arsip</option>
+                  {archives.map((a) => (
+                    <option key={a.code} value={a.code}>
+                      {a.name}
+                    </option>
+                  ))}
+                </select>
+                <div className="pointer-events-none absolute inset-y-0 right-0 top-7 flex items-center px-2 text-gray-700 dark:text-gray-400">
+                  <svg
+                    className="fill-current h-4 w-4"
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 20 20">
+                    <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
+                  </svg>
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-5">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                  Tanggal Dokumen
+                </label>
+                <div className="flex items-center gap-3">
+                  {/* PERBAIKAN: Menambahkan px-3 py-2 */}
+                  <input
+                    type="date"
+                    name="docDateStart"
+                    value={filters.docDateStart}
+                    onChange={onFilterChange}
+                    className="w-full text-sm border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 rounded-md focus:ring-green-500 focus:border-green-500 text-gray-900 dark:text-gray-200 px-3 py-2"
+                  />
+                  <span className="text-gray-500 text-sm">to</span>
+                  {/* PERBAIKAN: Menambahkan px-3 py-2 */}
+                  <input
+                    type="date"
+                    name="docDateEnd"
+                    value={filters.docDateEnd}
+                    onChange={onFilterChange}
+                    className="w-full text-sm border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 rounded-md focus:ring-green-500 focus:border-green-500 text-gray-900 dark:text-gray-200 px-3 py-2"
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Tanggal Kedaluwarsa
+                </label>
+                <div className="flex border-b border-gray-200 dark:border-gray-700 mb-3">
+                  <button
+                    onClick={() => setExpireFilterMethod("range")}
+                    className={`w-1/2 pb-2 text-sm font-semibold transition-colors ${
+                      expireFilterMethod === "range"
+                        ? activeTabClass
+                        : inactiveTabClass
+                    }`}>
+                    By Date Range
+                  </button>
+                  <button
+                    onClick={() => setExpireFilterMethod("period")}
+                    className={`w-1/2 pb-2 text-sm font-semibold transition-colors ${
+                      expireFilterMethod === "period"
+                        ? activeTabClass
+                        : inactiveTabClass
+                    }`}>
+                    By Period
+                  </button>
+                </div>
+                <div>
+                  {expireFilterMethod === "range" && (
+                    <div className="flex items-center gap-3">
+                      {/* PERBAIKAN: Menambahkan px-3 py-2 */}
+                      <input
+                        type="date"
+                        name="expireDateStart"
+                        value={filters.expireDateStart}
+                        onChange={onFilterChange}
+                        className="w-full text-sm border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 rounded-md focus:ring-green-500 focus:border-green-500 text-gray-900 dark:text-gray-200 px-3 py-2"
+                      />
+                      <span className="text-gray-500 text-sm">to</span>
+                      {/* PERBAIKAN: Menambahkan px-3 py-2 */}
+                      <input
+                        type="date"
+                        name="expireDateEnd"
+                        value={filters.expireDateEnd}
+                        onChange={onFilterChange}
+                        className="w-full text-sm border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 rounded-md focus:ring-green-500 focus:border-green-500 text-gray-900 dark:text-gray-200 px-3 py-2"
+                      />
+                    </div>
+                  )}
+                  {expireFilterMethod === "period" && (
+                    <div className="space-y-2.5">
+                      {expireInOptions.map((option) => (
+                        <label
+                          key={option.id}
+                          className="flex items-center space-x-3 cursor-pointer">
+                          <input
+                            type="checkbox"
+                            name="expireIn"
+                            value={option.id}
+                            checked={filters.expireIn.includes(option.id)}
+                            onChange={onCheckboxChange}
+                            className="rounded text-green-600 focus:ring-green-500"
+                          />
+                          <span className="text-sm text-gray-700 dark:text-gray-300">
+                            {option.label}
+                          </span>
+                        </label>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="flex-shrink-0 p-4 bg-gray-50 dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 flex justify-end items-center space-x-3">
+          <button
+            onClick={onReset}
+            className="px-4 py-2 text-sm font-semibold border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors">
+            Reset
+          </button>
+          <button
+            onClick={onApply}
+            className="px-4 py-2 text-sm font-semibold rounded-lg text-white transition-opacity hover:opacity-90"
+            style={{ backgroundColor: "#01793B" }}>
+            Apply Filters
+          </button>
+        </div>
+      </div>
+    );
+  }
+);
+FilterPopover.displayName = "FilterPopover";
 
 type DocumentsContainerProps = {
   children: ReactNode;
@@ -244,142 +511,80 @@ type DocumentsContainerProps = {
   onFilterChange: (
     e: ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => void;
+  onCheckboxChange: (e: ChangeEvent<HTMLInputElement>) => void;
   onFilterReset: () => void;
+  expireFilterMethod: "range" | "period";
+  setExpireFilterMethod: (method: "range" | "period") => void;
   pagination: { totalRows: number; rowsPerPage: number; currentPage: number };
   onPageChange: (page: number) => void;
   onRowsPerPageChange: (value: number) => void;
 };
-
 const DocumentsContainer = ({
   children,
   archives,
   filters,
   onFilterChange,
+  onCheckboxChange,
   onFilterReset,
   pagination,
   onPageChange,
   onRowsPerPageChange,
+  expireFilterMethod,
+  setExpireFilterMethod,
 }: DocumentsContainerProps) => {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [isClient, setIsClient] = useState(false);
-
+  const popoverRef = useRef<HTMLDivElement>(null);
   const filterButtonRef = useRef<HTMLButtonElement>(null);
   const [popoverPosition, setPopoverPosition] = useState({ top: 0, left: 0 });
-
-  const { totalRows, rowsPerPage, currentPage } = pagination;
-  const totalPages = Math.ceil(totalRows / rowsPerPage);
 
   useEffect(() => {
     setIsClient(true);
   }, []);
 
-  const handleFilterToggle = () => {
-    if (filterButtonRef.current) {
-      const rect = filterButtonRef.current.getBoundingClientRect();
-      setPopoverPosition({
-        top: rect.bottom + window.scrollY + 8,
-        left: rect.left + window.scrollX,
-      });
-    }
-    setIsFilterOpen(!isFilterOpen);
-  };
+  useOnClickOutside(popoverRef, () => setIsFilterOpen(false), filterButtonRef);
 
-  const FilterPopover = (
-    <div
-      style={{
-        top: `${popoverPosition.top}px`,
-        left: `${popoverPosition.left}px`,
-      }}
-      className="fixed bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl z-50 w-full max-w-2xl">
-      <div className="p-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="md:col-span-2">
-          <label
-            htmlFor="keyword"
-            className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
-            Filter document...
-          </label>
-          <input
-            type="text"
-            id="keyword"
-            name="keyword"
-            value={filters.keyword}
-            onChange={onFilterChange}
-            placeholder="Search by number, title, description..."
-            className="w-full text-sm border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500"
-          />
-        </div>
-        <div>
-          <label
-            htmlFor="archive"
-            className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
-            Archive
-          </label>
-          <select
-            id="archive"
-            name="archive"
-            value={filters.archive}
-            onChange={onFilterChange}
-            // [FIX] Menambahkan warna teks
-            className="w-full text-sm border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
-            <option value="All">All Archives</option>
-            {archives.map((a) => (
-              <option key={a.code} value={a.code}>
-                {a.name}
-              </option>
-            ))}
-          </select>
-        </div>
-        <div></div>
-        <div>
-          <label
-            htmlFor="docDateStart"
-            className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
-            Document Date (from)
-          </label>
-          <input
-            type="date"
-            id="docDateStart"
-            name="docDateStart"
-            value={filters.docDateStart}
-            onChange={onFilterChange}
-            className="w-full text-sm border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-          />
-        </div>
-        <div>
-          <label
-            htmlFor="docDateEnd"
-            className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
-            Document Date (to)
-          </label>
-          <input
-            type="date"
-            id="docDateEnd"
-            name="docDateEnd"
-            value={filters.docDateEnd}
-            onChange={onFilterChange}
-            // [FIX] Menambahkan warna teks
-            className="w-full text-sm border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-          />
-        </div>
-      </div>
-      <div className="px-4 py-3 bg-gray-50 dark:bg-gray-700/50 border-t border-gray-200 dark:border-gray-700 flex justify-end space-x-2">
-        <button
-          onClick={() => {
-            onFilterReset();
-            setIsFilterOpen(false);
-          }}
-          className="px-3 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600">
-          Reset
-        </button>
-        <button
-          onClick={() => setIsFilterOpen(false)}
-          className="px-3 py-1 text-sm rounded-lg text-white hover:opacity-90"
-          style={{ backgroundColor: "#01793B" }}>
-          Apply
-        </button>
-      </div>
-    </div>
-  );
+  useEffect(() => {
+    if (isFilterOpen && filterButtonRef.current) {
+      const calculatePosition = () => {
+        if (!popoverRef.current || !filterButtonRef.current) return;
+
+        const buttonRect = filterButtonRef.current.getBoundingClientRect();
+        const popoverHeight = popoverRef.current.offsetHeight;
+        const spaceBelow = window.innerHeight - buttonRect.bottom;
+        const spaceAbove = buttonRect.top;
+        const margin = 8;
+        let top = 0;
+        const left = buttonRect.left;
+
+        if (spaceBelow > popoverHeight + margin) {
+          top = buttonRect.bottom + margin;
+        } else if (spaceAbove > popoverHeight + margin) {
+          top = buttonRect.top - popoverHeight - margin;
+        } else {
+          top = buttonRect.bottom + margin;
+        }
+
+        if (top < margin) {
+          top = margin;
+        }
+        if (top + popoverHeight > window.innerHeight - margin) {
+          top = window.innerHeight - popoverHeight - margin;
+        }
+        setPopoverPosition({ top, left });
+      };
+
+      const timer = setTimeout(calculatePosition, 0);
+
+      window.addEventListener("resize", calculatePosition);
+      return () => {
+        clearTimeout(timer);
+        window.removeEventListener("resize", calculatePosition);
+      };
+    }
+  }, [isFilterOpen]);
+
+  const handleFilterToggle = () => setIsFilterOpen(!isFilterOpen);
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
@@ -399,12 +604,37 @@ const DocumentsContainer = ({
           </svg>
           <span>Filter</span>
         </button>
-
-        {/* Logika Portal */}
         {isClient &&
           isFilterOpen &&
-          ReactDOM.createPortal(FilterPopover, document.body)}
-
+          ReactDOM.createPortal(
+            <div
+              style={{
+                position: "fixed",
+                top: `${popoverPosition.top}px`,
+                left: `${popoverPosition.left}px`,
+                zIndex: 50,
+                visibility: popoverPosition.top === 0 ? "hidden" : "visible",
+                display: "flex",
+                maxHeight: "85vh",
+                width: "448px",
+              }}>
+              <FilterPopover
+                ref={popoverRef}
+                filters={filters}
+                archives={archives}
+                onFilterChange={onFilterChange}
+                onCheckboxChange={onCheckboxChange}
+                onReset={() => {
+                  onFilterReset();
+                  setIsFilterOpen(false);
+                }}
+                onApply={() => setIsFilterOpen(false)}
+                expireFilterMethod={expireFilterMethod}
+                setExpireFilterMethod={setExpireFilterMethod}
+              />
+            </div>,
+            document.body
+          )}
         <div className="flex items-center gap-2">
           <button className="px-3 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 flex items-center space-x-2">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
@@ -432,20 +662,22 @@ const DocumentsContainer = ({
           </button>
         </div>
       </div>
-
       <div className="overflow-x-auto">{children}</div>
-
       <div className="px-4 py-3 bg-gray-50 dark:bg-gray-700 border-t border-gray-200 dark:border-gray-600 flex items-center justify-between flex-wrap gap-2">
         <div className="text-sm text-gray-700 dark:text-gray-300">
-          Showing {Math.min(rowsPerPage * currentPage, totalRows)} of{" "}
-          {totalRows} row(s).
+          Showing{" "}
+          {Math.min(
+            pagination.rowsPerPage * pagination.currentPage,
+            pagination.totalRows
+          )}{" "}
+          of {pagination.totalRows} row(s).
         </div>
         <div className="flex items-center space-x-2">
           <span className="text-sm text-gray-700 dark:text-gray-300">
             Rows per page
           </span>
           <select
-            value={rowsPerPage}
+            value={pagination.rowsPerPage}
             onChange={(e) => onRowsPerPageChange(Number(e.target.value))}
             className="border border-gray-300 dark:border-gray-600 rounded px-2 py-1 text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white">
             <option value={5}>5</option>
@@ -453,11 +685,14 @@ const DocumentsContainer = ({
             <option value={20}>20</option>
           </select>
           <span className="text-sm text-gray-700 dark:text-gray-300">
-            Page {currentPage} of {totalPages > 0 ? totalPages : 1}
+            Page {pagination.currentPage} of{" "}
+            {Math.ceil(pagination.totalRows / pagination.rowsPerPage) > 0
+              ? Math.ceil(pagination.totalRows / pagination.rowsPerPage)
+              : 1}
           </span>
           <button
-            onClick={() => onPageChange(currentPage - 1)}
-            disabled={currentPage === 1}
+            onClick={() => onPageChange(pagination.currentPage - 1)}
+            disabled={pagination.currentPage === 1}
             className="p-1 border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-50 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
               <path
@@ -470,8 +705,12 @@ const DocumentsContainer = ({
             </svg>
           </button>
           <button
-            onClick={() => onPageChange(currentPage + 1)}
-            disabled={currentPage === totalPages || totalPages === 0}
+            onClick={() => onPageChange(pagination.currentPage + 1)}
+            disabled={
+              pagination.currentPage ===
+                Math.ceil(pagination.totalRows / pagination.rowsPerPage) ||
+              pagination.totalRows === 0
+            }
             className="p-1 border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-50 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
               <path
@@ -488,8 +727,6 @@ const DocumentsContainer = ({
     </div>
   );
 };
-
-// Table Component
 const DocumentTable = ({ documents }: { documents: Document[] }) => {
   const formatDate = (dateString: string) =>
     new Date(dateString).toLocaleDateString("id-ID", {
@@ -645,7 +882,6 @@ const DocumentGrid = ({ documents }: { documents: Document[] }) => (
     ))}
   </div>
 );
-
 const FolderIcon = () => (
   <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
     <path
@@ -657,20 +893,281 @@ const FolderIcon = () => (
   </svg>
 );
 
-// Page Component
+// GANTI SELURUH KOMPONEN AddDocumentModal LAMA DENGAN INI
+
+type AddDocumentModalProps = {
+  isOpen: boolean;
+  onClose: () => void;
+  onSave: () => void;
+  newDocument: NewDocumentData;
+  setNewDocument: (
+    value: NewDocumentData | ((prevState: NewDocumentData) => NewDocumentData)
+  ) => void;
+  archives: Archive[];
+};
+
+const AddDocumentModal = ({
+  isOpen,
+  onClose,
+  onSave,
+  newDocument,
+  setNewDocument,
+  archives,
+}: AddDocumentModalProps) => {
+  if (!isOpen) return null;
+
+  const handleInputChange = (
+    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+  ) => {
+    const { name, value } = e.target;
+
+    if (e.target.type === "file") {
+      const files = (e.target as HTMLInputElement).files;
+      setNewDocument((prevDoc) => ({
+        ...prevDoc,
+        file: files ? files[0] : null,
+      }));
+    } else {
+      setNewDocument((prevDoc) => ({ ...prevDoc, [name]: value }));
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 transition-opacity duration-300">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-3xl">
+        <div className="flex items-start justify-between p-5 border-b border-gray-200 dark:border-gray-700 rounded-t-lg">
+          <div>
+            <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
+              Add New Document
+            </h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+              Add new document here. Click save when youre done.
+            </p>
+          </div>
+          <button
+            onClick={onClose}
+            className="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-gray-600 dark:hover:text-white">
+            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+              <path
+                fillRule="evenodd"
+                d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                clipRule="evenodd"
+              />
+            </svg>
+          </button>
+        </div>
+
+        <div className="p-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-6">
+            <div className="relative">
+              <label
+                htmlFor="archive"
+                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Archive
+              </label>
+              {/* PERBAIKAN: Menambahkan px-3 py-2 */}
+              <select
+                name="archive"
+                id="archive"
+                value={newDocument.archive}
+                onChange={handleInputChange}
+                className="w-full text-sm border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 rounded-md focus:ring-green-500 focus:border-green-500 text-gray-900 dark:text-gray-200 appearance-none pr-8 px-3 py-2">
+                <option value="" disabled>
+                  Select Archive
+                </option>
+                {archives.map((a) => (
+                  <option key={a.id} value={a.code}>
+                    {a.name}
+                  </option>
+                ))}
+              </select>
+              <div className="pointer-events-none absolute inset-y-0 right-0 top-6 flex items-center px-2 text-gray-700 dark:text-gray-400">
+                <svg
+                  className="fill-current h-4 w-4"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 20 20">
+                  <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
+                </svg>
+              </div>
+            </div>
+
+            <div>
+              <label
+                htmlFor="number"
+                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Number
+              </label>
+              {/* PERBAIKAN: Menambahkan px-3 py-2 */}
+              <input
+                type="text"
+                name="number"
+                id="number"
+                value={newDocument.number}
+                onChange={handleInputChange}
+                placeholder="Enter Number"
+                className="w-full text-sm border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 rounded-md focus:ring-green-500 focus:border-green-500 text-gray-900 dark:text-gray-200 px-3 py-2"
+              />
+              <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                Seperti nomor Memo/PR/PO/dsb.
+              </p>
+            </div>
+
+            <div className="md:col-span-2">
+              <label
+                htmlFor="title"
+                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Title
+              </label>
+              {/* PERBAIKAN: Menambahkan px-3 py-2 */}
+              <input
+                type="text"
+                name="title"
+                id="title"
+                value={newDocument.title}
+                onChange={handleInputChange}
+                placeholder="Enter Title"
+                className="w-full text-sm border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 rounded-md focus:ring-green-500 focus:border-green-500 text-gray-900 dark:text-gray-200 px-3 py-2"
+              />
+              <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                Judul dokumen
+              </p>
+            </div>
+
+            <div className="md:col-span-2">
+              <label
+                htmlFor="description"
+                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Description
+              </label>
+              {/* PERBAIKAN: Menambahkan px-3 py-2 */}
+              <textarea
+                name="description"
+                id="description"
+                rows={3}
+                value={newDocument.description}
+                onChange={handleInputChange}
+                placeholder="Enter Description"
+                className="w-full text-sm border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 rounded-md focus:ring-green-500 focus:border-green-500 text-gray-900 dark:text-gray-200 px-3 py-2"
+              />
+              <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                Deskripsikan dokumen secara singkat
+              </p>
+            </div>
+
+            <div>
+              <label
+                htmlFor="documentDate"
+                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Document Date
+              </label>
+              {/* PERBAIKAN: Menambahkan px-3 py-2 */}
+              <input
+                type="date"
+                name="documentDate"
+                id="documentDate"
+                value={newDocument.documentDate}
+                onChange={handleInputChange}
+                className="w-full text-sm border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 rounded-md focus:ring-green-500 focus:border-green-500 text-gray-900 dark:text-gray-200 px-3 py-2"
+              />
+              <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                Tanggal dokumen
+              </p>
+            </div>
+
+            <div>
+              <label
+                htmlFor="expireDate"
+                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Document Expire Date
+              </label>
+              {/* PERBAIKAN: Menambahkan px-3 py-2 */}
+              <input
+                type="date"
+                name="expireDate"
+                id="expireDate"
+                value={newDocument.expireDate}
+                onChange={handleInputChange}
+                className="w-full text-sm border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 rounded-md focus:ring-green-500 focus:border-green-500 text-gray-900 dark:text-gray-200 px-3 py-2"
+              />
+              <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                Tanggal akhir dokumen berlaku
+              </p>
+            </div>
+
+            <div className="md:col-span-2">
+              <label
+                htmlFor="file"
+                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                File
+              </label>
+              <input
+                type="file"
+                name="file"
+                id="file"
+                onChange={handleInputChange}
+                className="w-full text-sm text-gray-900 dark:text-gray-200 border border-gray-300 dark:border-gray-600 rounded-lg cursor-pointer bg-gray-50 dark:bg-gray-700 focus:outline-none"
+              />
+            </div>
+          </div>
+        </div>
+
+        <div className="flex items-center justify-end p-4 bg-gray-50 dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 rounded-b-lg space-x-2">
+          <button
+            onClick={onClose}
+            className="px-4 py-2 text-sm font-semibold border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600">
+            Cancel
+          </button>
+          <button
+            onClick={onSave}
+            className="px-4 py-2 text-sm font-semibold rounded-lg text-white flex items-center gap-2"
+            style={{ backgroundColor: "#01793B" }}>
+            <svg
+              className="w-4 h-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24">
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V3"
+              />
+            </svg>
+            Save
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
 export default function SiadilPage() {
   const [isSearchPopupOpen, setIsSearchPopupOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [viewMode, setViewMode] = useState<"list" | "grid">("list");
-
-  // State untuk melacak folder aktif
   const [currentFolderId, setCurrentFolderId] = useState("root");
+  const [expireFilterMethod, setExpireFilterMethod] = useState<
+    "range" | "period"
+  >("range");
+
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [newDocument, setNewDocument] = useState<NewDocumentData>({
+    number: "",
+    title: "",
+    description: "",
+    documentDate: "",
+    archive: "",
+    expireDate: "",
+    file: null,
+  });
 
   const initialFilters: Filters = {
     keyword: "",
     archive: "All",
     docDateStart: "",
     docDateEnd: "",
+    expireDateStart: "",
+    expireDateEnd: "",
+    expireIn: [],
   };
   const [filters, setFilters] = useState(initialFilters);
   const [currentPage, setCurrentPage] = useState(1);
@@ -694,12 +1191,11 @@ export default function SiadilPage() {
 
     return path.map((item) => ({
       label: item.label,
-      icon: <FolderIcon />, // <-- BARIS INI DITAMBAHKAN
+      icon: <FolderIcon />,
       onClick: () => setCurrentFolderId(item.id),
     }));
   }, [currentFolderId]);
 
-  // Filter arsip & dokumen berdasarkan folder yang sedang aktif
   const displayedArchives = useMemo(
     () => allArchives.filter((a) => a.parentId === currentFolderId),
     [currentFolderId]
@@ -708,7 +1204,6 @@ export default function SiadilPage() {
     if (currentFolderId === "root") {
       return allDocuments;
     }
-    // Jika di dalam folder, jalankan logika seperti biasa
     return allDocuments.filter((d) => d.parentId === currentFolderId);
   }, [currentFolderId]);
 
@@ -720,13 +1215,25 @@ export default function SiadilPage() {
     setCurrentPage(1);
   };
 
+  const handleCheckboxChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const { value, checked } = e.target;
+    setFilters((prev) => {
+      const expireIn = prev.expireIn || [];
+      if (checked) {
+        return { ...prev, expireIn: [...expireIn, value] };
+      } else {
+        return { ...prev, expireIn: expireIn.filter((item) => item !== value) };
+      }
+    });
+    setCurrentPage(1);
+  };
+
   const filteredDocuments = useMemo(() => {
     return documentsInCurrentFolder.filter((doc) => {
       const keywordMatch =
         filters.keyword.toLowerCase() === "" ||
         doc.number.toLowerCase().includes(filters.keyword.toLowerCase()) ||
-        doc.title.toLowerCase().includes(filters.keyword.toLowerCase()) ||
-        doc.description.toLowerCase().includes(filters.keyword.toLowerCase());
+        doc.title.toLowerCase().includes(filters.keyword.toLowerCase());
       const archiveMatch =
         filters.archive === "All" || doc.archive === filters.archive;
       const docDateStartMatch =
@@ -735,8 +1242,34 @@ export default function SiadilPage() {
       const docDateEndMatch =
         filters.docDateEnd === "" ||
         new Date(doc.documentDate) <= new Date(filters.docDateEnd);
+      const expireDateStartMatch =
+        filters.expireDateStart === "" ||
+        new Date(doc.expireDate) >= new Date(filters.expireDateStart);
+      const expireDateEndMatch =
+        filters.expireDateEnd === "" ||
+        new Date(doc.expireDate) <= new Date(filters.expireDateEnd);
+      const expireInMatch =
+        filters.expireIn.length === 0 ||
+        filters.expireIn.some((period) => {
+          const now = new Date();
+          const expireDate = new Date(doc.expireDate);
+          if (period === "expired") return expireDate < now;
+          const targetDate = new Date();
+          if (period.endsWith("w")) {
+            targetDate.setDate(now.getDate() + parseInt(period) * 7);
+          } else if (period.endsWith("m")) {
+            targetDate.setMonth(now.getMonth() + parseInt(period));
+          }
+          return expireDate >= now && expireDate <= targetDate;
+        });
       return (
-        keywordMatch && archiveMatch && docDateStartMatch && docDateEndMatch
+        keywordMatch &&
+        archiveMatch &&
+        docDateStartMatch &&
+        docDateEndMatch &&
+        expireDateStartMatch &&
+        expireDateEndMatch &&
+        expireInMatch
       );
     });
   }, [documentsInCurrentFolder, filters]);
@@ -747,22 +1280,32 @@ export default function SiadilPage() {
   }, [filteredDocuments, currentPage, rowsPerPage]);
 
   const archiveDocCounts = useMemo(() => {
-    const counts = allDocuments.reduce((acc, doc) => {
+    return allDocuments.reduce((acc, doc) => {
       const archiveCode = doc.archive;
       acc[archiveCode] = (acc[archiveCode] || 0) + 1;
       return acc;
     }, {} as Record<string, number>);
-
-    console.log("2. Hasil Penghitungan Arsip:", counts); // <-- TAMBAHKAN INI
-
-    return counts;
   }, []);
 
-  console.log("3. Data Counts Sebelum Render:", archiveDocCounts);
+  const handleSaveDocument = () => {
+    console.log("Saving new document:", newDocument);
+    // Di sini Anda akan menambahkan logika untuk mengirim data ke API/backend
+
+    // Setelah berhasil, tutup modal dan reset form
+    setIsAddModalOpen(false);
+    setNewDocument({
+      number: "",
+      title: "",
+      description: "",
+      documentDate: "",
+      archive: "",
+      expireDate: "",
+      file: null,
+    });
+  };
 
   return (
     <>
-      {/* Header Section with Profile & Reminders */}
       <div className="mb-8">
         <div className="flex justify-between items-start">
           <div className="flex-1">
@@ -772,7 +1315,6 @@ export default function SiadilPage() {
             <p className="text-gray-600 dark:text-gray-300 mb-4">
               Sistem Arsip Digital
             </p>
-            {/* Breadcrumb sekarang dinamis */}
             <Breadcrumb items={breadcrumbItems} />
           </div>
           <div className="flex flex-col space-y-4 ml-6">
@@ -852,7 +1394,6 @@ export default function SiadilPage() {
         </div>
       </div>
 
-      {/* Archives Section Menampilkan folder aktif */}
       <div className="mb-8">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
@@ -872,12 +1413,18 @@ export default function SiadilPage() {
             <span>Create new archive</span>
           </button>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-[repeat(auto-fill,minmax(240px,1fr))] gap-6">
+          {displayedArchives.length === 0 && currentFolderId !== "root" && (
+            <div className="col-span-full text-center py-12">
+              <p className="text-gray-500 dark:text-gray-400">
+                Folder arsip ini kosong.
+              </p>
+            </div>
+          )}
           {displayedArchives.map((archive) => (
             <ArchiveCard
               key={archive.id}
               archive={archive}
-              // INI PERBAIKANNYA: Gunakan archive.code, bukan archive.id
               docCount={archiveDocCounts[archive.code] || 0}
               onClick={() => setCurrentFolderId(archive.id)}
             />
@@ -885,7 +1432,6 @@ export default function SiadilPage() {
         </div>
       </div>
 
-      {/* Documents Section */}
       <div>
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
           <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
@@ -910,6 +1456,7 @@ export default function SiadilPage() {
               <span>Search Document</span>
             </button>
             <button
+              onClick={() => setIsAddModalOpen(true)}
               className="text-white px-3 py-1.5 rounded-md text-sm font-medium flex items-center space-x-1.5 transition-colors hover:opacity-90"
               style={{ backgroundColor: "#01793B" }}>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
@@ -929,7 +1476,13 @@ export default function SiadilPage() {
           archives={allArchives}
           filters={filters}
           onFilterChange={handleFilterChange}
-          onFilterReset={() => setFilters(initialFilters)}
+          onCheckboxChange={handleCheckboxChange}
+          onFilterReset={() => {
+            setFilters(initialFilters);
+            setExpireFilterMethod("range");
+          }}
+          expireFilterMethod={expireFilterMethod}
+          setExpireFilterMethod={setExpireFilterMethod}
           pagination={{
             totalRows: filteredDocuments.length,
             rowsPerPage: rowsPerPage,
@@ -948,7 +1501,6 @@ export default function SiadilPage() {
         </DocumentsContainer>
       </div>
 
-      {/* Search Popup Modal */}
       {isSearchPopupOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-4xl">
@@ -1093,6 +1645,14 @@ export default function SiadilPage() {
           </div>
         </div>
       )}
+      <AddDocumentModal
+        isOpen={isAddModalOpen}
+        onClose={() => setIsAddModalOpen(false)}
+        onSave={handleSaveDocument}
+        newDocument={newDocument}
+        setNewDocument={setNewDocument}
+        archives={allArchives}
+      />
     </>
   );
 }
