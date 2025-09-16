@@ -55,6 +55,12 @@ type NewDocumentData = {
 // Data Dummy (tidak ada perubahan)
 const allArchives: Archive[] = [
   {
+    id: "personal-df",
+    name: "Personal",
+    code: "PERSONAL",
+    parentId: "root",
+  },
+  {
     id: "tik",
     name: "Teknologi, Informasi & Komunikasi",
     code: "TIK",
@@ -143,6 +149,51 @@ const generateDummyData = (count: number): Document[] => {
   }
   return generatedDocs;
 };
+
+// Di dalam file page.tsx
+
+const PersonalArchiveCard = ({
+  archive,
+  onClick,
+}: {
+  archive: Archive;
+  onClick: () => void;
+}) => (
+  <div
+    onClick={onClick}
+    className="relative overflow-hidden rounded-lg border dark:border-gray-700 p-5 transition-all duration-200 ease-in-out hover:shadow-lg hover:-translate-y-1 cursor-pointer flex items-center min-h-[110px] bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-800 border-l-4 border-demplon">
+    {/* PERBAIKAN 1: Jarak avatar ke teks dikurangi dari space-x-4 menjadi space-x-3 */}
+    <div className="flex items-center space-x-3 min-w-0">
+      <div className="w-10 h-10 bg-red-500 rounded-full flex items-center justify-center flex-shrink-0">
+        <span className="text-white font-semibold text-sm">DF</span>
+      </div>
+      <div className="min-w-0">
+        {/* PERBAIKAN 2: Judul dijadikan flex container untuk presisi ikon dan teks */}
+        <h3 className="flex items-center gap-1.5 font-semibold text-gray-900 dark:text-white text-sm truncate">
+          <svg
+            // Ukuran ikon sedikit disesuaikan untuk alignment yang lebih baik
+            className="h-3.5 w-3.5 text-gray-900 dark:text-gray-400 flex-shrink-0"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor">
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+            />
+          </svg>
+          <span>{archive.name}</span>
+        </h3>
+        {/* PERBAIKAN 3: Jarak antara judul dan NIP dikurangi dari mt-1 menjadi mt-0.5 */}
+        <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+          12231149
+        </p>
+      </div>
+    </div>
+  </div>
+);
 const allDocuments: Document[] = generateDummyData(100);
 const reminders = [
   {
@@ -259,7 +310,7 @@ const ArchiveCard = ({
     className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-5 transition-all duration-200 ease-in-out hover:shadow-lg hover:-translate-y-1 cursor-pointer flex items-center min-h-[110px] overflow-hidden
     ">
     <div className="flex items-center space-x-4 min-w-0">
-      <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-green-600 flex-shrink-0">
+      <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-demplon flex-shrink-0">
         <svg
           className="w-5 h-5 text-white"
           width="24"
@@ -493,7 +544,7 @@ const FilterPopover = forwardRef<HTMLDivElement, FilterPopoverProps>(
           </button>
           <button
             onClick={onApply}
-            className="px-4 py-2 text-sm font-semibold rounded-lg text-white transition-colors bg-green-600 hover:bg-green-700">
+            className="px-4 py-2 text-sm font-semibold rounded-lg text-white transition-colors bg-demplon hover:bg-green-700">
             Apply Filters
           </button>
         </div>
@@ -846,34 +897,41 @@ const DocumentTable = ({ documents }: { documents: Document[] }) => {
     </table>
   );
 };
+
+// Di dalam file page.tsx
+
 const DocumentGrid = ({ documents }: { documents: Document[] }) => (
-  <div className="p-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+  // PERUBAHAN: Padding disesuaikan agar lebih pas
+  <div className="p-5 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-5">
     {documents.map((doc) => (
       <div
         key={doc.id}
-        className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4 hover:shadow-md transition-shadow cursor-pointer">
-        <div className="flex items-center mb-3">
-          <div className="flex-shrink-0 w-8 h-8 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center mr-3">
+        className="group relative rounded-lg border border-gray-200 dark:border-gray-700 p-4 hover:shadow-md hover:border-brand dark:hover:border-brand transition-all cursor-pointer">
+        <div className="flex items-start mb-3">
+          {/* PERUBAHAN: Ikon diubah menjadi line-icon berwarna abu-abu */}
+          <div className="flex-shrink-0">
             <svg
-              className="w-4 h-4 text-blue-600 dark:text-blue-400"
+              className="w-8 h-8 text-gray-400 dark:text-gray-500 transition-colors group-hover:text-brand"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24">
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                strokeWidth={2}
+                strokeWidth="1.5"
                 d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
               />
             </svg>
           </div>
-          <p className="text-xs font-semibold text-gray-600 dark:text-gray-400">
-            {doc.number}
-          </p>
+          <div className="ml-3 min-w-0">
+            <p className="text-xs font-semibold text-gray-600 dark:text-gray-400 truncate">
+              {doc.number}
+            </p>
+            <h4 className="text-sm font-bold text-gray-900 dark:text-white truncate mt-1">
+              {doc.title}
+            </h4>
+          </div>
         </div>
-        <h4 className="text-sm font-bold text-gray-900 dark:text-white truncate mb-1">
-          {doc.title}
-        </h4>
         <p className="text-xs text-gray-500 dark:text-gray-400">
           Updated: {new Date(doc.updatedDate).toLocaleDateString("id-ID")}
         </p>
@@ -881,6 +939,7 @@ const DocumentGrid = ({ documents }: { documents: Document[] }) => (
     ))}
   </div>
 );
+
 const FolderIcon = () => (
   <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
     <path
@@ -1153,7 +1212,7 @@ const AddDocumentModal = ({
           </button>
           <button
             onClick={onSave}
-            className="flex items-center gap-2 rounded-lg bg-green-600 px-4 py-2 text-sm font-semibold text-white hover:bg-green-700">
+            className="flex items-center gap-2 rounded-lg bg-demplon px-4 py-2 text-sm font-semibold text-white hover:bg-green-700">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               className="h-4 w-4"
@@ -1381,32 +1440,36 @@ export default function SiadilPage() {
             <Breadcrumb items={breadcrumbItems} />
           </div>
           <div className="flex flex-col space-y-4 ml-6 w-[300px]">
-            <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
-              <div className="flex items-center space-x-3">
-                <div className="w-12 h-12 bg-red-500 rounded-full flex items-center justify-center flex-shrink-0">
-                  <span className="text-base font-bold text-white">DF</span>
-                </div>
-                <div className="flex flex-col">
-                  <div className="flex items-center space-x-1.5">
+            <div className="overflow-hidden rounded-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
+              <div className="p-5">
+                <div className="flex items-center">
+                  {/* PERUBAHAN: Ikon sekarang memiliki background */}
+                  <div className="flex-shrink-0 rounded-md bg-demplon dark:bg-green-800 p-3">
                     <svg
-                      className="h-4 w-4 text-gray-700 dark:text-gray-400"
+                      className="h-6 w-6 text-white dark:text-green-300"
                       fill="none"
                       viewBox="0 0 24 24"
-                      stroke="currentColor"
-                      stroke-width="2">
+                      stroke="currentColor">
                       <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
                       />
                     </svg>
-                    <p className="font-semibold text-gray-900 dark:text-white text-sm">
-                      Personal
-                    </p>
                   </div>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                    1990123
-                  </p>
+                  <div className="ml-4 w-0 flex-1">
+                    <dl>
+                      <dt className="truncate text-sm font-medium text-gray-500 dark:text-gray-400">
+                        Total Dokumen
+                      </dt>
+                      <dd>
+                        <div className="text-2xl font-bold text-gray-900 dark:text-white">
+                          {allDocuments.length}
+                        </div>
+                      </dd>
+                    </dl>
+                  </div>
                 </div>
               </div>
             </div>
@@ -1493,7 +1556,7 @@ export default function SiadilPage() {
             <button
               onClick={() => setIsCreateModalOpen(true)}
               // DISAMAKAN: padding, ukuran teks, dan tinggi
-              className="text-white px-3 py-1.5 rounded-md text-sm font-medium flex items-center space-x-1.5 transition-colors bg-green-600 hover:bg-green-700 flex-shrink-0">
+              className="text-white px-3 py-1.5 rounded-md text-sm font-medium flex items-center space-x-1.5 transition-colors bg-demplon hover:bg-green-700 flex-shrink-0">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
                 <path
                   d="M12 5V19M5 12H19"
@@ -1518,14 +1581,23 @@ export default function SiadilPage() {
               </p>
             </div>
           ) : (
-            paginatedArchives.map((archive) => (
-              <ArchiveCard
-                key={archive.id}
-                archive={archive}
-                docCount={archiveDocCounts[archive.code] || 0}
-                onClick={() => setCurrentFolderId(archive.id)}
-              />
-            ))
+            // MODIFIKASI LOGIKA MAPPING INI
+            paginatedArchives.map((archive) =>
+              archive.code === "PERSONAL" ? (
+                <PersonalArchiveCard
+                  key={archive.id}
+                  archive={archive}
+                  onClick={() => setCurrentFolderId(archive.id)}
+                />
+              ) : (
+                <ArchiveCard
+                  key={archive.id}
+                  archive={archive}
+                  docCount={archiveDocCounts[archive.code] || 0}
+                  onClick={() => setCurrentFolderId(archive.id)}
+                />
+              )
+            )
           )}
         </div>
 
@@ -1582,7 +1654,7 @@ export default function SiadilPage() {
             {/* PERBAIKAN 3: Mengganti inline style dengan Tailwind class */}
             <button
               onClick={() => setIsAddModalOpen(true)}
-              className="text-white px-3 py-1.5 rounded-md text-sm font-medium flex items-center space-x-1.5 transition-colors bg-green-600 hover:bg-green-700">
+              className="text-white px-3 py-1.5 rounded-md text-sm font-medium flex items-center space-x-1.5 transition-colors bg-demplon hover:bg-green-700">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
                 <path
                   d="M12 5V19M5 12H19"
