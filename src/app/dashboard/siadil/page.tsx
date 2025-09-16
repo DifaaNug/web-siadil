@@ -11,6 +11,7 @@ import {
 } from "react";
 import ReactDOM from "react-dom";
 import Breadcrumb from "@/components/Breadcrumb";
+import CreateArchiveModal from "@/components/CreateArchiveModal";
 
 // Tipe data (tidak ada perubahan)
 type Contributor = { name: string; role: string };
@@ -1174,12 +1175,17 @@ const AddDocumentModal = ({
 
 export default function SiadilPage() {
   const [isSearchPopupOpen, setIsSearchPopupOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [viewMode, setViewMode] = useState<"list" | "grid">("list");
+  const [viewMode, setViewMode] = useState<"list" | "grid">("grid");
   const [currentFolderId, setCurrentFolderId] = useState("root");
   const [expireFilterMethod, setExpireFilterMethod] = useState<
     "range" | "period"
   >("range");
+
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+
+  const [searchQuery, setSearchQuery] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const ITEMS_PER_PAGE = 10;
 
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [newDocument, setNewDocument] = useState<NewDocumentData>({
@@ -1202,7 +1208,6 @@ export default function SiadilPage() {
     expireIn: [],
   };
   const [filters, setFilters] = useState(initialFilters);
-  const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
   const breadcrumbItems = useMemo(() => {
@@ -1228,10 +1233,6 @@ export default function SiadilPage() {
     }));
   }, [currentFolderId]);
 
-  const displayedArchives = useMemo(
-    () => allArchives.filter((a) => a.parentId === currentFolderId),
-    [currentFolderId]
-  );
   const documentsInCurrentFolder = useMemo(() => {
     if (currentFolderId === "root") {
       return allDocuments;
@@ -1318,6 +1319,34 @@ export default function SiadilPage() {
       return acc;
     }, {} as Record<string, number>);
   }, []);
+
+  const filteredArchives = useMemo(() => {
+    const archivesInCurrentFolder = allArchives.filter(
+      (a) => a.parentId === currentFolderId
+    );
+    if (!searchQuery) {
+      return archivesInCurrentFolder;
+    }
+    return archivesInCurrentFolder.filter((archive) =>
+      archive.name.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }, [currentFolderId, searchQuery]);
+
+  const paginatedArchives = useMemo(() => {
+    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+    return filteredArchives.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+  }, [filteredArchives, currentPage]);
+
+  const totalPages = Math.ceil(filteredArchives.length / ITEMS_PER_PAGE);
+
+  // Fungsi untuk menyimpan arsip baru
+  const handleSaveArchive = (archiveData: {
+    name: string;
+    parentId: string;
+  }) => {
+    console.log("Saving new archive:", archiveData);
+    alert(`Arsip "${archiveData.name}" berhasil disimpan!`);
+  };
 
   const handleSaveDocument = () => {
     console.log("Saving new document:", newDocument);
@@ -1427,36 +1456,98 @@ export default function SiadilPage() {
           <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
             Archives
           </h2>
-          {/* PERBAIKAN 3: Mengganti inline style dengan Tailwind class */}
-          <button className="text-white px-3 py-1.5 rounded-md text-sm font-medium flex items-center space-x-1.5 transition-colors bg-green-600 hover:bg-green-700">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-              <path
-                d="M12 5V19M5 12H19"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
+
+          <div className="flex items-center gap-3">
+            {/* Search Bar */}
+            <div className="relative w-full max-w-xs hidden sm:block">
+              <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                <svg
+                  className="h-5 w-5 text-gray-400"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor">
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                  />
+                </svg>
+              </div>
+              <input
+                type="text"
+                placeholder="Cari arsip..."
+                value={searchQuery}
+                onChange={(e) => {
+                  setSearchQuery(e.target.value);
+                  setCurrentPage(1);
+                }}
+                // DISAMAKAN: padding dan ukuran teks
+                className="w-full rounded-md border border-gray-300 bg-white py-1.5 pl-10 pr-4 text-sm focus:border-green-500 focus:ring-green-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200"
               />
-            </svg>
-            <span>Create new archive</span>
-          </button>
+            </div>
+
+            {/* Tombol Create New Archive */}
+            <button
+              onClick={() => setIsCreateModalOpen(true)}
+              // DISAMAKAN: padding, ukuran teks, dan tinggi
+              className="text-white px-3 py-1.5 rounded-md text-sm font-medium flex items-center space-x-1.5 transition-colors bg-green-600 hover:bg-green-700 flex-shrink-0">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                <path
+                  d="M12 5V19M5 12H19"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                />
+              </svg>
+              <span>Create new archive</span>
+            </button>
+          </div>
         </div>
+
+        {/* Grid Arsip */}
         <div className="grid grid-cols-[repeat(auto-fill,minmax(240px,1fr))] gap-6">
-          {displayedArchives.length === 0 && currentFolderId !== "root" && (
+          {paginatedArchives.length === 0 ? (
             <div className="col-span-full text-center py-12">
               <p className="text-gray-500 dark:text-gray-400">
-                Folder arsip ini kosong.
+                {searchQuery
+                  ? "Arsip tidak ditemukan."
+                  : "Folder arsip ini kosong."}
               </p>
             </div>
+          ) : (
+            paginatedArchives.map((archive) => (
+              <ArchiveCard
+                key={archive.id}
+                archive={archive}
+                docCount={archiveDocCounts[archive.code] || 0}
+                onClick={() => setCurrentFolderId(archive.id)}
+              />
+            ))
           )}
-          {displayedArchives.map((archive) => (
-            <ArchiveCard
-              key={archive.id}
-              archive={archive}
-              docCount={archiveDocCounts[archive.code] || 0}
-              onClick={() => setCurrentFolderId(archive.id)}
-            />
-          ))}
         </div>
+
+        {/* Komponen Paginasi */}
+        {totalPages > 1 && (
+          <div className="mt-8 flex justify-center items-center space-x-2">
+            <button
+              onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+              disabled={currentPage === 1}
+              className="px-3 py-1 text-sm border border-gray-300 rounded-md disabled:opacity-50">
+              Previous
+            </button>
+            <span className="text-sm text-gray-700">
+              Page {currentPage} of {totalPages}
+            </span>
+            <button
+              onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+              disabled={currentPage === totalPages}
+              className="px-3 py-1 text-sm border border-gray-300 rounded-md disabled:opacity-50">
+              Next
+            </button>
+          </div>
+        )}
       </div>
 
       <div>
@@ -1683,6 +1774,13 @@ export default function SiadilPage() {
           archives={allArchives}
         />
       )}
+      <CreateArchiveModal
+        isOpen={isCreateModalOpen}
+        onClose={() => setIsCreateModalOpen(false)}
+        onSave={handleSaveArchive}
+        archives={allArchives}
+        currentFolderId={currentFolderId}
+      />
     </>
   );
 }
