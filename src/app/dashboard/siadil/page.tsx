@@ -1349,40 +1349,37 @@ export default function SiadilPage() {
             </p>
             <Breadcrumb items={breadcrumbItems} />
           </div>
-          <div className="flex flex-col space-y-4 ml-6">
-            <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4 w-[300px]">
-              <div className="flex flex-col items-center">
-                <div className="w-14 h-14 bg-red-500 rounded-full flex items-center justify-center mb-3">
-                  <span className="text-lg font-bold text-white">DF</span>
+          <div className="flex flex-col space-y-4 ml-6 w-[300px]">
+            <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
+              <div className="flex items-center space-x-3">
+                <div className="w-12 h-12 bg-red-500 rounded-full flex items-center justify-center flex-shrink-0">
+                  <span className="text-base font-bold text-white">DF</span>
                 </div>
-                <div className="flex flex-col items-center">
-                  <div className="flex items-center space-x-2 mb-1">
+                <div className="flex flex-col">
+                  <div className="flex items-center space-x-1.5">
                     <svg
-                      className="h-4 w-4 text-gray-900 dark:text-gray-400"
-                      width="24"
-                      height="24"
-                      viewBox="0 0 24 24"
-                      strokeWidth="2"
-                      stroke="currentColor"
+                      className="h-4 w-4 text-gray-700 dark:text-gray-400"
                       fill="none"
-                      strokeLinecap="round"
-                      strokeLinejoin="round">
-                      <path stroke="none" d="M0 0h24v24H0z" />
-                      <rect x="5" y="11" width="14" height="10" rx="2" />
-                      <circle cx="12" cy="16" r="1" />
-                      <path d="M8 11v-4a4 4 0 0 1 8 0v4" />
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      stroke-width="2">
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                      />
                     </svg>
-                    <p className="font-semibold text-gray-900 dark:text-white text-base">
+                    <p className="font-semibold text-gray-900 dark:text-white text-sm">
                       Personal
                     </p>
                   </div>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                     1990123
                   </p>
                 </div>
               </div>
             </div>
-            <div className="w-[300px]">
+            <div className="">
               <h3 className="text-base font-semibold text-gray-900 dark:text-white mb-3">
                 Reminders
               </h3>
@@ -1425,7 +1422,6 @@ export default function SiadilPage() {
           </div>
         </div>
       </div>
-
       <div className="mb-8">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
