@@ -244,6 +244,7 @@ const ViewModeToggle = ({
     </div>
   );
 };
+
 const ArchiveCard = ({
   archive,
   docCount,
@@ -255,10 +256,10 @@ const ArchiveCard = ({
 }) => (
   <div
     onClick={onClick}
-    className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-5 transition-all duration-200 ease-in-out hover:shadow-lg hover:-translate-y-1 cursor-pointer flex items-center min-h-[110px]">
-    <div className="flex items-center space-x-4">
-      {/* PERBAIKAN 3: Mengganti inline style dengan Tailwind class */}
-      <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-green-600">
+    className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-5 transition-all duration-200 ease-in-out hover:shadow-lg hover:-translate-y-1 cursor-pointer flex items-center min-h-[110px] overflow-hidden
+    ">
+    <div className="flex items-center space-x-4 min-w-0">
+      <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-green-600 flex-shrink-0">
         <svg
           className="w-5 h-5 text-white"
           width="24"
@@ -273,7 +274,8 @@ const ArchiveCard = ({
           />
         </svg>
       </div>
-      <div>
+      {/* PERBAIKAN 2: Tambahkan class `min-w-0` di sini */}
+      <div className="min-w-0">
         <h3 className="font-semibold text-gray-900 dark:text-white text-sm">
           {archive.name}
         </h3>
