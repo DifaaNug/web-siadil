@@ -101,7 +101,7 @@ const Sidebar = ({ onCollapseChange }: SidebarProps) => {
               {!isCollapsed && (
                 <div className="opacity-100 transition-opacity duration-300">
                   <div className="font-medium text-gray-900 text-sm">
-                    Difa Nugraha
+                    Someone
                   </div>
                   <div className="text-xs text-gray-600">10122059</div>
                 </div>
