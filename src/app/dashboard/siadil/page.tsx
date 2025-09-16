@@ -1483,8 +1483,7 @@ export default function SiadilPage() {
                   setSearchQuery(e.target.value);
                   setCurrentPage(1);
                 }}
-                // DISAMAKAN: padding dan ukuran teks
-                className="w-full rounded-md border border-gray-300 bg-white py-1.5 pl-10 pr-4 text-sm focus:border-green-500 focus:ring-green-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200"
+                className="w-full rounded-md border border-gray-300 bg-white py-1.5 pl-10 pr-4 text-sm text-gray-900 placeholder-gray-500 focus:border-green-500 focus:ring-green-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:placeholder-gray-400"
               />
             </div>
 
@@ -1534,16 +1533,21 @@ export default function SiadilPage() {
             <button
               onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
               disabled={currentPage === 1}
-              className="px-3 py-1 text-sm border border-gray-300 rounded-md disabled:opacity-50">
+              // TAMBAHKAN: class dark mode untuk background, border, dan teks
+              className="px-3 py-1 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md disabled:opacity-50 hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700">
               Previous
             </button>
-            <span className="text-sm text-gray-700">
+
+            {/* TAMBAHKAN: class dark mode untuk teks */}
+            <span className="text-sm text-gray-700 dark:text-gray-300">
               Page {currentPage} of {totalPages}
             </span>
+
             <button
               onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
               disabled={currentPage === totalPages}
-              className="px-3 py-1 text-sm border border-gray-300 rounded-md disabled:opacity-50">
+              // TAMBAHKAN: class dark mode untuk background, border, dan teks
+              className="px-3 py-1 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md disabled:opacity-50 hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700">
               Next
             </button>
           </div>
