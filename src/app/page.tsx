@@ -11,7 +11,7 @@ export default function Home() {
           <div className="space-y-4">
             <Link
               href="/dashboard"
-              className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors duration-200 flex items-center justify-center">
+              className="w-full bg-green-700 text-white py-3 px-4 rounded-lg hover:bg-green-800 transition-colors duration-200 flex items-center justify-center">
               <span className="mr-2">🏠</span>
               Masuk ke Dashboard
             </Link>
