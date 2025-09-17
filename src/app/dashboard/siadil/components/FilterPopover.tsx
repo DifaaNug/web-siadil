@@ -37,14 +37,14 @@ export const FilterPopover = forwardRef<HTMLDivElement, FilterPopoverProps>(
     return (
       <div
         ref={ref}
-        className="flex w-full max-w-md flex-col rounded-lg border border-gray-200 bg-white shadow-xl dark:border-gray-700 dark:bg-gray-800 max-h-[85vh]">
+        className="flex w-full max-w-md flex-col rounded-lg border border-gray-200 bg-white shadow-xl dark:border-gray-700 dark:bg-gray-800 max-h-[70vh]">
         <div className="p-5 border-b border-gray-200 dark:border-gray-700">
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
             Filter Dokumen
           </h3>
         </div>
 
-        <div className="overflow-y-auto p-5">
+        <div className="flex-grow overflow-y-auto p-5">
           <div className="space-y-8">
             <div className="space-y-5">
               <div>

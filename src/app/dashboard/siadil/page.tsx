@@ -16,7 +16,18 @@ import ViewModeToggle from "./components/ViewModeToggle";
 import { SearchPopup } from "./components/SearchPopup";
 import { FolderIcon } from "./components/FolderIcon";
 
+const allTableColumns = [
+  { id: "numberAndTitle", label: "Number & Title" },
+  { id: "description", label: "Description" },
+  { id: "documentDate", label: "Document Date" },
+  { id: "contributors", label: "Contributors" },
+  { id: "archive", label: "Archive" },
+  { id: "updatedAndCreatedBy", label: "Update & Create By" },
+  { id: "actions", label: "Actions" },
+];
+
 export default function SiadilPage() {
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
   const [isSearchPopupOpen, setIsSearchPopupOpen] = useState(false);
   const [viewMode, setViewMode] = useState<"list" | "grid">("list");
   const [currentFolderId, setCurrentFolderId] = useState("root");
@@ -52,6 +63,19 @@ export default function SiadilPage() {
   };
   const [filters, setFilters] = useState(initialFilters);
   const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [visibleColumns, setVisibleColumns] = useState(
+    new Set(allTableColumns.map((c) => c.id))
+  );
+
+  const handleFilterReset = () => {
+    setFilters(initialFilters);
+    setCurrentPage(1);
+  };
+
+  const handleRowsPerPageChange = (value: number) => {
+    setRowsPerPage(value);
+    setCurrentPage(1);
+  };
 
   const breadcrumbItems = useMemo(() => {
     const path = [];
@@ -83,6 +107,18 @@ export default function SiadilPage() {
     return allDocuments.filter((d) => d.parentId === currentFolderId);
   }, [currentFolderId]);
 
+  const handleColumnToggle = (columnId: string) => {
+    setVisibleColumns((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(columnId)) {
+        newSet.delete(columnId);
+      } else {
+        newSet.add(columnId);
+      }
+      return newSet;
+    });
+  };
+
   const handleFilterChange = (
     e: ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
@@ -105,7 +141,7 @@ export default function SiadilPage() {
   };
 
   const filteredDocuments = useMemo(() => {
-    return documentsInCurrentFolder.filter((doc) => {
+    const filtered = documentsInCurrentFolder.filter((doc) => {
       const keywordMatch =
         filters.keyword.toLowerCase() === "" ||
         doc.number.toLowerCase().includes(filters.keyword.toLowerCase()) ||
@@ -148,12 +184,26 @@ export default function SiadilPage() {
         expireInMatch
       );
     });
-  }, [documentsInCurrentFolder, filters]);
+    // Sort by document number (default), ascending/descending
+    return filtered.sort((a, b) => {
+      if (sortOrder === "asc") {
+        return a.number.localeCompare(b.number, undefined, { numeric: true });
+      } else {
+        return b.number.localeCompare(a.number, undefined, { numeric: true });
+      }
+    });
+  }, [documentsInCurrentFolder, filters, sortOrder]);
 
   const paginatedDocuments = useMemo(() => {
     const startIndex = (currentPage - 1) * rowsPerPage;
     return filteredDocuments.slice(startIndex, startIndex + rowsPerPage);
   }, [filteredDocuments, currentPage, rowsPerPage]);
+
+  const pagination = {
+    totalRows: filteredDocuments.length,
+    rowsPerPage,
+    currentPage,
+  };
 
   const archiveDocCounts = useMemo(() => {
     return allDocuments.reduce((acc, doc) => {
@@ -455,37 +505,37 @@ export default function SiadilPage() {
           filters={filters}
           onFilterChange={handleFilterChange}
           onCheckboxChange={handleCheckboxChange}
-          onFilterReset={() => {
-            setFilters(initialFilters);
-            setExpireFilterMethod("range");
-          }}
+          onFilterReset={handleFilterReset}
+          pagination={pagination}
+          onPageChange={setCurrentPage}
+          onRowsPerPageChange={handleRowsPerPageChange}
           expireFilterMethod={expireFilterMethod}
           setExpireFilterMethod={setExpireFilterMethod}
-          pagination={{
-            totalRows: filteredDocuments.length,
-            rowsPerPage: rowsPerPage,
-            currentPage: currentPage,
-          }}
-          onPageChange={(page: number) => setCurrentPage(page)}
-          onRowsPerPageChange={(value: number) => {
-            setRowsPerPage(value);
-            setCurrentPage(1);
-          }}>
+          allTableColumns={allTableColumns}
+          visibleColumns={visibleColumns}
+          onColumnToggle={handleColumnToggle}
+          sortOrder={sortOrder}
+          setSortOrder={setSortOrder}>
           {viewMode === "list" ? (
-            <DocumentTable documents={paginatedDocuments} />
+            <DocumentTable
+              documents={paginatedDocuments}
+              visibleColumns={visibleColumns}
+            />
           ) : (
             <DocumentGrid documents={paginatedDocuments} />
           )}
         </DocumentsContainer>
       </div>
 
-      <SearchPopup
-        isOpen={isSearchPopupOpen}
-        onClose={() => setIsSearchPopupOpen(false)}
-        searchQuery={searchQuery}
-        setSearchQuery={setSearchQuery}
-        documents={allDocuments}
-      />
+      {isCreateModalOpen && (
+        <CreateArchiveModal
+          isOpen={isCreateModalOpen}
+          onClose={() => setIsCreateModalOpen(false)}
+          onSave={handleSaveArchive}
+          archives={allArchives}
+          currentFolderId={currentFolderId}
+        />
+      )}
 
       {isAddModalOpen && (
         <AddDocumentModal
@@ -497,13 +547,13 @@ export default function SiadilPage() {
         />
       )}
 
-      {isCreateModalOpen && (
-        <CreateArchiveModal
-          isOpen={isCreateModalOpen}
-          onClose={() => setIsCreateModalOpen(false)}
-          onSave={handleSaveArchive}
-          currentFolderId={currentFolderId}
-          archives={allArchives}
+      {isSearchPopupOpen && (
+        <SearchPopup
+          isOpen={isSearchPopupOpen}
+          onClose={() => setIsSearchPopupOpen(false)}
+          searchQuery={searchQuery}
+          setSearchQuery={setSearchQuery}
+          documents={allDocuments}
         />
       )}
     </>
