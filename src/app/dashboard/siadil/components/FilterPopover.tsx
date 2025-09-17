@@ -30,7 +30,7 @@ export const FilterPopover = forwardRef<HTMLDivElement, FilterPopoverProps>(
     ref
   ) => {
     const activeTabClass =
-      "text-green-600 dark:text-green-400 border-b-2 border-green-600";
+      "text-gray-600 dark:text-gray-400 border-b-2 border-gray-600";
     const inactiveTabClass =
       "text-gray-500 dark:text-gray-400 border-b-2 border-transparent hover:border-gray-300 dark:hover:border-gray-600 hover:text-gray-700 dark:hover:text-gray-200";
 
@@ -104,7 +104,7 @@ export const FilterPopover = forwardRef<HTMLDivElement, FilterPopoverProps>(
                     name="docDateStart"
                     value={filters.docDateStart}
                     onChange={onFilterChange}
-                    className="w-full text-sm border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 rounded-md focus:ring-green-500 focus:border-green-500 text-gray-900 dark:text-gray-200 px-3 py-2"
+                    className="w-full text-sm border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 rounded-md focus:ring-gray-500 focus:border-gray-500 text-gray-900 dark:text-gray-200 px-3 py-2"
                   />
                   <span className="text-gray-500 text-sm">to</span>
                   <input
@@ -112,7 +112,7 @@ export const FilterPopover = forwardRef<HTMLDivElement, FilterPopoverProps>(
                     name="docDateEnd"
                     value={filters.docDateEnd}
                     onChange={onFilterChange}
-                    className="w-full text-sm border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 rounded-md focus:ring-green-500 focus:border-green-500 text-gray-900 dark:text-gray-200 px-3 py-2"
+                    className="w-full text-sm border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 rounded-md focus:ring-gray-500 focus:border-gray-500 text-gray-900 dark:text-gray-200 px-3 py-2"
                   />
                 </div>
               </div>
@@ -148,7 +148,7 @@ export const FilterPopover = forwardRef<HTMLDivElement, FilterPopoverProps>(
                         name="expireDateStart"
                         value={filters.expireDateStart}
                         onChange={onFilterChange}
-                        className="w-full text-sm border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 rounded-md focus:ring-green-500 focus:border-green-500 text-gray-900 dark:text-gray-200 px-3 py-2"
+                        className="w-full text-sm border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 rounded-md focus:ring-gray-500 focus:border-gray-500 text-gray-900 dark:text-gray-200 px-3 py-2"
                       />
                       <span className="text-gray-500 text-sm">to</span>
                       <input
@@ -156,7 +156,7 @@ export const FilterPopover = forwardRef<HTMLDivElement, FilterPopoverProps>(
                         name="expireDateEnd"
                         value={filters.expireDateEnd}
                         onChange={onFilterChange}
-                        className="w-full text-sm border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 rounded-md focus:ring-green-500 focus:border-green-500 text-gray-900 dark:text-gray-200 px-3 py-2"
+                        className="w-full text-sm border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 rounded-md focus:ring-gray-500 focus:border-gray-500 text-gray-900 dark:text-gray-200 px-3 py-2"
                       />
                     </div>
                   )}
@@ -172,7 +172,7 @@ export const FilterPopover = forwardRef<HTMLDivElement, FilterPopoverProps>(
                             value={option.id}
                             checked={filters.expireIn.includes(option.id)}
                             onChange={onCheckboxChange}
-                            className="rounded text-green-600 focus:ring-green-500"
+                            className="rounded text-gray-600 focus:ring-gray-500"
                           />
                           <span className="text-sm text-gray-700 dark:text-gray-300">
                             {option.label}
@@ -195,7 +195,7 @@ export const FilterPopover = forwardRef<HTMLDivElement, FilterPopoverProps>(
           </button>
           <button
             onClick={onApply}
-            className="px-4 py-2 text-sm font-semibold rounded-lg text-white transition-colors bg-demplon hover:bg-green-700">
+            className="px-4 py-2 text-sm font-semibold rounded-lg text-white transition-colors bg-demplon hover:bg-gray-700">
             Apply Filters
           </button>
         </div>

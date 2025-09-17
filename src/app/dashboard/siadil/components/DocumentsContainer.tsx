@@ -341,7 +341,7 @@ export const DocumentsContainer = ({
                   }}
                   className={`w-full text-left px-3 py-1.5 text-sm rounded-md flex items-center gap-2 ${
                     sortOrder === "asc"
-                      ? "font-semibold text-green-600 bg-green-50 dark:bg-green-900/50 dark:text-green-400"
+                      ? "'font-semibold bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white'"
                       : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
                   }`}>
                   <svg
@@ -366,7 +366,7 @@ export const DocumentsContainer = ({
                   }}
                   className={`w-full text-left px-3 py-1.5 text-sm rounded-md flex items-center gap-2 ${
                     sortOrder === "desc"
-                      ? "font-semibold text-green-600 bg-green-50 dark:bg-green-900/50 dark:text-green-400"
+                      ? "'font-semibold bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white"
                       : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
                   }`}>
                   <svg
