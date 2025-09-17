@@ -39,7 +39,7 @@ export default function SiadilPage() {
 
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const ITEMS_PER_PAGE = 10;
+  const ITEMS_PER_PAGE = 4;
 
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [newDocument, setNewDocument] = useState<NewDocumentData>({
