@@ -161,7 +161,7 @@ const PersonalArchiveCard = ({
 }) => (
   <div
     onClick={onClick}
-    className="relative overflow-hidden rounded-lg border dark:border-gray-700 p-5 transition-all duration-200 ease-in-out hover:shadow-lg hover:-translate-y-1 cursor-pointer flex items-center min-h-[110px] bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-800 border-l-4 border-demplon">
+    className="relative overflow-hidden rounded-lg border dark:border-gray-700 p-5 transition-all duration-200 ease-in-out hover:bg-gray-50 cursor-pointer flex items-center min-h-[110px] bg-gradient-to-br dark:from-gray-800 dark:to-gray-800 border-l-4 border-demplon">
     {/* PERBAIKAN 1: Jarak avatar ke teks dikurangi dari space-x-4 menjadi space-x-3 */}
     <div className="flex items-center space-x-3 min-w-0">
       <div className="w-10 h-10 bg-red-500 rounded-full flex items-center justify-center flex-shrink-0">
@@ -188,7 +188,7 @@ const PersonalArchiveCard = ({
         </h3>
         {/* PERBAIKAN 3: Jarak antara judul dan NIP dikurangi dari mt-1 menjadi mt-0.5 */}
         <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-          12231149
+          10122059
         </p>
       </div>
     </div>
@@ -307,7 +307,7 @@ const ArchiveCard = ({
 }) => (
   <div
     onClick={onClick}
-    className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-5 transition-all duration-200 ease-in-out hover:shadow-lg hover:-translate-y-1 cursor-pointer flex items-center min-h-[110px] overflow-hidden
+    className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-5 transition-all duration-200 ease-in-out hover:bg-gray-50 cursor-pointer flex items-center min-h-[110px] overflow-hidden
     ">
     <div className="flex items-center space-x-4 min-w-0">
       <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-demplon flex-shrink-0">
@@ -905,7 +905,7 @@ const DocumentGrid = ({ documents }: { documents: Document[] }) => (
     {documents.map((doc) => (
       <div
         key={doc.id}
-        className="group relative rounded-lg border border-gray-200 dark:border-gray-700 p-4 hover:shadow-md hover:border-brand dark:hover:border-brand transition-all cursor-pointer">
+        className="group relative rounded-lg border border-gray-200 dark:border-gray-700 p-4 hover:bg-gray-50 hover:border-brand dark:hover:border-brand transition-all cursor-pointer">
         <div className="flex items-start mb-3">
           {/* PERUBAHAN: Ikon diubah menjadi line-icon berwarna abu-abu */}
           <div className="flex-shrink-0">
