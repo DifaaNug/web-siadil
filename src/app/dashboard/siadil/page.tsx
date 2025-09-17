@@ -258,6 +258,20 @@ export default function SiadilPage() {
     });
   };
 
+  const [isExporting, setIsExporting] = useState(false);
+
+  const handleExport = () => {
+    console.log("Tombol export diklik, simulasi dimulai...");
+    setIsExporting(true); // Tampilkan loading
+
+    // Simulasi proses ekspor selama 2 detik
+    setTimeout(() => {
+      setIsExporting(false); // Sembunyikan loading
+      alert("Fitur export belum diimplementasikan."); // Beri notifikasi
+      console.log("Simulasi selesai.");
+    }, 2000); // 2000 ms = 2 detik
+  };
+
   return (
     <>
       <div className="mb-10">
@@ -515,7 +529,9 @@ export default function SiadilPage() {
           visibleColumns={visibleColumns}
           onColumnToggle={handleColumnToggle}
           sortOrder={sortOrder}
-          setSortOrder={setSortOrder}>
+          setSortOrder={setSortOrder}
+          isExporting={isExporting}
+          onExport={handleExport}>
           {viewMode === "list" ? (
             <DocumentTable
               documents={paginatedDocuments}

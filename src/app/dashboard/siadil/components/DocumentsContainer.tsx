@@ -29,6 +29,8 @@ type DocumentsContainerProps = {
   onColumnToggle: (columnId: string) => void;
   sortOrder: "asc" | "desc";
   setSortOrder: (order: "asc" | "desc") => void;
+  onExport: () => void;
+  isExporting: boolean;
 };
 
 export const DocumentsContainer = ({
@@ -48,6 +50,8 @@ export const DocumentsContainer = ({
   onColumnToggle,
   sortOrder,
   setSortOrder,
+  onExport,
+  isExporting,
 }: DocumentsContainerProps) => {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [isColumnToggleOpen, setIsColumnToggleOpen] = useState(false);
@@ -71,7 +75,15 @@ export const DocumentsContainer = ({
     top: 0,
     left: 0,
   });
-  const handleSortMenuToggle = () => setIsSortMenuOpen((v) => !v);
+
+  // 1. Tambahkan state & ref baru untuk Export Popover
+  const [isExportMenuOpen, setIsExportMenuOpen] = useState(false);
+  const exportMenuButtonRef = useRef<HTMLButtonElement>(null);
+  const exportMenuPopoverRef = useRef<HTMLDivElement>(null);
+  const [exportMenuPopoverPosition, setExportMenuPopoverPosition] = useState({
+    top: 0,
+    left: 0,
+  });
 
   useEffect(() => {
     setIsClient(true);
@@ -190,8 +202,59 @@ export const DocumentsContainer = ({
     }
   }, [isSortMenuOpen]);
 
-  const handleFilterToggle = () => setIsFilterOpen(!isFilterOpen);
-  const handleColumnToggle = () => setIsColumnToggleOpen(!isColumnToggleOpen);
+  useEffect(() => {
+    if (isExportMenuOpen && exportMenuButtonRef.current) {
+      const calculatePosition = () => {
+        if (!exportMenuPopoverRef.current || !exportMenuButtonRef.current)
+          return;
+        const buttonRect = exportMenuButtonRef.current.getBoundingClientRect();
+        const popoverRect =
+          exportMenuPopoverRef.current.getBoundingClientRect();
+        const margin = 8;
+        let top = buttonRect.bottom + margin;
+        const left = buttonRect.right - popoverRect.width;
+
+        if (top + popoverRect.height > window.innerHeight) {
+          top = buttonRect.top - popoverRect.height - margin;
+        }
+        setExportMenuPopoverPosition({ top, left });
+      };
+      const timer = setTimeout(calculatePosition, 0);
+      window.addEventListener("resize", calculatePosition);
+      return () => {
+        clearTimeout(timer);
+        window.removeEventListener("resize", calculatePosition);
+      };
+    }
+  }, [isExportMenuOpen]);
+
+  // Handler untuk toggle popover
+  const handleFilterToggle = () => setIsFilterOpen((v) => !v);
+  const handleColumnToggle = () => setIsColumnToggleOpen((v) => !v);
+  const handleSortMenuToggle = () => setIsSortMenuOpen((v) => !v);
+  const handleExportMenuToggle = () => setIsExportMenuOpen((v) => !v);
+
+  // 2. Tambahkan hook baru untuk menutup popover saat klik di luar
+  useOnClickOutside(
+    filterPopoverRef,
+    () => setIsFilterOpen(false),
+    filterButtonRef
+  );
+  useOnClickOutside(
+    columnTogglePopoverRef,
+    () => setIsColumnToggleOpen(false),
+    columnToggleButtonRef
+  );
+  useOnClickOutside(
+    sortMenuPopoverRef,
+    () => setIsSortMenuOpen(false),
+    sortMenuButtonRef
+  );
+  useOnClickOutside(
+    exportMenuPopoverRef,
+    () => setIsExportMenuOpen(false),
+    exportMenuButtonRef
+  );
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
@@ -245,9 +308,75 @@ export const DocumentsContainer = ({
             </div>,
             document.body
           )}
+        {isClient &&
+          isExportMenuOpen &&
+          ReactDOM.createPortal(
+            <div
+              ref={exportMenuPopoverRef}
+              style={{
+                position: "fixed",
+                top: `${exportMenuPopoverPosition.top}px`,
+                left: `${exportMenuPopoverPosition.left}px`,
+                zIndex: 50,
+                visibility:
+                  exportMenuPopoverPosition.top === 0 ? "hidden" : "visible",
+              }}
+              className="w-36 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg">
+              <div className="p-2">
+                <div className="px-2 py-1">
+                  <p className="text-xs font-semibold text-gray-500 dark:text-gray-400">
+                    Export data to
+                  </p>
+                </div>
+                <div className="border-t border-gray-100 dark:border-gray-700 my-1" />
+                <button
+                  onClick={() => {
+                    onExport(); // Panggil fungsi ekspor
+                    setIsExportMenuOpen(false); // Tutup popover
+                  }}
+                  disabled={isExporting}
+                  className="w-full flex items-center px-2 py-1.5 text-sm rounded-md text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed">
+                  {isExporting ? (
+                    <svg
+                      className="animate-spin -ml-1 mr-2 h-4 w-4"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24">
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"></circle>
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                  ) : (
+                    <svg
+                      className="w-4 h-4 mr-2"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor">
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                      />
+                    </svg>
+                  )}
+                  <span>{isExporting ? "Exporting..." : "Excel"}</span>
+                </button>
+              </div>
+            </div>,
+            document.body
+          )}
+
         <div className="flex items-center gap-2">
           <div className="flex items-center gap-2">
-            {/* Tombol Sort (HANYA SATU dan dipindah ke sini) */}
             <button
               ref={sortMenuButtonRef}
               onClick={handleSortMenuToggle}
@@ -266,7 +395,10 @@ export const DocumentsContainer = ({
               </svg>
               <span>Sort</span>
             </button>
-            <button className="px-3 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 flex items-center space-x-2">
+            <button
+              ref={exportMenuButtonRef}
+              onClick={handleExportMenuToggle}
+              className="px-3 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 flex items-center space-x-2">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
                 <path
                   d="M21 15V19C21 20.1046 20.1046 21 19 21H5C3.89543 21 3 20.1046 3 19V15M7 10L12 15L17 10M12 15V3"
@@ -278,7 +410,6 @@ export const DocumentsContainer = ({
               </svg>
               <span>Export</span>
             </button>
-
             <button
               ref={columnToggleButtonRef}
               onClick={handleColumnToggle}
