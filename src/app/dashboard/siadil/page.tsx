@@ -901,8 +901,7 @@ const DocumentTable = ({ documents }: { documents: Document[] }) => {
 // Di dalam file page.tsx
 
 const DocumentGrid = ({ documents }: { documents: Document[] }) => (
-  // PERUBAHAN: Padding disesuaikan agar lebih pas
-  <div className="p-5 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-5">
+  <div className="p-5 grid grid-cols-4  gap-5">
     {documents.map((doc) => (
       <div
         key={doc.id}
@@ -924,10 +923,10 @@ const DocumentGrid = ({ documents }: { documents: Document[] }) => (
             </svg>
           </div>
           <div className="ml-3 min-w-0">
-            <p className="text-xs font-semibold text-gray-600 dark:text-gray-400 truncate">
+            <p className="text-xs font-semibold text-gray-600 dark:text-gray-400">
               {doc.number}
             </p>
-            <h4 className="text-sm font-bold text-gray-900 dark:text-white truncate mt-1">
+            <h4 className="text-sm font-bold text-gray-900 dark:text-white mt-1">
               {doc.title}
             </h4>
           </div>
@@ -1428,7 +1427,7 @@ export default function SiadilPage() {
 
   return (
     <>
-      <div className="mb-8">
+      <div className="mb-10">
         <div className="flex justify-between items-start">
           <div className="flex-1">
             <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
@@ -1439,7 +1438,7 @@ export default function SiadilPage() {
             </p>
             <Breadcrumb items={breadcrumbItems} />
           </div>
-          <div className="flex flex-col space-y-4 ml-6 w-[300px]">
+          <div className="flex flex-col space-y-4 ml-6 w-[250px]">
             <div className="overflow-hidden rounded-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
               <div className="p-5">
                 <div className="flex items-center">
@@ -1481,10 +1480,10 @@ export default function SiadilPage() {
                 {reminders.map((reminder) => (
                   <div
                     key={reminder.id}
-                    className="bg-red-700 text-white rounded-lg p-3 w-full">
+                    className="bg-[#EF4444] text-white rounded-lg p-3 w-full">
                     <div className="flex items-start space-x-3">
                       <div className="flex-shrink-0 mt-0.5">
-                        <div className="w-5 h-5 bg-red-800 rounded-full flex items-center justify-center">
+                        <div className="w-5 h-5 bg-red-600 rounded-full flex items-center justify-center">
                           <svg
                             className="w-3 h-3 text-white"
                             fill="currentColor"
@@ -1516,7 +1515,7 @@ export default function SiadilPage() {
           </div>
         </div>
       </div>
-      <div className="mb-8">
+      <div className="mb-10">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
             Archives
@@ -1571,7 +1570,7 @@ export default function SiadilPage() {
         </div>
 
         {/* Grid Arsip */}
-        <div className="grid grid-cols-[repeat(auto-fill,minmax(240px,1fr))] gap-6">
+        <div className="grid grid-cols-[repeat(auto-fill,minmax(200px,1fr))] gap-6">
           {paginatedArchives.length === 0 ? (
             <div className="col-span-full text-center py-12">
               <p className="text-gray-500 dark:text-gray-400">
