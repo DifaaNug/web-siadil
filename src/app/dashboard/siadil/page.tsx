@@ -38,7 +38,8 @@ export default function SiadilPage() {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
   const [searchQuery, setSearchQuery] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
+  const [archiveCurrentPage, setArchiveCurrentPage] = useState(1);
+  const [documentCurrentPage, setDocumentCurrentPage] = useState(1);
   const ITEMS_PER_PAGE = 4;
 
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -69,18 +70,17 @@ export default function SiadilPage() {
 
   const handleFilterReset = () => {
     setFilters(initialFilters);
-    setCurrentPage(1);
+    setDocumentCurrentPage(1);
   };
 
   const handleRowsPerPageChange = (value: number) => {
     setRowsPerPage(value);
-    setCurrentPage(1);
+    setDocumentCurrentPage(1);
   };
 
   const breadcrumbItems = useMemo(() => {
     const path = [];
     let currentId = currentFolderId;
-
     while (currentId !== "root") {
       const folder = allArchives.find((a) => a.id === currentId);
       if (folder) {
@@ -90,9 +90,7 @@ export default function SiadilPage() {
         break;
       }
     }
-
     path.unshift({ label: "Root", id: "root" });
-
     return path.map((item) => ({
       label: item.label,
       icon: <FolderIcon />,
@@ -124,7 +122,7 @@ export default function SiadilPage() {
   ) => {
     const { name, value } = e.target;
     setFilters((prev) => ({ ...prev, [name]: value }));
-    setCurrentPage(1);
+    setDocumentCurrentPage(1);
   };
 
   const handleCheckboxChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -137,7 +135,7 @@ export default function SiadilPage() {
         return { ...prev, expireIn: expireIn.filter((item) => item !== value) };
       }
     });
-    setCurrentPage(1);
+    setDocumentCurrentPage(1);
   };
 
   const filteredDocuments = useMemo(() => {
@@ -195,14 +193,14 @@ export default function SiadilPage() {
   }, [documentsInCurrentFolder, filters, sortOrder]);
 
   const paginatedDocuments = useMemo(() => {
-    const startIndex = (currentPage - 1) * rowsPerPage;
+    const startIndex = (documentCurrentPage - 1) * rowsPerPage;
     return filteredDocuments.slice(startIndex, startIndex + rowsPerPage);
-  }, [filteredDocuments, currentPage, rowsPerPage]);
+  }, [filteredDocuments, documentCurrentPage, rowsPerPage]);
 
   const pagination = {
     totalRows: filteredDocuments.length,
     rowsPerPage,
-    currentPage,
+    currentPage: documentCurrentPage,
   };
 
   const archiveDocCounts = useMemo(() => {
@@ -226,9 +224,9 @@ export default function SiadilPage() {
   }, [currentFolderId, searchQuery]);
 
   const paginatedArchives = useMemo(() => {
-    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+    const startIndex = (archiveCurrentPage - 1) * ITEMS_PER_PAGE;
     return filteredArchives.slice(startIndex, startIndex + ITEMS_PER_PAGE);
-  }, [filteredArchives, currentPage]);
+  }, [filteredArchives, archiveCurrentPage]);
 
   const totalPages = Math.ceil(filteredArchives.length / ITEMS_PER_PAGE);
 
@@ -392,7 +390,7 @@ export default function SiadilPage() {
                 value={searchQuery}
                 onChange={(e) => {
                   setSearchQuery(e.target.value);
-                  setCurrentPage(1);
+                  setArchiveCurrentPage(1);
                 }}
                 className="w-full rounded-md border border-gray-300 bg-white py-1.5 pl-10 pr-4 text-sm text-gray-900 placeholder-gray-500 focus:border-green-500 focus:ring-green-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:placeholder-gray-400"
               />
@@ -451,8 +449,8 @@ export default function SiadilPage() {
         {totalPages > 1 && (
           <div className="mt-8 flex justify-center items-center space-x-2">
             <button
-              onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-              disabled={currentPage === 1}
+              onClick={() => setArchiveCurrentPage((p) => Math.max(1, p - 1))}
+              disabled={archiveCurrentPage === 1}
               // TAMBAHKAN: class dark mode untuk background, border, dan teks
               className="px-3 py-1 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md disabled:opacity-50 hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700">
               Previous
@@ -460,12 +458,14 @@ export default function SiadilPage() {
 
             {/* TAMBAHKAN: class dark mode untuk teks */}
             <span className="text-sm text-gray-700 dark:text-gray-300">
-              Page {currentPage} of {totalPages}
+              Page {archiveCurrentPage} of {totalPages}
             </span>
 
             <button
-              onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-              disabled={currentPage === totalPages}
+              onClick={() =>
+                setArchiveCurrentPage((p) => Math.min(totalPages, p + 1))
+              }
+              disabled={archiveCurrentPage === totalPages}
               // TAMBAHKAN: class dark mode untuk background, border, dan teks
               className="px-3 py-1 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md disabled:opacity-50 hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700">
               Next
@@ -521,7 +521,7 @@ export default function SiadilPage() {
           onCheckboxChange={handleCheckboxChange}
           onFilterReset={handleFilterReset}
           pagination={pagination}
-          onPageChange={setCurrentPage}
+          onPageChange={setDocumentCurrentPage} // Gunakan state setter dokumen
           onRowsPerPageChange={handleRowsPerPageChange}
           expireFilterMethod={expireFilterMethod}
           setExpireFilterMethod={setExpireFilterMethod}
