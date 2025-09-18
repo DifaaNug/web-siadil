@@ -33,7 +33,7 @@ export const FilterPopover = forwardRef<HTMLDivElement, FilterPopoverProps>(
         className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg w-full flex flex-col">
         <div className="p-4 border-b border-gray-200 dark:border-gray-600">
           <h3 className="font-semibold text-gray-800 dark:text-white">
-            Filter Tanggal
+            Date Filter
           </h3>
         </div>
 
@@ -41,7 +41,7 @@ export const FilterPopover = forwardRef<HTMLDivElement, FilterPopoverProps>(
           {/* Tanggal Dokumen */}
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Tanggal Dokumen
+              Document Date
             </label>
             <div className="flex items-center space-x-2">
               <input
@@ -65,7 +65,7 @@ export const FilterPopover = forwardRef<HTMLDivElement, FilterPopoverProps>(
           {/* Tanggal Kedaluwarsa */}
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Tanggal Kedaluwarsa
+              Document Expire Date
             </label>
             <div className="flex border border-gray-300 dark:border-gray-600 rounded-md">
               <button

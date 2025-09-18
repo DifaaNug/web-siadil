@@ -256,19 +256,6 @@ export const DocumentsContainer = ({
               />
             </div>
           </div>
-          <div className="min-w-[200px]">
-            <button
-              ref={archiveFilterButtonRef}
-              onClick={() => setIsArchiveFilterOpen((v) => !v)}
-              className={`w-full text-left rounded-md border py-1.5 px-3 text-sm transition-colors
-               bg-white text-gray-900 dark:bg-gray-700 dark:text-gray-200 hover:bg-gray-50
-               
-              `}>
-              {filters.archive.length === 0
-                ? "All Archives"
-                : `${filters.archive.length} Archives Selected`}
-            </button>
-          </div>
         </div>
 
         {isClient &&
@@ -394,6 +381,44 @@ export const DocumentsContainer = ({
           )}
 
         <div className="flex items-center gap-2">
+          <button
+            ref={archiveFilterButtonRef}
+            onClick={() => setIsArchiveFilterOpen((v) => !v)}
+            className={`px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 flex items-center space-x-2`}>
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg">
+              <path
+                d="M21 8V21H3V8"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <path
+                d="M23 3H1V8H23V3Z"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <path
+                d="M10 12H14"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+            <span>
+              {filters.archive.length === 0
+                ? "All Archives"
+                : `${filters.archive.length} Archives Selected`}
+            </span>
+          </button>
           <button
             ref={filterButtonRef}
             onClick={handleFilterToggle}

@@ -24,11 +24,11 @@ export const ArchiveFilterPopover = forwardRef<HTMLDivElement, Props>(
         {/* Header dan Search Input */}
         <div className="p-3 border-b border-gray-200 dark:border-gray-700">
           <h3 className="font-semibold text-gray-800 dark:text-white mb-2">
-            Filter Arsip
+            Archive Filter
           </h3>
           <input
             type="text"
-            placeholder="Cari arsip..."
+            placeholder="Search Archive"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full rounded-md border border-gray-300 bg-white py-1.5 px-3 text-sm text-gray-900 placeholder-gray-500 focus:border-green-500 focus:ring-green-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:placeholder-gray-400"
