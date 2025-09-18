@@ -1,9 +1,12 @@
+// File: DocumentsContainer.tsx
+
 import { useState, useEffect, useRef, ReactNode, ChangeEvent } from "react";
 import ReactDOM from "react-dom";
 import { useOnClickOutside } from "../hooks/useOnClickOutside";
 import { FilterPopover } from "./FilterPopover";
 import { ColumnTogglePopover } from "./ColumnTogglePopover";
 import { Filters, Archive } from "../types";
+import { ArchiveFilterPopover } from "./ArchiveFilterPopover";
 
 type Column = {
   id: string;
@@ -29,6 +32,7 @@ type DocumentsContainerProps = {
   onColumnToggle: (columnId: string) => void;
   onExport: () => void;
   isExporting: boolean;
+  onArchiveCheckboxChange: (archiveCode: string, isChecked: boolean) => void;
 };
 
 export const DocumentsContainer = ({
@@ -48,6 +52,7 @@ export const DocumentsContainer = ({
   onColumnToggle,
   onExport,
   isExporting,
+  onArchiveCheckboxChange,
 }: DocumentsContainerProps) => {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [isColumnToggleOpen, setIsColumnToggleOpen] = useState(false);
@@ -62,7 +67,6 @@ export const DocumentsContainer = ({
   });
   const [columnTogglePopoverPosition, setColumnTogglePopoverPosition] =
     useState({ top: 0, left: 0 });
-
   const [isExportMenuOpen, setIsExportMenuOpen] = useState(false);
   const exportMenuButtonRef = useRef<HTMLButtonElement>(null);
   const exportMenuPopoverRef = useRef<HTMLDivElement>(null);
@@ -95,41 +99,27 @@ export const DocumentsContainer = ({
     if (isFilterOpen && filterButtonRef.current) {
       const calculatePosition = () => {
         if (!filterPopoverRef.current || !filterButtonRef.current) return;
-
         const buttonRect = filterButtonRef.current.getBoundingClientRect();
         const popoverHeight = filterPopoverRef.current.offsetHeight;
         const spaceBelow = window.innerHeight - buttonRect.bottom;
         const spaceAbove = buttonRect.top;
         const margin = 8;
-        let top = 0;
-        let left = 0;
-
-        // Position horizontally: align right of popover with right of button
+        let top = 0,
+          left = 0;
         const popoverWidth = filterPopoverRef.current.offsetWidth;
         left = buttonRect.right - popoverWidth;
-
-        if (spaceBelow > popoverHeight + margin) {
+        if (spaceBelow > popoverHeight + margin)
           top = buttonRect.bottom + margin;
-        } else if (spaceAbove > popoverHeight + margin) {
+        else if (spaceAbove > popoverHeight + margin)
           top = buttonRect.top - popoverHeight - margin;
-        } else {
-          top = buttonRect.bottom + margin;
-        }
-
-        if (top < margin) {
-          top = margin;
-        }
-        if (top + popoverHeight > window.innerHeight - margin) {
+        else top = buttonRect.bottom + margin;
+        if (top < margin) top = margin;
+        if (top + popoverHeight > window.innerHeight - margin)
           top = window.innerHeight - popoverHeight - margin;
-        }
-        if (left < margin) {
-          left = margin;
-        }
+        if (left < margin) left = margin;
         setFilterPopoverPosition({ top, left });
       };
-
       const timer = setTimeout(calculatePosition, 0);
-
       window.addEventListener("resize", calculatePosition);
       return () => {
         clearTimeout(timer);
@@ -143,23 +133,16 @@ export const DocumentsContainer = ({
       const calculatePosition = () => {
         if (!columnTogglePopoverRef.current || !columnToggleButtonRef.current)
           return;
-
         const buttonRect =
           columnToggleButtonRef.current.getBoundingClientRect();
         const popoverRect =
           columnTogglePopoverRef.current.getBoundingClientRect();
         const margin = 8;
-
         let top = buttonRect.bottom + margin;
         let left = buttonRect.right - popoverRect.width;
-
-        if (top + popoverRect.height > window.innerHeight) {
+        if (top + popoverRect.height > window.innerHeight)
           top = buttonRect.top - popoverRect.height - margin;
-        }
-        if (left < 0) {
-          left = buttonRect.left;
-        }
-
+        if (left < 0) left = buttonRect.left;
         setColumnTogglePopoverPosition({ top, left });
       };
       const timer = setTimeout(calculatePosition, 0);
@@ -182,10 +165,8 @@ export const DocumentsContainer = ({
         const margin = 8;
         let top = buttonRect.bottom + margin;
         const left = buttonRect.right - popoverRect.width;
-
-        if (top + popoverRect.height > window.innerHeight) {
+        if (top + popoverRect.height > window.innerHeight)
           top = buttonRect.top - popoverRect.height - margin;
-        }
         setExportMenuPopoverPosition({ top, left });
       };
       const timer = setTimeout(calculatePosition, 0);
@@ -201,36 +182,92 @@ export const DocumentsContainer = ({
   const handleColumnToggle = () => setIsColumnToggleOpen((v) => !v);
   const handleExportMenuToggle = () => setIsExportMenuOpen((v) => !v);
 
+  const [isArchiveFilterOpen, setIsArchiveFilterOpen] = useState(false);
+  const archiveFilterButtonRef = useRef<HTMLButtonElement>(null);
+  const archiveFilterPopoverRef = useRef<HTMLDivElement>(null);
+  const [archiveFilterPopoverPosition, setArchiveFilterPopoverPosition] =
+    useState({ top: 0, left: 0 });
+
+  useOnClickOutside(
+    archiveFilterPopoverRef,
+    () => setIsArchiveFilterOpen(false),
+    archiveFilterButtonRef
+  );
+
+  useEffect(() => {
+    if (isArchiveFilterOpen && archiveFilterButtonRef.current) {
+      const calculatePosition = () => {
+        if (!archiveFilterPopoverRef.current || !archiveFilterButtonRef.current)
+          return;
+        const buttonRect =
+          archiveFilterButtonRef.current.getBoundingClientRect();
+        const popoverHeight = archiveFilterPopoverRef.current.offsetHeight;
+        const margin = 8;
+
+        let top = buttonRect.bottom + margin;
+        // Posisikan popover di atas tombol jika tidak cukup ruang di bawah
+        if (top + popoverHeight > window.innerHeight) {
+          top = buttonRect.top - popoverHeight - margin;
+        }
+
+        setArchiveFilterPopoverPosition({ top, left: buttonRect.left });
+      };
+
+      // Beri sedikit waktu agar popover sempat di-render sebelum kalkulasi
+      const timer = setTimeout(calculatePosition, 0);
+      window.addEventListener("resize", calculatePosition);
+
+      return () => {
+        clearTimeout(timer);
+        window.removeEventListener("resize", calculatePosition);
+      };
+    }
+  }, [isArchiveFilterOpen]);
+
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
-      <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center flex-wrap gap-2">
-        {/* PERUBAHAN 1: Ganti Tombol Filter dengan Search Bar */}
-        <div className="flex-1 min-w-[250px]">
-          <div className="relative">
-            <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-              <svg
-                className="h-5 w-5 text-gray-400"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                />
-              </svg>
+    <div className="bg-white dark:bg-gray-800 rounded-md border border-gray-200 dark:border-gray-700">
+      <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center flex-wrap gap-3">
+        <div className="flex items-center gap-2 flex-grow flex-wrap">
+          <div className="flex-grow min-w-[250px] max-w-sm">
+            <div className="relative">
+              <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                <svg
+                  className="h-5 w-5 text-gray-400"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 22 22"
+                  stroke="currentColor">
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                  />
+                </svg>
+              </div>
+              <input
+                type="text"
+                name="keyword"
+                id="keyword"
+                placeholder="Search by number, title..."
+                value={filters.keyword}
+                onChange={onFilterChange}
+                className="w-full rounded-md border border-gray-300 bg-white py-1.5 pl-10 pr-4 text-sm text-gray-900 placeholder-gray-500 focus:border-green-500 focus:ring-green-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:placeholder-gray-400"
+              />
             </div>
-            <input
-              type="text"
-              name="keyword"
-              id="keyword"
-              placeholder="Cari berdasarkan nomor, judul..."
-              value={filters.keyword}
-              onChange={onFilterChange}
-              className="w-full rounded-md border border-gray-300 bg-white py-1.5 pl-10 pr-4 text-sm text-gray-900 placeholder-gray-500 focus:border-green-500 focus:ring-green-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:placeholder-gray-400"
-            />
+          </div>
+          <div className="min-w-[200px]">
+            <button
+              ref={archiveFilterButtonRef}
+              onClick={() => setIsArchiveFilterOpen((v) => !v)}
+              className={`w-full text-left rounded-md border py-1.5 px-3 text-sm transition-colors
+               bg-white text-gray-900 dark:bg-gray-700 dark:text-gray-200 hover:bg-gray-50
+               
+              `}>
+              {filters.archive.length === 0
+                ? "All Archives"
+                : `${filters.archive.length} Archives Selected`}
+            </button>
           </div>
         </div>
 
@@ -252,7 +289,6 @@ export const DocumentsContainer = ({
               <FilterPopover
                 ref={filterPopoverRef}
                 filters={filters}
-                archives={archives}
                 onFilterChange={onFilterChange}
                 onCheckboxChange={onCheckboxChange}
                 onReset={() => {
@@ -266,6 +302,30 @@ export const DocumentsContainer = ({
             </div>,
             document.body
           )}
+
+        {/* TAMBAHKAN BLOK PORTAL BARU INI */}
+        {isClient &&
+          isArchiveFilterOpen &&
+          ReactDOM.createPortal(
+            <div
+              style={{
+                position: "fixed",
+                top: `${archiveFilterPopoverPosition.top}px`,
+                left: `${archiveFilterPopoverPosition.left}px`,
+                zIndex: 50,
+                visibility:
+                  archiveFilterPopoverPosition.top === 0 ? "hidden" : "visible",
+              }}>
+              <ArchiveFilterPopover
+                ref={archiveFilterPopoverRef}
+                allArchives={archives}
+                selectedArchives={filters.archive}
+                onArchiveChange={onArchiveCheckboxChange}
+              />
+            </div>,
+            document.body
+          )}
+
         {isClient &&
           isExportMenuOpen &&
           ReactDOM.createPortal(
@@ -281,7 +341,7 @@ export const DocumentsContainer = ({
               }}
               className="w-36 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg">
               <div className="p-2">
-                <div className="px-2 py-1">
+                <div className="px-2 py-1.5">
                   <p className="text-xs font-semibold text-gray-500 dark:text-gray-400">
                     Export data to
                   </p>
@@ -333,28 +393,53 @@ export const DocumentsContainer = ({
             document.body
           )}
 
-        {/* PERUBAHAN 2: Pindahkan Tombol Filter ke sini */}
         <div className="flex items-center gap-2">
           <button
             ref={filterButtonRef}
             onClick={handleFilterToggle}
-            className="px-3 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 flex items-center space-x-2">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+            className="px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 flex items-center space-x-2">
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 22 20"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg">
               <path
-                d="M22 3H2L10 12.46V19L14 21V12.46L22 3Z"
+                d="M5 4H19C19.5523 4 20 4.44772 20 5V19C20 19.5523 19.5523 20 19 20H5C4.44772 20 4 19.5523 4 19V5C4 4.44772 4.44772 4 5 4Z"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <path
+                d="M4 10H20"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <path
+                d="M8 2V6"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <path
+                d="M16 2V6"
                 stroke="currentColor"
                 strokeWidth="2"
                 strokeLinecap="round"
                 strokeLinejoin="round"
               />
             </svg>
-            <span>Filter</span>
+            <span>Date Filter</span>
           </button>
           <button
             ref={exportMenuButtonRef}
             onClick={handleExportMenuToggle}
-            className="px-3 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 flex items-center space-x-2">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+            className="px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 flex items-center space-x-2">
+            <svg width="14" height="14" viewBox="0 0 22 22" fill="none">
               <path
                 d="M21 15V19C21 20.1046 20.1046 21 19 21H5C3.89543 21 3 20.1046 3 19V15M7 10L12 15L17 10M12 15V3"
                 stroke="currentColor"
@@ -368,8 +453,8 @@ export const DocumentsContainer = ({
           <button
             ref={columnToggleButtonRef}
             onClick={handleColumnToggle}
-            className="px-3 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 flex items-center space-x-2">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+            className="px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 flex items-center space-x-2">
+            <svg width="14" height="14" viewBox="0 0 22 22" fill="none">
               <path
                 d="M3 12L5 10M5 10L3 8M5 10H11M13 12L15 10M15 10L13 8M15 10H21M7 20H17C18.1046 20 19 19.1046 19 18V6C19 4.89543 18.1046 4 17 4H7C5.89543 4 5 6V18C5 19.1046 5.89543 20 7 20Z"
                 stroke="currentColor"
@@ -423,22 +508,20 @@ export const DocumentsContainer = ({
           <select
             value={pagination.rowsPerPage}
             onChange={(e) => onRowsPerPageChange(Number(e.target.value))}
-            className="border border-gray-300 dark:border-gray-600 rounded px-2 py-1 text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white">
+            className="border border-gray-300 dark:border-gray-600 rounded px-2 py-1.5 text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white">
             <option value={5}>5</option>
             <option value={10}>10</option>
             <option value={20}>20</option>
           </select>
           <span className="text-sm text-gray-700 dark:text-gray-300">
             Page {pagination.currentPage} of{" "}
-            {Math.ceil(pagination.totalRows / pagination.rowsPerPage) > 0
-              ? Math.ceil(pagination.totalRows / pagination.rowsPerPage)
-              : 1}
+            {Math.ceil(pagination.totalRows / pagination.rowsPerPage) || 1}
           </span>
           <button
             onClick={() => onPageChange(pagination.currentPage - 1)}
             disabled={pagination.currentPage === 1}
             className="p-1 border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-50 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+            <svg width="16" height="16" viewBox="0 0 22 22" fill="none">
               <path
                 d="M15 18L9 12L15 6"
                 stroke="currentColor"
@@ -456,7 +539,7 @@ export const DocumentsContainer = ({
               pagination.totalRows === 0
             }
             className="p-1 border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-50 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+            <svg width="16" height="16" viewBox="0 0 22 22" fill="none">
               <path
                 d="M9 18L15 12L9 6"
                 stroke="currentColor"
