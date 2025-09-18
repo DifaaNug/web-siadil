@@ -270,6 +270,7 @@ export const DocumentsContainer = ({
                 visibility:
                   filterPopoverPosition.top === 0 ? "hidden" : "visible",
                 display: "flex",
+                flexDirection: "column",
                 maxHeight: "70vh",
                 width: "448px",
               }}>
