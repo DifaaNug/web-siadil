@@ -175,7 +175,7 @@ export const DocumentTable = ({
               )}
               {visibleColumns.has("description") && (
                 <td
-                  className="px-4 py-4 text-sm text-gray-500 dark:text-gray-400 max-w-xs truncate"
+                  className="px-4 py-4 text-sm text-gray-500 dark:text-gray-400 max-w-xs "
                   title={doc.description}>
                   {doc.description}
                 </td>
