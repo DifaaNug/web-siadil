@@ -269,8 +269,7 @@ export const DocumentsContainer = ({
                 zIndex: 50,
                 visibility:
                   filterPopoverPosition.top === 0 ? "hidden" : "visible",
-                maxHeight: "70vh",
-                minHeight: "480px", // <-- TAMBAHKAN INI
+                maxHeight: "75vh",
                 width: "448px",
               }}>
               <FilterPopover
