@@ -3,10 +3,8 @@
 import { useState, useMemo, ChangeEvent } from "react";
 import Breadcrumb from "@/components/Breadcrumb";
 import CreateArchiveModal from "@/components/CreateArchiveModal";
-
-import { Filters, NewDocumentData } from "./types";
+import { Filters, NewDocumentData, Document } from "./types"; // Pastikan Document diimpor
 import { allArchives, allDocuments, reminders } from "./data";
-
 import { AddDocumentModal } from "./components/AddDocumentModal";
 import { DocumentsContainer } from "./components/DocumentsContainer";
 import { DocumentTable } from "./components/DocumentTable";
@@ -27,21 +25,19 @@ const allTableColumns = [
 ];
 
 export default function SiadilPage() {
-  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc" | null>(null);
+  const [sortColumn, setSortColumn] = useState<keyof Document | null>(null);
   const [isSearchPopupOpen, setIsSearchPopupOpen] = useState(false);
   const [viewMode, setViewMode] = useState<"list" | "grid">("list");
   const [currentFolderId, setCurrentFolderId] = useState("root");
   const [expireFilterMethod, setExpireFilterMethod] = useState<
     "range" | "period"
   >("range");
-
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-
   const [searchQuery, setSearchQuery] = useState("");
   const [archiveCurrentPage, setArchiveCurrentPage] = useState(1);
   const [documentCurrentPage, setDocumentCurrentPage] = useState(1);
   const ITEMS_PER_PAGE = 4;
-
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [newDocument, setNewDocument] = useState<NewDocumentData>({
     number: "",
@@ -52,7 +48,6 @@ export default function SiadilPage() {
     expireDate: "",
     file: null,
   });
-
   const initialFilters: Filters = {
     keyword: "",
     archive: "All",
@@ -72,10 +67,18 @@ export default function SiadilPage() {
     setFilters(initialFilters);
     setDocumentCurrentPage(1);
   };
-
   const handleRowsPerPageChange = (value: number) => {
     setRowsPerPage(value);
     setDocumentCurrentPage(1);
+  };
+
+  const handleSort = (columnId: keyof Document) => {
+    if (sortColumn === columnId) {
+      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+    } else {
+      setSortColumn(columnId);
+      setSortOrder("asc");
+    }
   };
 
   const breadcrumbItems = useMemo(() => {
@@ -183,14 +186,24 @@ export default function SiadilPage() {
       );
     });
     // Sort by document number (default), ascending/descending
-    return filtered.sort((a, b) => {
-      if (sortOrder === "asc") {
-        return a.number.localeCompare(b.number, undefined, { numeric: true });
+    return [...filtered].sort((a, b) => {
+      if (!sortColumn) return 0; // <-- TAMBAHKAN BARIS INI
+      const aValue = a[sortColumn];
+      const bValue = b[sortColumn];
+      if (aValue == null || bValue == null) return 0;
+      let comparison = 0;
+      if (sortColumn === "documentDate" || sortColumn === "updatedDate") {
+        comparison =
+          new Date(aValue as string).getTime() -
+          new Date(bValue as string).getTime();
       } else {
-        return b.number.localeCompare(a.number, undefined, { numeric: true });
+        comparison = String(aValue).localeCompare(String(bValue), undefined, {
+          numeric: true,
+        });
       }
+      return sortOrder === "asc" ? comparison : -comparison;
     });
-  }, [documentsInCurrentFolder, filters, sortOrder]);
+  }, [documentsInCurrentFolder, filters, sortOrder, sortColumn]);
 
   const paginatedDocuments = useMemo(() => {
     const startIndex = (documentCurrentPage - 1) * rowsPerPage;
@@ -521,21 +534,23 @@ export default function SiadilPage() {
           onCheckboxChange={handleCheckboxChange}
           onFilterReset={handleFilterReset}
           pagination={pagination}
-          onPageChange={setDocumentCurrentPage} // Gunakan state setter dokumen
+          onPageChange={setDocumentCurrentPage}
           onRowsPerPageChange={handleRowsPerPageChange}
           expireFilterMethod={expireFilterMethod}
           setExpireFilterMethod={setExpireFilterMethod}
           allTableColumns={allTableColumns}
           visibleColumns={visibleColumns}
           onColumnToggle={handleColumnToggle}
-          sortOrder={sortOrder}
-          setSortOrder={setSortOrder}
           isExporting={isExporting}
           onExport={handleExport}>
           {viewMode === "list" ? (
             <DocumentTable
               documents={paginatedDocuments}
               visibleColumns={visibleColumns}
+              onSortChange={handleSort}
+              sortColumn={sortColumn}
+              sortOrder={sortOrder}
+              onColumnToggle={handleColumnToggle}
             />
           ) : (
             <DocumentGrid documents={paginatedDocuments} />
