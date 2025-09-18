@@ -31,38 +31,87 @@ export const allArchives: Archive[] = [
   },
 ];
 
+// Data sampel baru yang lebih realistis
+const sampleApps = [
+  {
+    number: "JAJAPWEB",
+    title: "JAJAPWEB",
+    description: "Aplikasi Jajap untuk Admin Mengelola Transaksi Jajap",
+  },
+  {
+    number: "JAJAPDRIVER",
+    title: "JAJAPDRIVER",
+    description:
+      "Aplikasi Jajap untuk Request Transformasi Area Kawasan Kujang",
+  },
+  {
+    number: "APM",
+    title: "APM",
+    description:
+      "Aplikasi Performance Monitoring Management untuk Generate Montly Report",
+  },
+  {
+    number: "WEBKUJANGADMIN",
+    title: "WEBKUJANGADMIN",
+    description: "Aplikasi Panel Admin untuk Pengelolaan Website Pupuk Kujang",
+  },
+  {
+    number: "SPIRITK3",
+    title: "SPIRITK3",
+    description: "Aplikasi Safety is Priority yang dikelola oleh Dept K3LH",
+  },
+  {
+    number: "SIMRISKANPER",
+    title: "SIMRISKANPER",
+    description:
+      "Aplikasi Sistem Manajemen Risiko untuk anak perusahaan (dikelola oleh unit Manrisk)",
+  },
+  {
+    number: "SIMRISK",
+    title: "SIMRISK",
+    description:
+      "Aplikasi Sistem Manajemen Risiko (dikelola oleh unit Manrisk)",
+  },
+  {
+    number: "DOKUMENTASIAPLIKASI",
+    title: "Dokumentasi Aplikasi",
+    description: "Pusat dokumentasi untuk semua aplikasi internal perusahaan.",
+  },
+  {
+    number: "DTS 3.1",
+    title: "DTS 3.1",
+    description: "Dokumen Teknis Spesifikasi versi 3.1 untuk proyek baru.",
+  },
+];
+
+const sampleUserIDs = ["3082625", "3082626", "3082627", "3082628", "3082629"];
+const sampleContributors = [
+  "Budi Santoso",
+  "Siti Aisyah",
+  "Rizki Pratama",
+  "Dewi Lestari",
+  "Agus Wijaya",
+  "Rina Hartono",
+];
+
+// Helper untuk format tanggal YYYY-MM-DD HH:mm
+const formatDateTime = (date: Date): string => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  const hours = String(date.getHours()).padStart(2, "0");
+  const minutes = String(date.getMinutes()).padStart(2, "0");
+  return `${year}-${month}-${day} ${hours}:${minutes}`;
+};
+
 export const generateDummyData = (count: number): Document[] => {
   const generatedDocs: Document[] = [];
-  const sampleTitles = [
-    "Surat Keputusan",
-    "Memorandum of Understanding",
-    "Standard Operating Procedure",
-    "Laporan Keuangan",
-    "Laporan Audit Internal",
-    "Kebijakan Keamanan",
-    "Materi Training",
-    "Kontrak Pengadaan",
-  ];
-  const sampleNames = [
-    "Budi Santoso",
-    "Siti Aisyah",
-    "Rizki Pratama",
-    "Dewi Lestari",
-    "Agus Wijaya",
-    "Rina Hartono",
-  ];
-  const sampleDepts = [
-    "IT Department",
-    "Legal Dept",
-    "Finance Dept",
-    "HR Department",
-    "Internal Audit",
-    "Management",
-  ];
 
   for (let i = 1; i <= count; i++) {
     const parentFolder = allArchives[i % allArchives.length];
-    const createdDate = new Date(2023, 0, 1 + i * 3);
+    const appData = sampleApps[i % sampleApps.length];
+
+    const createdDate = new Date(2024, 0, 1 + i, i % 24, i % 60);
     const updatedDate = new Date(
       createdDate.getTime() + 2 * 24 * 60 * 60 * 1000
     );
@@ -73,32 +122,33 @@ export const generateDummyData = (count: number): Document[] => {
     );
 
     const doc: Document = {
-      id: `DOC${String(i).padStart(3, "0")}`,
+      id: `${75000 + i}`, // ID numerik
       parentId: parentFolder.id,
-      number: `${parentFolder.code}/${String(i).padStart(
-        3,
-        "0"
-      )}/${createdDate.getFullYear()}`,
-      title: `${sampleTitles[i % sampleTitles.length]} #${i}`,
-      description: `Deskripsi untuk dokumen nomor ${i}.`,
+      number: appData.number,
+      title: appData.title,
+      description: appData.description,
       documentDate: createdDate.toISOString().split("T")[0],
       contributors: [
-        { name: sampleNames[i % sampleNames.length], role: "Penulis" },
+        {
+          name: sampleContributors[i % sampleContributors.length],
+          role: "Penulis",
+        },
       ],
       archive: parentFolder.code,
       expireDate: expireDate.toISOString().split("T")[0],
       status: Math.random() > 0.1 ? "Active" : "Expired",
-      updatedBy: sampleDepts[i % sampleDepts.length],
-      createdBy: sampleDepts[(i + 1) % sampleDepts.length],
-      createdDate: createdDate.toISOString().split("T")[0],
-      updatedDate: updatedDate.toISOString().split("T")[0],
+      updatedBy: sampleUserIDs[i % sampleUserIDs.length], // ID Pengguna numerik
+      createdBy: sampleUserIDs[(i + 1) % sampleUserIDs.length], // ID Pengguna numerik
+      createdDate: formatDateTime(createdDate), // Format YYYY-MM-DD HH:mm
+      updatedDate: formatDateTime(updatedDate), // Format YYYY-MM-DD HH:mm
     };
     generatedDocs.push(doc);
   }
   return generatedDocs;
 };
 
-export const allDocuments: Document[] = generateDummyData(100);
+// Generate lebih banyak data
+export const allDocuments: Document[] = generateDummyData(250);
 
 export const reminders = [
   {

@@ -50,12 +50,12 @@ export default function SiadilPage() {
   });
   const initialFilters: Filters = {
     keyword: "",
-    archive: "All",
+    archive: [],
     docDateStart: "",
     docDateEnd: "",
     expireDateStart: "",
     expireDateEnd: "",
-    expireIn: [],
+    expireIn: {},
   };
   const [filters, setFilters] = useState(initialFilters);
   const [rowsPerPage, setRowsPerPage] = useState(10);
@@ -79,6 +79,26 @@ export default function SiadilPage() {
       setSortColumn(columnId);
       setSortOrder("asc");
     }
+  };
+
+  const handleArchiveCheckboxChange = (
+    archiveCode: string,
+    isChecked: boolean
+  ) => {
+    setFilters((prev) => {
+      const currentArchives = prev.archive || []; // Pastikan array tidak null
+      if (isChecked) {
+        // Tambahkan kode arsip ke array jika dicentang
+        return { ...prev, archive: [...currentArchives, archiveCode] };
+      } else {
+        // Hapus kode arsip dari array jika tidak dicentang
+        return {
+          ...prev,
+          archive: currentArchives.filter((code) => code !== archiveCode),
+        };
+      }
+    });
+    setDocumentCurrentPage(1); // Reset ke halaman pertama setelah filter berubah
   };
 
   const breadcrumbItems = useMemo(() => {
@@ -127,83 +147,119 @@ export default function SiadilPage() {
     setFilters((prev) => ({ ...prev, [name]: value }));
     setDocumentCurrentPage(1);
   };
-
   const handleCheckboxChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { value, checked } = e.target;
     setFilters((prev) => {
-      const expireIn = prev.expireIn || [];
+      const newExpireIn = { ...prev.expireIn }; // Salin objek expireIn
+
       if (checked) {
-        return { ...prev, expireIn: [...expireIn, value] };
+        newExpireIn[value] = true; // Tambahkan key dan set nilainya true
       } else {
-        return { ...prev, expireIn: expireIn.filter((item) => item !== value) };
+        delete newExpireIn[value]; // Hapus key dari objek jika tidak dicentang
       }
+
+      return { ...prev, expireIn: newExpireIn };
     });
     setDocumentCurrentPage(1);
   };
 
+  const handleExpireMethodChange = (method: "range" | "period") => {
+    setExpireFilterMethod(method);
+    // Bersihkan state filter yang tidak aktif
+    if (method === "range") {
+      setFilters((prev) => ({ ...prev, expireIn: {} }));
+    } else {
+      setFilters((prev) => ({
+        ...prev,
+        expireDateStart: "",
+        expireDateEnd: "",
+      }));
+    }
+  };
+
   const filteredDocuments = useMemo(() => {
-    const filtered = documentsInCurrentFolder.filter((doc) => {
-      const keywordMatch =
-        filters.keyword.toLowerCase() === "" ||
-        doc.number.toLowerCase().includes(filters.keyword.toLowerCase()) ||
-        doc.title.toLowerCase().includes(filters.keyword.toLowerCase());
-      const archiveMatch =
-        filters.archive === "All" || doc.archive === filters.archive;
-      const docDateStartMatch =
-        filters.docDateStart === "" ||
-        new Date(doc.documentDate) >= new Date(filters.docDateStart);
-      const docDateEndMatch =
-        filters.docDateEnd === "" ||
-        new Date(doc.documentDate) <= new Date(filters.docDateEnd);
-      const expireDateStartMatch =
-        filters.expireDateStart === "" ||
-        new Date(doc.expireDate) >= new Date(filters.expireDateStart);
-      const expireDateEndMatch =
-        filters.expireDateEnd === "" ||
-        new Date(doc.expireDate) <= new Date(filters.expireDateEnd);
-      const expireInMatch =
-        filters.expireIn.length === 0 ||
-        filters.expireIn.some((period) => {
-          const now = new Date();
-          const expireDate = new Date(doc.expireDate);
-          if (period === "expired") return expireDate < now;
-          const targetDate = new Date();
-          if (period.endsWith("w")) {
-            targetDate.setDate(now.getDate() + parseInt(period) * 7);
-          } else if (period.endsWith("m")) {
-            targetDate.setMonth(now.getMonth() + parseInt(period));
+    return [...documentsInCurrentFolder]
+      .filter((doc) => {
+        const keywordMatch =
+          filters.keyword.toLowerCase() === "" ||
+          doc.number.toLowerCase().includes(filters.keyword.toLowerCase()) ||
+          doc.title.toLowerCase().includes(filters.keyword.toLowerCase());
+
+        const archiveMatch =
+          filters.archive.length === 0 || // Jika array kosong, tampilkan semua (logika untuk "Semua Arsip")
+          filters.archive.includes(doc.archive);
+
+        // PERBAIKAN: Membandingkan tanggal sebagai string untuk akurasi
+        const docDateStartMatch =
+          filters.docDateStart === "" ||
+          doc.documentDate >= filters.docDateStart;
+
+        const docDateEndMatch =
+          filters.docDateEnd === "" || doc.documentDate <= filters.docDateEnd;
+
+        let finalExpireMatch = true;
+
+        if (expireFilterMethod === "range") {
+          // PERBAIKAN: Membandingkan tanggal sebagai string untuk akurasi
+          const expireDateStartMatch =
+            filters.expireDateStart === "" ||
+            doc.expireDate >= filters.expireDateStart;
+          const expireDateEndMatch =
+            filters.expireDateEnd === "" ||
+            doc.expireDate <= filters.expireDateEnd;
+          finalExpireMatch = expireDateStartMatch && expireDateEndMatch;
+        } else {
+          // 'period'
+          const activeExpireInPeriods = Object.keys(filters.expireIn);
+          if (activeExpireInPeriods.length > 0) {
+            finalExpireMatch = activeExpireInPeriods.some((period) => {
+              const now = new Date();
+              // Untuk perbandingan periode, new Date() masih diperlukan
+              const expireDate = new Date(doc.expireDate);
+              if (period === "expired") return expireDate < now;
+              const targetDate = new Date();
+              if (period.endsWith("w")) {
+                targetDate.setDate(now.getDate() + parseInt(period) * 7);
+              } else if (period.endsWith("m")) {
+                targetDate.setMonth(now.getMonth() + parseInt(period));
+              }
+              return expireDate >= now && expireDate <= targetDate;
+            });
           }
-          return expireDate >= now && expireDate <= targetDate;
-        });
-      return (
-        keywordMatch &&
-        archiveMatch &&
-        docDateStartMatch &&
-        docDateEndMatch &&
-        expireDateStartMatch &&
-        expireDateEndMatch &&
-        expireInMatch
-      );
-    });
-    // Sort by document number (default), ascending/descending
-    return [...filtered].sort((a, b) => {
-      if (!sortColumn) return 0; // <-- TAMBAHKAN BARIS INI
-      const aValue = a[sortColumn];
-      const bValue = b[sortColumn];
-      if (aValue == null || bValue == null) return 0;
-      let comparison = 0;
-      if (sortColumn === "documentDate" || sortColumn === "updatedDate") {
-        comparison =
-          new Date(aValue as string).getTime() -
-          new Date(bValue as string).getTime();
-      } else {
-        comparison = String(aValue).localeCompare(String(bValue), undefined, {
-          numeric: true,
-        });
-      }
-      return sortOrder === "asc" ? comparison : -comparison;
-    });
-  }, [documentsInCurrentFolder, filters, sortOrder, sortColumn]);
+        }
+
+        return (
+          keywordMatch &&
+          archiveMatch &&
+          docDateStartMatch &&
+          docDateEndMatch &&
+          finalExpireMatch
+        );
+      })
+      .sort((a, b) => {
+        if (!sortColumn) return 0;
+        const aValue = a[sortColumn];
+        const bValue = b[sortColumn];
+        if (aValue == null || bValue == null) return 0;
+        let comparison = 0;
+        if (sortColumn === "documentDate" || sortColumn === "updatedDate") {
+          comparison =
+            new Date(aValue as string).getTime() -
+            new Date(bValue as string).getTime();
+        } else {
+          comparison = String(aValue).localeCompare(String(bValue), undefined, {
+            numeric: true,
+          });
+        }
+        return sortOrder === "asc" ? comparison : -comparison;
+      });
+  }, [
+    documentsInCurrentFolder,
+    filters,
+    sortOrder,
+    sortColumn,
+    expireFilterMethod,
+  ]);
 
   const paginatedDocuments = useMemo(() => {
     const startIndex = (documentCurrentPage - 1) * rowsPerPage;
@@ -399,7 +455,7 @@ export default function SiadilPage() {
               </div>
               <input
                 type="text"
-                placeholder="Cari arsip..."
+                placeholder="Search Archive"
                 value={searchQuery}
                 onChange={(e) => {
                   setSearchQuery(e.target.value);
@@ -479,7 +535,6 @@ export default function SiadilPage() {
                 setArchiveCurrentPage((p) => Math.min(totalPages, p + 1))
               }
               disabled={archiveCurrentPage === totalPages}
-              // TAMBAHKAN: class dark mode untuk background, border, dan teks
               className="px-3 py-1 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md disabled:opacity-50 hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700">
               Next
             </button>
@@ -522,7 +577,7 @@ export default function SiadilPage() {
                   strokeLinecap="round"
                 />
               </svg>
-              <span>Add New</span>
+              <span>Add New Document</span>
             </button>
             <ViewModeToggle viewMode={viewMode} setViewMode={setViewMode} />
           </div>
@@ -537,11 +592,12 @@ export default function SiadilPage() {
           onPageChange={setDocumentCurrentPage}
           onRowsPerPageChange={handleRowsPerPageChange}
           expireFilterMethod={expireFilterMethod}
-          setExpireFilterMethod={setExpireFilterMethod}
+          setExpireFilterMethod={handleExpireMethodChange}
           allTableColumns={allTableColumns}
           visibleColumns={visibleColumns}
           onColumnToggle={handleColumnToggle}
           isExporting={isExporting}
+          onArchiveCheckboxChange={handleArchiveCheckboxChange}
           onExport={handleExport}>
           {viewMode === "list" ? (
             <DocumentTable

@@ -24,12 +24,12 @@ export type Document = {
 };
 export type Filters = {
   keyword: string;
-  archive: string;
+  archive: string[];
   docDateStart: string;
   docDateEnd: string;
   expireDateStart: string;
   expireDateEnd: string;
-  expireIn: string[];
+  expireIn: Record<string, boolean>;
 };
 
 export type NewDocumentData = {
