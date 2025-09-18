@@ -30,14 +30,14 @@ export const FilterPopover = forwardRef<HTMLDivElement, FilterPopoverProps>(
     return (
       <div
         ref={ref}
-        className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg w-full flex flex-col">
+        className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg w-full flex flex-col ">
         <div className="p-4 border-b border-gray-200 dark:border-gray-600">
           <h3 className="font-semibold text-gray-800 dark:text-white">
             Date Filter
           </h3>
         </div>
 
-        <div className="p-4 space-y-4 overflow-y-auto">
+        <div className="p-4 space-y-4 overflow-y-auto flex-1">
           {/* Tanggal Dokumen */}
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
