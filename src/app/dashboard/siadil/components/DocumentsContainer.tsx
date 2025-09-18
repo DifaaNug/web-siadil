@@ -27,8 +27,6 @@ type DocumentsContainerProps = {
   allTableColumns: Column[];
   visibleColumns: Set<string>;
   onColumnToggle: (columnId: string) => void;
-  sortOrder: "asc" | "desc";
-  setSortOrder: (order: "asc" | "desc") => void;
   onExport: () => void;
   isExporting: boolean;
 };
@@ -48,8 +46,6 @@ export const DocumentsContainer = ({
   allTableColumns,
   visibleColumns,
   onColumnToggle,
-  sortOrder,
-  setSortOrder,
   onExport,
   isExporting,
 }: DocumentsContainerProps) => {
@@ -67,16 +63,6 @@ export const DocumentsContainer = ({
   const [columnTogglePopoverPosition, setColumnTogglePopoverPosition] =
     useState({ top: 0, left: 0 });
 
-  // Sort menu state
-  const [isSortMenuOpen, setIsSortMenuOpen] = useState(false);
-  const sortMenuButtonRef = useRef<HTMLButtonElement>(null);
-  const sortMenuPopoverRef = useRef<HTMLDivElement>(null);
-  const [sortMenuPopoverPosition, setSortMenuPopoverPosition] = useState({
-    top: 0,
-    left: 0,
-  });
-
-  // 1. Tambahkan state & ref baru untuk Export Popover
   const [isExportMenuOpen, setIsExportMenuOpen] = useState(false);
   const exportMenuButtonRef = useRef<HTMLButtonElement>(null);
   const exportMenuPopoverRef = useRef<HTMLDivElement>(null);
@@ -100,9 +86,9 @@ export const DocumentsContainer = ({
     columnToggleButtonRef
   );
   useOnClickOutside(
-    sortMenuPopoverRef,
-    () => setIsSortMenuOpen(false),
-    sortMenuButtonRef
+    exportMenuPopoverRef,
+    () => setIsExportMenuOpen(false),
+    exportMenuButtonRef
   );
 
   useEffect(() => {
@@ -179,30 +165,6 @@ export const DocumentsContainer = ({
   }, [isColumnToggleOpen]);
 
   useEffect(() => {
-    if (isSortMenuOpen && sortMenuButtonRef.current) {
-      const calculatePosition = () => {
-        if (!sortMenuPopoverRef.current || !sortMenuButtonRef.current) return;
-        const buttonRect = sortMenuButtonRef.current.getBoundingClientRect();
-        const popoverRect = sortMenuPopoverRef.current.getBoundingClientRect();
-        const margin = 8;
-        let top = buttonRect.bottom + margin;
-        const left = buttonRect.left;
-
-        if (top + popoverRect.height > window.innerHeight) {
-          top = buttonRect.top - popoverRect.height - margin;
-        }
-        setSortMenuPopoverPosition({ top, left });
-      };
-      const timer = setTimeout(calculatePosition, 0);
-      window.addEventListener("resize", calculatePosition);
-      return () => {
-        clearTimeout(timer);
-        window.removeEventListener("resize", calculatePosition);
-      };
-    }
-  }, [isSortMenuOpen]);
-
-  useEffect(() => {
     if (isExportMenuOpen && exportMenuButtonRef.current) {
       const calculatePosition = () => {
         if (!exportMenuPopoverRef.current || !exportMenuButtonRef.current)
@@ -231,7 +193,6 @@ export const DocumentsContainer = ({
   // Handler untuk toggle popover
   const handleFilterToggle = () => setIsFilterOpen((v) => !v);
   const handleColumnToggle = () => setIsColumnToggleOpen((v) => !v);
-  const handleSortMenuToggle = () => setIsSortMenuOpen((v) => !v);
   const handleExportMenuToggle = () => setIsExportMenuOpen((v) => !v);
 
   // 2. Tambahkan hook baru untuk menutup popover saat klik di luar
@@ -244,11 +205,6 @@ export const DocumentsContainer = ({
     columnTogglePopoverRef,
     () => setIsColumnToggleOpen(false),
     columnToggleButtonRef
-  );
-  useOnClickOutside(
-    sortMenuPopoverRef,
-    () => setIsSortMenuOpen(false),
-    sortMenuButtonRef
   );
   useOnClickOutside(
     exportMenuPopoverRef,
@@ -378,24 +334,6 @@ export const DocumentsContainer = ({
         <div className="flex items-center gap-2">
           <div className="flex items-center gap-2">
             <button
-              ref={sortMenuButtonRef}
-              onClick={handleSortMenuToggle}
-              className="px-3 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 flex items-center space-x-2">
-              <svg
-                className="w-4 h-4"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12"
-                />
-              </svg>
-              <span>Sort</span>
-            </button>
-            <button
               ref={exportMenuButtonRef}
               onClick={handleExportMenuToggle}
               className="px-3 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 flex items-center space-x-2">
@@ -446,74 +384,6 @@ export const DocumentsContainer = ({
                   visibleColumns={visibleColumns}
                   onColumnToggle={onColumnToggle}
                 />
-              </div>,
-              document.body
-            )}
-          {/* PERBAIKAN TAMPILAN POPOVER SORT */}
-          {isClient &&
-            isSortMenuOpen &&
-            ReactDOM.createPortal(
-              <div
-                ref={sortMenuPopoverRef}
-                style={{
-                  position: "fixed",
-                  top: `${sortMenuPopoverPosition.top}px`,
-                  left: `${sortMenuPopoverPosition.left}px`,
-                  zIndex: 50,
-                  visibility:
-                    sortMenuPopoverPosition.top === 0 ? "hidden" : "visible",
-                }}
-                // Kelas Tailwind untuk styling konsisten
-                className="w-40 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg p-1">
-                <button
-                  onClick={() => {
-                    setSortOrder("asc");
-                    setIsSortMenuOpen(false);
-                  }}
-                  className={`w-full text-left px-3 py-1.5 text-sm rounded-md flex items-center gap-2 ${
-                    sortOrder === "asc"
-                      ? "'font-semibold bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white'"
-                      : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
-                  }`}>
-                  <svg
-                    className="w-4 h-4"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor">
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M3 4h13M3 8h9m-9 4h6m4-4l4 4m0 0l4-4m-4 4v12"
-                    />
-                  </svg>
-                  <span>Ascending</span>
-                </button>
-
-                <button
-                  onClick={() => {
-                    setSortOrder("desc");
-                    setIsSortMenuOpen(false);
-                  }}
-                  className={`w-full text-left px-3 py-1.5 text-sm rounded-md flex items-center gap-2 ${
-                    sortOrder === "desc"
-                      ? "'font-semibold bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white"
-                      : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
-                  }`}>
-                  <svg
-                    className="w-4 h-4"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor">
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M3 4h13M3 8h9m-9 4h9m-9 4h13M17 20l4-4m0 0l-4-4m4 4H3"
-                    />
-                  </svg>
-                  <span>Descending</span>
-                </button>
               </div>,
               document.body
             )}
