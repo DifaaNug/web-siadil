@@ -102,7 +102,11 @@ export const DocumentsContainer = ({
         const spaceAbove = buttonRect.top;
         const margin = 8;
         let top = 0;
-        const left = buttonRect.left;
+        let left = 0;
+
+        // Position horizontally: align right of popover with right of button
+        const popoverWidth = filterPopoverRef.current.offsetWidth;
+        left = buttonRect.right - popoverWidth;
 
         if (spaceBelow > popoverHeight + margin) {
           top = buttonRect.bottom + margin;
@@ -117,6 +121,9 @@ export const DocumentsContainer = ({
         }
         if (top + popoverHeight > window.innerHeight - margin) {
           top = window.innerHeight - popoverHeight - margin;
+        }
+        if (left < margin) {
+          left = margin;
         }
         setFilterPopoverPosition({ top, left });
       };
@@ -190,48 +197,43 @@ export const DocumentsContainer = ({
     }
   }, [isExportMenuOpen]);
 
-  // Handler untuk toggle popover
   const handleFilterToggle = () => setIsFilterOpen((v) => !v);
   const handleColumnToggle = () => setIsColumnToggleOpen((v) => !v);
   const handleExportMenuToggle = () => setIsExportMenuOpen((v) => !v);
 
-  // 2. Tambahkan hook baru untuk menutup popover saat klik di luar
-  useOnClickOutside(
-    filterPopoverRef,
-    () => setIsFilterOpen(false),
-    filterButtonRef
-  );
-  useOnClickOutside(
-    columnTogglePopoverRef,
-    () => setIsColumnToggleOpen(false),
-    columnToggleButtonRef
-  );
-  useOnClickOutside(
-    exportMenuPopoverRef,
-    () => setIsExportMenuOpen(false),
-    exportMenuButtonRef
-  );
-
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
       <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center flex-wrap gap-2">
-        <div className="flex items-center gap-2">
-          <button
-            ref={filterButtonRef}
-            onClick={handleFilterToggle}
-            className="px-3 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 flex items-center space-x-2">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-              <path
-                d="M22 3H2L10 12.46V19L14 21V12.46L22 3Z"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-            <span>Filter</span>
-          </button>
+        {/* PERUBAHAN 1: Ganti Tombol Filter dengan Search Bar */}
+        <div className="flex-1 min-w-[250px]">
+          <div className="relative">
+            <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+              <svg
+                className="h-5 w-5 text-gray-400"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                />
+              </svg>
+            </div>
+            <input
+              type="text"
+              name="keyword"
+              id="keyword"
+              placeholder="Cari berdasarkan nomor, judul..."
+              value={filters.keyword}
+              onChange={onFilterChange}
+              className="w-full rounded-md border border-gray-300 bg-white py-1.5 pl-10 pr-4 text-sm text-gray-900 placeholder-gray-500 focus:border-green-500 focus:ring-green-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:placeholder-gray-400"
+            />
+          </div>
         </div>
+
         {isClient &&
           isFilterOpen &&
           ReactDOM.createPortal(
@@ -287,8 +289,8 @@ export const DocumentsContainer = ({
                 <div className="border-t border-gray-100 dark:border-gray-700 my-1" />
                 <button
                   onClick={() => {
-                    onExport(); // Panggil fungsi ekspor
-                    setIsExportMenuOpen(false); // Tutup popover
+                    onExport();
+                    setIsExportMenuOpen(false);
                   }}
                   disabled={isExporting}
                   className="w-full flex items-center px-2 py-1.5 text-sm rounded-md text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed">
@@ -331,39 +333,54 @@ export const DocumentsContainer = ({
             document.body
           )}
 
+        {/* PERUBAHAN 2: Pindahkan Tombol Filter ke sini */}
         <div className="flex items-center gap-2">
-          <div className="flex items-center gap-2">
-            <button
-              ref={exportMenuButtonRef}
-              onClick={handleExportMenuToggle}
-              className="px-3 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 flex items-center space-x-2">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-                <path
-                  d="M21 15V19C21 20.1046 20.1046 21 19 21H5C3.89543 21 3 20.1046 3 19V15M7 10L12 15L17 10M12 15V3"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-              <span>Export</span>
-            </button>
-            <button
-              ref={columnToggleButtonRef}
-              onClick={handleColumnToggle}
-              className="px-3 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 flex items-center space-x-2">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-                <path
-                  d="M3 12L5 10M5 10L3 8M5 10H11M13 12L15 10M15 10L13 8M15 10H21M7 20H17C18.1046 20 19 19.1046 19 18V6C19 4.89543 18.1046 4 17 4H7C5.89543 4 5 6V18C5 19.1046 5.89543 20 7 20Z"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-              <span>View</span>
-            </button>
-          </div>
+          <button
+            ref={filterButtonRef}
+            onClick={handleFilterToggle}
+            className="px-3 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 flex items-center space-x-2">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+              <path
+                d="M22 3H2L10 12.46V19L14 21V12.46L22 3Z"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+            <span>Filter</span>
+          </button>
+          <button
+            ref={exportMenuButtonRef}
+            onClick={handleExportMenuToggle}
+            className="px-3 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 flex items-center space-x-2">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+              <path
+                d="M21 15V19C21 20.1046 20.1046 21 19 21H5C3.89543 21 3 20.1046 3 19V15M7 10L12 15L17 10M12 15V3"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+            <span>Export</span>
+          </button>
+          <button
+            ref={columnToggleButtonRef}
+            onClick={handleColumnToggle}
+            className="px-3 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 flex items-center space-x-2">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+              <path
+                d="M3 12L5 10M5 10L3 8M5 10H11M13 12L15 10M15 10L13 8M15 10H21M7 20H17C18.1046 20 19 19.1046 19 18V6C19 4.89543 18.1046 4 17 4H7C5.89543 4 5 6V18C5 19.1046 5.89543 20 7 20Z"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+            <span>View</span>
+          </button>
+
           {isClient &&
             isColumnToggleOpen &&
             ReactDOM.createPortal(
