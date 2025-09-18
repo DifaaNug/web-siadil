@@ -40,29 +40,14 @@ export const FilterPopover = forwardRef<HTMLDivElement, FilterPopoverProps>(
         className="flex w-full max-w-md flex-col rounded-lg border border-gray-200 bg-white shadow-xl dark:border-gray-700 dark:bg-gray-800 max-h-[70vh]">
         <div className="p-5 border-b border-gray-200 dark:border-gray-700">
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-            Filter Dokumen
+            Filter Lanjutan
           </h3>
         </div>
 
         <div className="flex-grow overflow-y-auto p-5">
           <div className="space-y-8">
             <div className="space-y-5">
-              <div>
-                <label
-                  htmlFor="keyword"
-                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                  Pencarian Utama
-                </label>
-                <input
-                  type="text"
-                  id="keyword"
-                  name="keyword"
-                  value={filters.keyword}
-                  onChange={onFilterChange}
-                  placeholder="Cari berdasarkan nomor, judul..."
-                  className="w-full text-sm border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 rounded-md focus:ring-green-500 focus:border-green-500 text-gray-900 dark:text-gray-200 placeholder-gray-500 dark:placeholder-gray-400 px-3 py-2"
-                />
-              </div>
+              {/* INPUT PENCARIAN UTAMA DIHAPUS DARI SINI */}
               <div className="relative">
                 <label
                   htmlFor="archive-filter"
