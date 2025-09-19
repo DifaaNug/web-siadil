@@ -16,6 +16,7 @@ type ActionMenuProps = {
   documentId: string;
   onClose: () => void;
   buttonEl: HTMLButtonElement;
+  onMove: (documentId: string) => void;
 };
 
 export const ActionMenu = ({
@@ -72,6 +73,11 @@ export const ActionMenu = ({
       label: "Edit",
       icon: <IconEdit />,
       onClick: () => alert(`Edit for ${documentId}`),
+    },
+    {
+      label: "Pindahkan",
+      icon: <IconManageFiles />,
+      onClick: () => onMove(documentId),
     },
     {
       label: "Delete",
