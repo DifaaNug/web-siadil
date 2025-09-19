@@ -26,6 +26,7 @@ type DocumentTableProps = {
   sortOrder: "asc" | "desc" | null;
   selectedDocumentId: string | null;
   onDocumentSelect: (id: string) => void;
+  onMove: (docId: string) => void;
 };
 
 export const DocumentTable = ({
@@ -37,6 +38,7 @@ export const DocumentTable = ({
   sortOrder,
   selectedDocumentId,
   onDocumentSelect,
+  onMove,
 }: DocumentTableProps) => {
   const [activeActionMenu, setActiveActionMenu] =
     useState<ActiveMenuState>(null);
@@ -276,6 +278,7 @@ export const DocumentTable = ({
                       documentId={doc.id}
                       onClose={() => setActiveActionMenu(null)}
                       buttonEl={activeActionMenu.buttonEl}
+                      onMove={onMove}
                     />
                   )}
                 </td>
@@ -308,6 +311,7 @@ export const DocumentTable = ({
           y={contextMenu.y}
           documentId={contextMenu.documentId}
           onClose={handleCloseContextMenu}
+          onMove={onMove}
         />
       )}
     </>

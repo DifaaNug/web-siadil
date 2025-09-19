@@ -1,5 +1,4 @@
 // src/app/dashboard/siadil/components/ActionMenu.tsx
-
 "use client";
 
 import { useEffect, useRef, useState } from "react";
@@ -16,13 +15,14 @@ type ActionMenuProps = {
   documentId: string;
   onClose: () => void;
   buttonEl: HTMLButtonElement;
-  onMove: (documentId: string) => void;
+  onMove: (documentId: string) => void; // <-- Prop yang ditambahkan
 };
 
 export const ActionMenu = ({
   documentId,
   onClose,
   buttonEl,
+  onMove, // <-- Prop yang ditambahkan
 }: ActionMenuProps) => {
   const menuRef = useRef<HTMLDivElement>(null);
   const [style, setStyle] = useState<React.CSSProperties>({
@@ -36,23 +36,18 @@ export const ActionMenu = ({
     if (menuRef.current && buttonEl) {
       const menuRect = menuRef.current.getBoundingClientRect();
       const buttonRect = buttonEl.getBoundingClientRect();
-      // PERBAIKAN: Hapus 'innerWidth: windowWidth' karena tidak digunakan
       const { innerHeight: windowHeight } = window;
-
       const newStyle: React.CSSProperties = { position: "fixed" };
 
-      // Vertical positioning
       const spaceBelow = windowHeight - buttonRect.bottom;
       if (spaceBelow >= menuRect.height || spaceBelow > buttonRect.top) {
-        newStyle.top = buttonRect.bottom + 4; // Position below button
+        newStyle.top = buttonRect.bottom + 4;
       } else {
-        newStyle.bottom = windowHeight - buttonRect.top + 4; // Position above button
+        newStyle.bottom = windowHeight - buttonRect.top + 4;
       }
 
-      // Horizontal positioning
       const leftAligned = buttonRect.right - menuRect.width;
       if (leftAligned < 0) {
-        // If aligning right would push it off-screen left, align left instead.
         newStyle.left = buttonRect.left;
       } else {
         newStyle.left = leftAligned;
@@ -74,6 +69,7 @@ export const ActionMenu = ({
       icon: <IconEdit />,
       onClick: () => alert(`Edit for ${documentId}`),
     },
+    // Item "Pindahkan" ditambahkan di sini
     {
       label: "Pindahkan",
       icon: <IconManageFiles />,
@@ -91,23 +87,11 @@ export const ActionMenu = ({
       icon: <IconManageContributors />,
       onClick: () => alert(`Manage Contributors for ${documentId}`),
     },
-    {
-      label: "Delete All Contributors",
-      icon: <IconDelete />,
-      onClick: () => alert(`Delete All Contributors for ${documentId}`),
-      isDestructive: true,
-    },
     { isSeparator: true },
     {
       label: "Manage Files",
       icon: <IconManageFiles />,
       onClick: () => alert(`Manage Files for ${documentId}`),
-    },
-    {
-      label: "Delete All Files",
-      icon: <IconDelete />,
-      onClick: () => alert(`Delete All Files for ${documentId}`),
-      isDestructive: true,
     },
   ];
 

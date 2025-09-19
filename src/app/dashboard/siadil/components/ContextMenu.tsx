@@ -6,7 +6,6 @@ import {
   IconDetail,
   IconEdit,
   IconDelete,
-  IconManageContributors,
   IconManageFiles,
 } from "./ActionIcons";
 
@@ -27,7 +26,6 @@ export const ContextMenu = ({
 }: ContextMenuProps) => {
   const menuRef = useRef<HTMLDivElement>(null);
 
-  // Klik di luar menu akan menutupnya
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
@@ -41,14 +39,27 @@ export const ContextMenu = ({
   }, [onClose]);
 
   const menuItems = [
-    { label: "Detail", icon: <IconDetail /> },
-    { label: "Edit", icon: <IconEdit /> },
+    {
+      label: "Detail",
+      icon: <IconDetail />,
+      action: () => alert(`Detail for ${documentId}`),
+    },
+    {
+      label: "Edit",
+      icon: <IconEdit />,
+      action: () => alert(`Edit for ${documentId}`),
+    },
     {
       label: "Pindahkan",
       icon: <IconManageFiles />,
-      onClick: () => onMove(documentId),
+      action: () => onMove(documentId),
     },
-    { label: "Delete", icon: <IconDelete />, isDestructive: true },
+    {
+      label: "Delete",
+      icon: <IconDelete />,
+      isDestructive: true,
+      action: () => alert(`Delete ${documentId}`),
+    },
   ];
 
   return (
@@ -58,7 +69,7 @@ export const ContextMenu = ({
       style={{ top: y, left: x }}>
       <div className="px-2 py-1 mb-1">
         <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">
-          {documentId}
+          ID: {documentId}
         </p>
       </div>
       <div className="border-t border-gray-200 dark:border-gray-700 my-1" />
@@ -67,7 +78,7 @@ export const ContextMenu = ({
           <li key={index}>
             <button
               onClick={() => {
-                alert(`${item.label} clicked for document ${documentId}`);
+                item.action(); // <-- Perbaikan logika di sini
                 onClose();
               }}
               className={`w-full flex items-center px-2 py-1.5 text-sm rounded-md ${

@@ -747,7 +747,7 @@ export default function SiadilPage() {
               // 2. Teruskan state dan fungsi ke DocumentTable
               selectedDocumentId={selectedDocumentId}
               onDocumentSelect={setSelectedDocumentId}
-              onMoveClick={handleOpenMoveModal}
+              onMove={handleOpenMoveModal}
             />
           ) : (
             <DocumentGrid
@@ -755,7 +755,7 @@ export default function SiadilPage() {
               // 3. Teruskan state dan fungsi ke DocumentGrid
               selectedDocumentId={selectedDocumentId}
               onDocumentSelect={setSelectedDocumentId}
-              onMoveClick={handleOpenMoveModal}
+              onMove={handleOpenMoveModal}
             />
           )}
         </DocumentsContainer>

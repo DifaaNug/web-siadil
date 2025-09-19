@@ -14,10 +14,12 @@ export const DocumentGrid = ({
   documents,
   selectedDocumentId,
   onDocumentSelect,
+  onMove, // Ditambahkan
 }: {
   documents: Document[];
   selectedDocumentId: string | null;
   onDocumentSelect: (id: string) => void;
+  onMove: (docId: string) => void; // Ditambahkan
 }) => {
   const [activeActionMenu, setActiveActionMenu] = useState<null | {
     docId: string;
@@ -27,7 +29,7 @@ export const DocumentGrid = ({
 
   const handleContextMenu = (event: React.MouseEvent, docId: string) => {
     event.preventDefault();
-    onDocumentSelect(docId); // Pilih dokumen saat klik kanan
+    onDocumentSelect(docId);
     setContextMenu({ x: event.clientX, y: event.clientY, documentId: docId });
   };
 
@@ -100,18 +102,19 @@ export const DocumentGrid = ({
                 documentId={doc.id}
                 onClose={() => setActiveActionMenu(null)}
                 buttonEl={activeActionMenu.buttonEl}
+                onMove={onMove}
               />
             )}
           </div>
         ))}
       </div>
-
       {contextMenu && (
         <ContextMenu
           x={contextMenu.x}
           y={contextMenu.y}
           documentId={contextMenu.documentId}
           onClose={handleCloseContextMenu}
+          onMove={onMove}
         />
       )}
     </>
