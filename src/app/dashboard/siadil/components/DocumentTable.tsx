@@ -1,7 +1,15 @@
+// src/app/dashboard/siadil/components/DocumentTable.tsx
 import { useState } from "react";
 import { Document } from "../types";
 import { ActionMenu } from "./ActionMenu";
 import { HeaderSortMenu } from "./HeaderSortMenu";
+import { ContextMenu } from "./ContextMenu";
+
+type ContextMenuState = {
+  x: number;
+  y: number;
+  documentId: string;
+} | null;
 
 type ActiveMenuState = { docId: string; buttonEl: HTMLButtonElement } | null;
 type ActiveHeaderMenuState = {
@@ -14,8 +22,10 @@ type DocumentTableProps = {
   visibleColumns: Set<string>;
   onSortChange: (column: keyof Document, order: "asc" | "desc") => void;
   onColumnToggle: (columnId: string) => void;
-  sortColumn: keyof Document | null; // <-- TAMBAHKAN | null
-  sortOrder: "asc" | "desc" | null; // <-- TAMBAHKAN | null
+  sortColumn: keyof Document | null;
+  sortOrder: "asc" | "desc" | null;
+  selectedDocumentId: string | null;
+  onDocumentSelect: (id: string) => void;
 };
 
 export const DocumentTable = ({
@@ -25,11 +35,24 @@ export const DocumentTable = ({
   onColumnToggle,
   sortColumn,
   sortOrder,
+  selectedDocumentId,
+  onDocumentSelect,
 }: DocumentTableProps) => {
   const [activeActionMenu, setActiveActionMenu] =
     useState<ActiveMenuState>(null);
   const [activeHeaderMenu, setActiveHeaderMenu] =
     useState<ActiveHeaderMenuState>(null);
+  const [contextMenu, setContextMenu] = useState<ContextMenuState>(null);
+
+  const handleContextMenu = (event: React.MouseEvent, docId: string) => {
+    event.preventDefault();
+    onDocumentSelect(docId); // Pilih dokumen saat klik kanan
+    setContextMenu({ x: event.clientX, y: event.clientY, documentId: docId });
+  };
+
+  const handleCloseContextMenu = () => {
+    setContextMenu(null);
+  };
 
   const handleMenuToggle = (docId: string, buttonEl: HTMLButtonElement) => {
     setActiveActionMenu((prev) =>
@@ -45,9 +68,7 @@ export const DocumentTable = ({
     });
 
   const SortIndicator = ({ columnId }: { columnId: keyof Document }) => {
-    // Jika kolom ini sedang aktif disortir
     if (sortColumn === columnId) {
-      // Tampilkan panah atas jika 'asc'
       if (sortOrder === "asc") {
         return (
           <svg
@@ -64,7 +85,6 @@ export const DocumentTable = ({
           </svg>
         );
       }
-      // Tampilkan panah bawah jika 'desc'
       return (
         <svg
           className="w-4 h-4 text-gray-900 dark:text-white"
@@ -80,8 +100,6 @@ export const DocumentTable = ({
         </svg>
       );
     }
-
-    // Jika kolom tidak aktif, tampilkan ikon default
     return (
       <svg
         className="w-4 h-4 text-gray-400"
@@ -161,7 +179,13 @@ export const DocumentTable = ({
           {documents.map((doc) => (
             <tr
               key={doc.id}
-              className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+              onContextMenu={(e) => handleContextMenu(e, doc.id)}
+              onClick={() => onDocumentSelect(doc.id)}
+              className={`transition-colors cursor-pointer ${
+                selectedDocumentId === doc.id
+                  ? "bg-green-50 dark:bg-green-900/50"
+                  : "hover:bg-gray-50 dark:hover:bg-gray-700"
+              }`}>
               <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
                 {doc.id}
               </td>
@@ -217,7 +241,6 @@ export const DocumentTable = ({
               {visibleColumns.has("updatedAndCreatedBy") && (
                 <td className="px-4 py-4 text-sm">
                   <div>
-                    {/* Ukuran font sekarang seragam (text-sm) dari parent td */}
                     <div className="text-gray-900 dark:text-white">
                       Updated: {formatDate(doc.updatedDate)}
                     </div>
@@ -277,6 +300,14 @@ export const DocumentTable = ({
             onColumnToggle(activeHeaderMenu.columnId);
             setActiveHeaderMenu(null);
           }}
+        />
+      )}
+      {contextMenu && (
+        <ContextMenu
+          x={contextMenu.x}
+          y={contextMenu.y}
+          documentId={contextMenu.documentId}
+          onClose={handleCloseContextMenu}
         />
       )}
     </>
