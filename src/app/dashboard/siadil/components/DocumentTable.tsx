@@ -24,8 +24,8 @@ type DocumentTableProps = {
   onColumnToggle: (columnId: string) => void;
   sortColumn: keyof Document | null;
   sortOrder: "asc" | "desc" | null;
-  selectedDocumentId: string | null;
-  onDocumentSelect: (id: string) => void;
+  selectedDocumentIds: Set<string>;
+  onDocumentSelect: (id: string, event?: React.MouseEvent) => void;
   onMove: (docId: string) => void;
 };
 
@@ -36,7 +36,7 @@ export const DocumentTable = ({
   onColumnToggle,
   sortColumn,
   sortOrder,
-  selectedDocumentId,
+  selectedDocumentIds,
   onDocumentSelect,
   onMove,
 }: DocumentTableProps) => {
@@ -182,9 +182,9 @@ export const DocumentTable = ({
             <tr
               key={doc.id}
               onContextMenu={(e) => handleContextMenu(e, doc.id)}
-              onClick={() => onDocumentSelect(doc.id)}
+              onClick={(e) => onDocumentSelect(doc.id, e)}
               className={`transition-colors cursor-pointer ${
-                selectedDocumentId === doc.id
+                selectedDocumentIds.has(doc.id)
                   ? "bg-green-50 dark:bg-green-900/50"
                   : "hover:bg-gray-50 dark:hover:bg-gray-700"
               }`}>

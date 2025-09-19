@@ -1,25 +1,20 @@
-// src/app/dashboard/siadil/components/DocumentGrid.tsx
 import { useState } from "react";
 import { Document } from "../types";
 import { ActionMenu } from "./ActionMenu";
 import { ContextMenu } from "./ContextMenu";
 
-type ContextMenuState = {
-  x: number;
-  y: number;
-  documentId: string;
-} | null;
+type ContextMenuState = { x: number; y: number; documentId: string } | null;
 
 export const DocumentGrid = ({
   documents,
-  selectedDocumentId,
+  selectedDocumentIds,
   onDocumentSelect,
-  onMove, // Ditambahkan
+  onMove,
 }: {
   documents: Document[];
-  selectedDocumentId: string | null;
-  onDocumentSelect: (id: string) => void;
-  onMove: (docId: string) => void; // Ditambahkan
+  selectedDocumentIds: Set<string>;
+  onDocumentSelect: (id: string, event?: React.MouseEvent) => void;
+  onMove: (docId: string) => void;
 }) => {
   const [activeActionMenu, setActiveActionMenu] = useState<null | {
     docId: string;
@@ -29,7 +24,9 @@ export const DocumentGrid = ({
 
   const handleContextMenu = (event: React.MouseEvent, docId: string) => {
     event.preventDefault();
-    onDocumentSelect(docId);
+    if (!selectedDocumentIds.has(docId)) {
+      onDocumentSelect(docId, event);
+    }
     setContextMenu({ x: event.clientX, y: event.clientY, documentId: docId });
   };
 
@@ -44,10 +41,10 @@ export const DocumentGrid = ({
           <div
             key={doc.id}
             onContextMenu={(e) => handleContextMenu(e, doc.id)}
-            onClick={() => onDocumentSelect(doc.id)}
+            onClick={(e) => onDocumentSelect(doc.id, e)}
             className={`group relative rounded-lg border p-4 transition-all cursor-pointer ${
-              selectedDocumentId === doc.id
-                ? "bg-green-50 border-green-500 dark:bg-green-900/50 dark:border-green-700"
+              selectedDocumentIds.has(doc.id)
+                ? "bg-green-50 border-green-500 dark:bg-green-900/50 dark:border-green-700 ring-2 ring-green-500"
                 : "border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800"
             }`}>
             <button
@@ -108,6 +105,7 @@ export const DocumentGrid = ({
           </div>
         ))}
       </div>
+
       {contextMenu && (
         <ContextMenu
           x={contextMenu.x}
