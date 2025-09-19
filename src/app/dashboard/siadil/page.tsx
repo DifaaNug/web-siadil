@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, ChangeEvent } from "react";
+import { useState, useMemo, ChangeEvent, useRef } from "react";
 import Breadcrumb from "@/components/Breadcrumb";
 import CreateArchiveModal from "@/components/CreateArchiveModal";
 import { Filters, NewDocumentData, Document } from "./types"; // Pastikan Document diimpor
@@ -13,6 +13,10 @@ import { ArchiveCard, PersonalArchiveCard } from "./components/ArchiveCards";
 import ViewModeToggle from "./components/ViewModeToggle";
 import { SearchPopup } from "./components/SearchPopup";
 import { FolderIcon } from "./components/FolderIcon";
+import { Dropzone } from "./components/DropZone";
+import { AddNewMenu } from "./components/AddNewMenu";
+import { InfoPanel } from "./components/InfoPanel";
+import { MoveToModal } from "./components/MoveToModal";
 
 const allTableColumns = [
   { id: "numberAndTitle", label: "Number & Title" },
@@ -30,6 +34,8 @@ export default function SiadilPage() {
   const [isSearchPopupOpen, setIsSearchPopupOpen] = useState(false);
   const [viewMode, setViewMode] = useState<"list" | "grid">("list");
   const [currentFolderId, setCurrentFolderId] = useState("root");
+  const [isAddNewMenuOpen, setIsAddNewMenuOpen] = useState(false); // State untuk menu baru
+  const addNewButtonRef = useRef<HTMLButtonElement>(null);
   const [expireFilterMethod, setExpireFilterMethod] = useState<
     "range" | "period"
   >("range");
@@ -339,6 +345,49 @@ export default function SiadilPage() {
     }, 2000); // 2000 ms = 2 detik
   };
 
+  const [droppedFiles, setDroppedFiles] = useState<File[]>([]);
+
+  // TAMBAHKAN FUNGSI HANDLER BARU INI
+  const handleFilesAdded = (files: File[]) => {
+    setDroppedFiles(files);
+    // Di sini Anda bisa memicu modal unggah atau langsung mengunggah
+    console.log("File yang akan diunggah:", files);
+    alert(`${files.length} file siap untuk diunggah!`);
+  };
+
+  const [selectedDocumentId, setSelectedDocumentId] = useState<string | null>(
+    null
+  );
+
+  // Cari data dokumen yang dipilih berdasarkan ID-nya
+  const selectedDocument = useMemo(
+    () => allDocuments.find((doc) => doc.id === selectedDocumentId) || null,
+    [selectedDocumentId]
+  );
+
+  // Fungsi untuk menutup panel
+  const handleCloseInfoPanel = () => {
+    setSelectedDocumentId(null);
+  };
+
+  const [isMoveModalOpen, setIsMoveModalOpen] = useState(false);
+  const [documentToMove, setDocumentToMove] = useState<string | null>(null);
+
+  // TAMBAHKAN FUNGSI HANDLER BARU INI
+  const handleOpenMoveModal = (docId: string) => {
+    setDocumentToMove(docId);
+    setIsMoveModalOpen(true);
+  };
+
+  const handleConfirmMove = (targetArchiveId: string) => {
+    alert(
+      `Pindahkan dokumen ID: ${documentToMove} ke arsip ID: ${targetArchiveId}`
+    );
+    // Di sini nantinya akan ada logika untuk memindahkan data
+    setIsMoveModalOpen(false);
+    setDocumentToMove(null);
+  };
+
   return (
     <>
       <div className="mb-10">
@@ -430,58 +479,156 @@ export default function SiadilPage() {
         </div>
       </div>
       <div className="mb-10">
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-            Archives
-          </h2>
-
-          <div className="flex items-center gap-3">
-            {/* Search Bar */}
-            <div className="relative w-full max-w-xs hidden sm:block">
-              <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+        {/* Ganti header lama dengan semua kode di bawah ini */}
+        {currentFolderId === "root" ? (
+          // Tampilan jika di folder root (seperti yang sekarang)
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+              Archives
+            </h2>
+            <div className="flex items-center gap-4">
+              <div className="relative w-full max-w-xs">
+                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                  <svg
+                    className="h-5 w-5 text-gray-400"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                    />
+                  </svg>
+                </div>
+                <input
+                  type="text"
+                  placeholder="Search Archive"
+                  value={searchQuery}
+                  onChange={(e) => {
+                    setSearchQuery(e.target.value);
+                    setArchiveCurrentPage(1);
+                  }}
+                  className="w-full rounded-md border border-gray-300 bg-white py-1.5 pl-10 pr-4 text-sm text-gray-900 placeholder-gray-500 focus:border-green-500 focus:ring-green-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:placeholder-gray-400"
+                />
+              </div>
+              <div className="relative">
+                <button
+                  ref={addNewButtonRef}
+                  onClick={() => setIsAddNewMenuOpen(!isAddNewMenuOpen)}
+                  className="bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 font-semibold px-5 py-2.5 rounded-lg shadow hover:shadow-lg transition-all duration-200 ease-in-out flex items-center border border-gray-200 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                  <svg
+                    className="w-5 h-5 mr-2 -ml-1"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 4v16m8-8H4"
+                    />
+                  </svg>
+                  <span>Add New</span>
+                </button>
+                {isAddNewMenuOpen && (
+                  <AddNewMenu
+                    buttonRef={addNewButtonRef}
+                    onClose={() => setIsAddNewMenuOpen(false)}
+                    onNewFolder={() => setIsCreateModalOpen(true)}
+                    onFileUpload={() => setIsAddModalOpen(true)}
+                  />
+                )}
+              </div>
+            </div>
+          </div>
+        ) : (
+          // Tampilan jika di dalam sebuah folder
+          <div className="flex justify-between items-center mb-6">
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => setCurrentFolderId("root")}
+                className="p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                title="Kembali ke Root">
                 <svg
-                  className="h-5 w-5 text-gray-400"
-                  xmlns="http://www.w3.org/2000/svg"
+                  className="w-6 h-6 text-gray-600 dark:text-gray-300"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor">
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                    strokeWidth={2}
+                    d="M10 19l-7-7m0 0l7-7m-7 7h18"
                   />
                 </svg>
-              </div>
-              <input
-                type="text"
-                placeholder="Search Archive"
-                value={searchQuery}
-                onChange={(e) => {
-                  setSearchQuery(e.target.value);
-                  setArchiveCurrentPage(1);
-                }}
-                className="w-full rounded-md border border-gray-300 bg-white py-1.5 pl-10 pr-4 text-sm text-gray-900 placeholder-gray-500 focus:border-green-500 focus:ring-green-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:placeholder-gray-400"
-              />
+              </button>
+              <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+                {allArchives.find((a) => a.id === currentFolderId)?.name ||
+                  "Arsip"}
+              </h2>
             </div>
-
-            {/* Tombol Create New Archive */}
-            <button
-              onClick={() => setIsCreateModalOpen(true)}
-              // DISAMAKAN: padding, ukuran teks, dan tinggi
-              className="text-white px-3 py-1.5 rounded-md text-sm font-medium flex items-center space-x-1.5 transition-colors bg-demplon hover:bg-green-700 flex-shrink-0">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-                <path
-                  d="M12 5V19M5 12H19"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
+            <div className="flex items-center gap-4">
+              <div className="relative w-full max-w-xs">
+                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                  <svg
+                    className="h-5 w-5 text-gray-400"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                    />
+                  </svg>
+                </div>
+                <input
+                  type="text"
+                  placeholder="Search Archive"
+                  value={searchQuery}
+                  onChange={(e) => {
+                    setSearchQuery(e.target.value);
+                    setArchiveCurrentPage(1);
+                  }}
+                  className="w-full rounded-md border border-gray-300 bg-white py-1.5 pl-10 pr-4 text-sm text-gray-900 placeholder-gray-500 focus:border-green-500 focus:ring-green-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:placeholder-gray-400"
                 />
-              </svg>
-              <span>Create new archive</span>
-            </button>
+              </div>
+              <div className="relative">
+                <button
+                  ref={addNewButtonRef}
+                  onClick={() => setIsAddNewMenuOpen(!isAddNewMenuOpen)}
+                  className="bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 font-semibold px-5 py-2.5 rounded-lg shadow hover:shadow-lg transition-all duration-200 ease-in-out flex items-center border border-gray-200 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                  <svg
+                    className="w-5 h-5 mr-2 -ml-1"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 4v16m8-8H4"
+                    />
+                  </svg>
+                  <span>Add New</span>
+                </button>
+                {isAddNewMenuOpen && (
+                  <AddNewMenu
+                    buttonRef={addNewButtonRef}
+                    onClose={() => setIsAddNewMenuOpen(false)}
+                    onNewFolder={() => setIsCreateModalOpen(true)}
+                    onFileUpload={() => setIsAddModalOpen(true)}
+                  />
+                )}
+              </div>
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Grid Arsip */}
         <div className="grid grid-cols-[repeat(auto-fill,minmax(200px,1fr))] gap-6">
@@ -541,6 +688,9 @@ export default function SiadilPage() {
           </div>
         )}
       </div>
+      <div className="mb-10">
+        <Dropzone onFilesAdded={handleFilesAdded} />
+      </div>
 
       <div>
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
@@ -565,20 +715,7 @@ export default function SiadilPage() {
               </svg>
               <span>Search Document</span>
             </button>
-            {/* PERBAIKAN 3: Mengganti inline style dengan Tailwind class */}
-            <button
-              onClick={() => setIsAddModalOpen(true)}
-              className="text-white px-3 py-1.5 rounded-md text-sm font-medium flex items-center space-x-1.5 transition-colors bg-demplon hover:bg-green-700">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-                <path
-                  d="M12 5V19M5 12H19"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                />
-              </svg>
-              <span>Add New Document</span>
-            </button>
+
             <ViewModeToggle viewMode={viewMode} setViewMode={setViewMode} />
           </div>
         </div>
@@ -607,12 +744,26 @@ export default function SiadilPage() {
               sortColumn={sortColumn}
               sortOrder={sortOrder}
               onColumnToggle={handleColumnToggle}
+              // 2. Teruskan state dan fungsi ke DocumentTable
+              selectedDocumentId={selectedDocumentId}
+              onDocumentSelect={setSelectedDocumentId}
+              onMoveClick={handleOpenMoveModal}
             />
           ) : (
-            <DocumentGrid documents={paginatedDocuments} />
+            <DocumentGrid
+              documents={paginatedDocuments}
+              // 3. Teruskan state dan fungsi ke DocumentGrid
+              selectedDocumentId={selectedDocumentId}
+              onDocumentSelect={setSelectedDocumentId}
+              onMoveClick={handleOpenMoveModal}
+            />
           )}
         </DocumentsContainer>
       </div>
+      <InfoPanel
+        selectedDocument={selectedDocument}
+        onClose={handleCloseInfoPanel}
+      />
 
       {isCreateModalOpen && (
         <CreateArchiveModal
@@ -641,6 +792,13 @@ export default function SiadilPage() {
           searchQuery={searchQuery}
           setSearchQuery={setSearchQuery}
           documents={allDocuments}
+        />
+      )}
+      {isMoveModalOpen && (
+        <MoveToModal
+          archives={allArchives}
+          onClose={() => setIsMoveModalOpen(false)}
+          onMove={handleConfirmMove}
         />
       )}
     </>
