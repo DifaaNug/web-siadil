@@ -340,9 +340,21 @@ export default function SiadilPage() {
   const [droppedFiles, setDroppedFiles] = useState<File[]>([]);
 
   const handleFilesAdded = (files: File[]) => {
-    setDroppedFiles(files);
-    console.log("File yang akan diunggah:", files);
-    alert(`${files.length} file siap untuk diunggah!`);
+    if (files.length === 0) return;
+
+    // Ambil file pertama yang di-drop
+    const file = files[0];
+
+    // Set state newDocument dengan file yang baru di-drop
+    setNewDocument((prev) => ({
+      ...prev,
+      file: file,
+      // Coba isi otomatis judul dari nama file (tanpa ekstensi)
+      title: file.name.split(".").slice(0, -1).join("."),
+    }));
+
+    // Buka modal untuk mengisi sisa data
+    setIsAddModalOpen(true);
   };
 
   const handleDocumentSelect = (docId: string, event?: React.MouseEvent) => {
@@ -646,81 +658,83 @@ export default function SiadilPage() {
       </div>
 
       {/* ===== PERUBAHAN 2: Logika untuk menampilkan DocumentsContainer atau Dropzone ===== */}
-      <div className="relative">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-            Dokumen
-          </h2>
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => setIsSearchPopupOpen(true)}
-              className="px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-600 focus:ring-2 focus:ring-blue-500 focus:border-transparent text-left flex items-center gap-2">
-              <svg
-                className="text-gray-400 w-4 h-4"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                />
-              </svg>
-              <span>Search Document</span>
-            </button>
-            <ViewModeToggle viewMode={viewMode} setViewMode={setViewMode} />
+      {currentFolderId !== "root" && (
+        <div className="relative">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+              Dokumen
+            </h2>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => setIsSearchPopupOpen(true)}
+                className="px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-600 focus:ring-2 focus:ring-blue-500 focus:border-transparent text-left flex items-center gap-2">
+                <svg
+                  className="text-gray-400 w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24">
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                  />
+                </svg>
+                <span>Search Document</span>
+              </button>
+              <ViewModeToggle viewMode={viewMode} setViewMode={setViewMode} />
+            </div>
           </div>
+
+          {hasDocuments ? (
+            <DocumentsContainer
+              archives={allArchives}
+              filters={filters}
+              onFilterChange={handleFilterChange}
+              onCheckboxChange={handleCheckboxChange}
+              onFilterReset={handleFilterReset}
+              pagination={pagination}
+              onPageChange={setDocumentCurrentPage}
+              onRowsPerPageChange={handleRowsPerPageChange}
+              expireFilterMethod={expireFilterMethod}
+              setExpireFilterMethod={handleExpireMethodChange}
+              allTableColumns={allTableColumns}
+              visibleColumns={visibleColumns}
+              onColumnToggle={handleColumnToggle}
+              isExporting={isExporting}
+              onArchiveCheckboxChange={handleArchiveCheckboxChange}
+              onExport={handleExport}>
+              {viewMode === "list" ? (
+                <DocumentTable
+                  documents={paginatedDocuments}
+                  visibleColumns={visibleColumns}
+                  onSortChange={handleSort}
+                  sortColumn={sortColumn}
+                  sortOrder={sortOrder}
+                  onColumnToggle={handleColumnToggle}
+                  selectedDocumentIds={selectedDocumentIds}
+                  onDocumentSelect={handleDocumentSelect}
+                  onMove={handleOpenMoveModal}
+                />
+              ) : (
+                <DocumentGrid
+                  documents={paginatedDocuments}
+                  selectedDocumentIds={selectedDocumentIds}
+                  onDocumentSelect={handleDocumentSelect}
+                  onMove={handleOpenMoveModal}
+                />
+              )}
+            </DocumentsContainer>
+          ) : (
+            <Dropzone onFilesAdded={handleFilesAdded} />
+          )}
+
+          <InfoPanel
+            selectedDocument={selectedDocument}
+            onClose={handleCloseInfoPanel}
+          />
         </div>
-
-        {hasDocuments ? (
-          <DocumentsContainer
-            archives={allArchives}
-            filters={filters}
-            onFilterChange={handleFilterChange}
-            onCheckboxChange={handleCheckboxChange}
-            onFilterReset={handleFilterReset}
-            pagination={pagination}
-            onPageChange={setDocumentCurrentPage}
-            onRowsPerPageChange={handleRowsPerPageChange}
-            expireFilterMethod={expireFilterMethod}
-            setExpireFilterMethod={handleExpireMethodChange}
-            allTableColumns={allTableColumns}
-            visibleColumns={visibleColumns}
-            onColumnToggle={handleColumnToggle}
-            isExporting={isExporting}
-            onArchiveCheckboxChange={handleArchiveCheckboxChange}
-            onExport={handleExport}>
-            {viewMode === "list" ? (
-              <DocumentTable
-                documents={paginatedDocuments}
-                visibleColumns={visibleColumns}
-                onSortChange={handleSort}
-                sortColumn={sortColumn}
-                sortOrder={sortOrder}
-                onColumnToggle={handleColumnToggle}
-                selectedDocumentIds={selectedDocumentIds}
-                onDocumentSelect={handleDocumentSelect}
-                onMove={handleOpenMoveModal}
-              />
-            ) : (
-              <DocumentGrid
-                documents={paginatedDocuments}
-                selectedDocumentIds={selectedDocumentIds}
-                onDocumentSelect={handleDocumentSelect}
-                onMove={handleOpenMoveModal}
-              />
-            )}
-          </DocumentsContainer>
-        ) : (
-          <Dropzone onFilesAdded={handleFilesAdded} />
-        )}
-
-        <InfoPanel
-          selectedDocument={selectedDocument}
-          onClose={handleCloseInfoPanel}
-        />
-      </div>
+      )}
 
       {isCreateModalOpen && (
         <CreateArchiveModal

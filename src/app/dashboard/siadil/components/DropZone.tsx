@@ -66,9 +66,8 @@ export const Dropzone = ({ onFilesAdded }: DropzoneProps) => {
         ref={inputRef}
         type="file"
         className="hidden"
-        multiple // Izinkan memilih banyak file
+        // HAPUS prop 'multiple' agar hanya bisa pilih satu file
         onChange={handleChange}
-        // Batasi tipe file yang bisa dipilih
         accept="application/pdf, .doc, .docx, .xls, .xlsx, .ppt, .pptx, application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document, application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-powerpoint, application/vnd.openxmlformats-officedocument.presentationml.presentation"
       />
 
