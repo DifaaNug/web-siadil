@@ -1,7 +1,7 @@
 // src/app/dashboard/siadil/components/Dropzone.tsx
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef } from "react";
 
 type DropzoneProps = {
   onFilesAdded: (files: File[]) => void;
@@ -9,6 +9,8 @@ type DropzoneProps = {
 
 export const Dropzone = ({ onFilesAdded }: DropzoneProps) => {
   const [isDragActive, setIsDragActive] = useState(false);
+  // Ref untuk input file yang tersembunyi
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const handleDrag = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -34,17 +36,42 @@ export const Dropzone = ({ onFilesAdded }: DropzoneProps) => {
     [onFilesAdded]
   );
 
+  // Fungsi untuk menangani file yang dipilih dari klik
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    e.preventDefault();
+    if (e.target.files && e.target.files.length > 0) {
+      onFilesAdded(Array.from(e.target.files));
+    }
+  };
+
+  // Fungsi untuk memicu klik pada input file
+  const onButtonClick = () => {
+    inputRef.current?.click();
+  };
+
   return (
     <div
+      onClick={onButtonClick} // Tambahkan onClick handler
       onDragEnter={handleDrag}
       onDragLeave={handleDrag}
       onDragOver={handleDrag}
       onDrop={handleDrop}
-      className={`mt-6 border-2 border-dashed rounded-lg p-12 text-center transition-colors duration-200 ${
+      className={`mt-6 border-2 border-dashed rounded-lg p-12 text-center transition-colors duration-200 cursor-pointer ${
         isDragActive
           ? "border-green-600 bg-green-50 dark:bg-green-900/50"
           : "border-gray-300 dark:border-gray-600 hover:border-gray-400"
       }`}>
+      {/* Input file yang sebenarnya, tapi disembunyikan */}
+      <input
+        ref={inputRef}
+        type="file"
+        className="hidden"
+        multiple // Izinkan memilih banyak file
+        onChange={handleChange}
+        // Batasi tipe file yang bisa dipilih
+        accept="application/pdf, .doc, .docx, .xls, .xlsx, .ppt, .pptx, application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document, application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-powerpoint, application/vnd.openxmlformats-officedocument.presentationml.presentation"
+      />
+
       <div className="flex flex-col items-center pointer-events-none">
         <svg
           className={`w-12 h-12 mb-4 ${
@@ -67,7 +94,7 @@ export const Dropzone = ({ onFilesAdded }: DropzoneProps) => {
           atau klik untuk memilih file
         </p>
         <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">
-          PNG, JPG, PDF, DOCX, dll.
+          Hanya file dokumen (PDF, Word, Excel, dll.) yang diperbolehkan
         </p>
       </div>
     </div>
