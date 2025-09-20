@@ -492,7 +492,9 @@ export default function SiadilPage() {
             </div>
           </div>
         </div>
-        <div className="relative">
+
+        {/* ===== Tombol "+ Add New" dipindahkan ke sini ===== */}
+        <div className="mt-6 relative">
           <button
             ref={addNewButtonRef}
             onClick={() => setIsAddNewMenuOpen(!isAddNewMenuOpen)}
@@ -517,6 +519,8 @@ export default function SiadilPage() {
               onClose={() => setIsAddNewMenuOpen(false)}
               onNewFolder={() => setIsCreateModalOpen(true)}
               onFileUpload={() => setIsAddModalOpen(true)}
+              // Mengirimkan konteks berdasarkan folder saat ini
+              context={currentFolderId === "root" ? "archives" : "documents"}
             />
           )}
         </div>
