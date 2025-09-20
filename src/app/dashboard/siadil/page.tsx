@@ -74,6 +74,7 @@ export default function SiadilPage() {
   const [isMoveModalOpen, setIsMoveModalOpen] = useState(false);
   const [documentToMove, setDocumentToMove] = useState<string | null>(null);
 
+  // ... (semua fungsi handler Anda tetap sama) ...
   const handleFilterReset = () => {
     setFilters(initialFilters);
     setDocumentCurrentPage(1);
@@ -265,6 +266,9 @@ export default function SiadilPage() {
     const startIndex = (documentCurrentPage - 1) * rowsPerPage;
     return filteredDocuments.slice(startIndex, startIndex + rowsPerPage);
   }, [filteredDocuments, documentCurrentPage, rowsPerPage]);
+
+  // ===== PERUBAHAN 1: Buat variabel untuk mengecek apakah ada dokumen =====
+  const hasDocuments = paginatedDocuments.length > 0;
 
   const pagination = {
     totalRows: filteredDocuments.length,
@@ -492,9 +496,7 @@ export default function SiadilPage() {
             </div>
           </div>
         </div>
-
-        {/* ===== Tombol "+ Add New" dipindahkan ke sini ===== */}
-        <div className="mt-6 relative">
+        <div className="relative mt-6">
           <button
             ref={addNewButtonRef}
             onClick={() => setIsAddNewMenuOpen(!isAddNewMenuOpen)}
@@ -519,12 +521,12 @@ export default function SiadilPage() {
               onClose={() => setIsAddNewMenuOpen(false)}
               onNewFolder={() => setIsCreateModalOpen(true)}
               onFileUpload={() => setIsAddModalOpen(true)}
-              // Mengirimkan konteks berdasarkan folder saat ini
               context={currentFolderId === "root" ? "archives" : "documents"}
             />
           )}
         </div>
       </div>
+
       <div className="mb-10">
         {currentFolderId === "root" ? (
           <div className="flex justify-between items-center mb-6">
@@ -643,8 +645,7 @@ export default function SiadilPage() {
         <Dropzone onFilesAdded={handleFilesAdded} />
       </div>
 
-      {/* ===== PERUBAHAN DIMULAI DI SINI ===== */}
-      {/* 1. Wrapper ini sekarang 'relative' untuk menjadi "rumah" bagi InfoPanel */}
+      {/* ===== PERUBAHAN 2: Logika untuk menampilkan DocumentsContainer atau Dropzone ===== */}
       <div className="relative">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
           <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
@@ -671,53 +672,55 @@ export default function SiadilPage() {
             <ViewModeToggle viewMode={viewMode} setViewMode={setViewMode} />
           </div>
         </div>
-        <DocumentsContainer
-          archives={allArchives}
-          filters={filters}
-          onFilterChange={handleFilterChange}
-          onCheckboxChange={handleCheckboxChange}
-          onFilterReset={handleFilterReset}
-          pagination={pagination}
-          onPageChange={setDocumentCurrentPage}
-          onRowsPerPageChange={handleRowsPerPageChange}
-          expireFilterMethod={expireFilterMethod}
-          setExpireFilterMethod={handleExpireMethodChange}
-          allTableColumns={allTableColumns}
-          visibleColumns={visibleColumns}
-          onColumnToggle={handleColumnToggle}
-          isExporting={isExporting}
-          onArchiveCheckboxChange={handleArchiveCheckboxChange}
-          onExport={handleExport}>
-          {viewMode === "list" ? (
-            <DocumentTable
-              documents={paginatedDocuments}
-              visibleColumns={visibleColumns}
-              onSortChange={handleSort}
-              sortColumn={sortColumn}
-              sortOrder={sortOrder}
-              onColumnToggle={handleColumnToggle}
-              selectedDocumentIds={selectedDocumentIds}
-              onDocumentSelect={handleDocumentSelect}
-              onMove={handleOpenMoveModal}
-            />
-          ) : (
-            <DocumentGrid
-              documents={paginatedDocuments}
-              selectedDocumentIds={selectedDocumentIds}
-              onDocumentSelect={handleDocumentSelect}
-              onMove={handleOpenMoveModal}
-            />
-          )}
-        </DocumentsContainer>
 
-        {/* 2. InfoPanel dipindahkan ke dalam wrapper 'relative' */}
-        {/* PENTING: Pastikan CSS di dalam komponen InfoPanel diubah menjadi 'position: absolute' */}
+        {hasDocuments ? (
+          <DocumentsContainer
+            archives={allArchives}
+            filters={filters}
+            onFilterChange={handleFilterChange}
+            onCheckboxChange={handleCheckboxChange}
+            onFilterReset={handleFilterReset}
+            pagination={pagination}
+            onPageChange={setDocumentCurrentPage}
+            onRowsPerPageChange={handleRowsPerPageChange}
+            expireFilterMethod={expireFilterMethod}
+            setExpireFilterMethod={handleExpireMethodChange}
+            allTableColumns={allTableColumns}
+            visibleColumns={visibleColumns}
+            onColumnToggle={handleColumnToggle}
+            isExporting={isExporting}
+            onArchiveCheckboxChange={handleArchiveCheckboxChange}
+            onExport={handleExport}>
+            {viewMode === "list" ? (
+              <DocumentTable
+                documents={paginatedDocuments}
+                visibleColumns={visibleColumns}
+                onSortChange={handleSort}
+                sortColumn={sortColumn}
+                sortOrder={sortOrder}
+                onColumnToggle={handleColumnToggle}
+                selectedDocumentIds={selectedDocumentIds}
+                onDocumentSelect={handleDocumentSelect}
+                onMove={handleOpenMoveModal}
+              />
+            ) : (
+              <DocumentGrid
+                documents={paginatedDocuments}
+                selectedDocumentIds={selectedDocumentIds}
+                onDocumentSelect={handleDocumentSelect}
+                onMove={handleOpenMoveModal}
+              />
+            )}
+          </DocumentsContainer>
+        ) : (
+          <Dropzone onFilesAdded={handleFilesAdded} />
+        )}
+
         <InfoPanel
           selectedDocument={selectedDocument}
           onClose={handleCloseInfoPanel}
         />
       </div>
-      {/* ===== PERUBAHAN SELESAI DI SINI ===== */}
 
       {isCreateModalOpen && (
         <CreateArchiveModal
