@@ -73,8 +73,19 @@ export default function SiadilPage() {
   );
   const [isMoveModalOpen, setIsMoveModalOpen] = useState(false);
   const [documentToMove, setDocumentToMove] = useState<string | null>(null);
+  const [documents, setDocuments] = useState<Document[]>(allDocuments);
 
-  // ... (semua fungsi handler Anda tetap sama) ...
+  const [pageView, setPageView] = useState<"archives" | "starred">("archives");
+
+  const handleToggleStar = (docId: string, event: React.MouseEvent) => {
+    event.stopPropagation();
+    setDocuments((docs) =>
+      docs.map((doc) =>
+        doc.id === docId ? { ...doc, isStarred: !doc.isStarred } : doc
+      )
+    );
+  };
+
   const handleFilterReset = () => {
     setFilters(initialFilters);
     setDocumentCurrentPage(1);
@@ -133,10 +144,10 @@ export default function SiadilPage() {
 
   const documentsInCurrentFolder = useMemo(() => {
     if (currentFolderId === "root") {
-      return allDocuments;
+      return []; // Dokumen tidak ada di root, hanya arsip
     }
-    return allDocuments.filter((d) => d.parentId === currentFolderId);
-  }, [currentFolderId]);
+    return documents.filter((d) => d.parentId === currentFolderId);
+  }, [currentFolderId, documents]);
 
   const handleColumnToggle = (columnId: string) => {
     setVisibleColumns((prev) => {
@@ -187,23 +198,19 @@ export default function SiadilPage() {
   const filteredDocuments = useMemo(() => {
     return [...documentsInCurrentFolder]
       .filter((doc) => {
+        // ... (logika filter Anda tetap sama)
         const keywordMatch =
           filters.keyword.toLowerCase() === "" ||
           doc.number.toLowerCase().includes(filters.keyword.toLowerCase()) ||
           doc.title.toLowerCase().includes(filters.keyword.toLowerCase());
-
         const archiveMatch =
           filters.archive.length === 0 || filters.archive.includes(doc.archive);
-
         const docDateStartMatch =
           filters.docDateStart === "" ||
           doc.documentDate >= filters.docDateStart;
-
         const docDateEndMatch =
           filters.docDateEnd === "" || doc.documentDate <= filters.docDateEnd;
-
         let finalExpireMatch = true;
-
         if (expireFilterMethod === "range") {
           const expireDateStartMatch =
             filters.expireDateStart === "" ||
@@ -267,7 +274,6 @@ export default function SiadilPage() {
     return filteredDocuments.slice(startIndex, startIndex + rowsPerPage);
   }, [filteredDocuments, documentCurrentPage, rowsPerPage]);
 
-  // ===== PERUBAHAN 1: Buat variabel untuk mengecek apakah ada dokumen =====
   const hasDocuments = paginatedDocuments.length > 0;
 
   const pagination = {
@@ -337,29 +343,27 @@ export default function SiadilPage() {
     }, 2000);
   };
 
-  const [droppedFiles, setDroppedFiles] = useState<File[]>([]);
-
   const handleFilesAdded = (files: File[]) => {
     if (files.length === 0) return;
-
-    // Ambil file pertama yang di-drop
+    if (currentFolderId === "root") {
+      alert(
+        "Silakan masuk ke salah satu arsip terlebih dahulu untuk menambahkan dokumen."
+      );
+      return;
+    }
     const file = files[0];
-
-    // Set state newDocument dengan file yang baru di-drop
+    const currentArchive = allArchives.find((a) => a.id === currentFolderId);
     setNewDocument((prev) => ({
       ...prev,
       file: file,
-      // Coba isi otomatis judul dari nama file (tanpa ekstensi)
       title: file.name.split(".").slice(0, -1).join("."),
+      archive: currentArchive ? currentArchive.code : "",
     }));
-
-    // Buka modal untuk mengisi sisa data
     setIsAddModalOpen(true);
   };
 
   const handleDocumentSelect = (docId: string, event?: React.MouseEvent) => {
     const newSelection = new Set(selectedDocumentIds);
-
     if (event?.ctrlKey || event?.metaKey) {
       if (newSelection.has(docId)) {
         newSelection.delete(docId);
@@ -377,7 +381,6 @@ export default function SiadilPage() {
         );
         const start = Math.min(lastIndex, currentIndex);
         const end = Math.max(lastIndex, currentIndex);
-
         for (let i = start; i <= end; i++) {
           newSelection.add(paginatedDocuments[i].id);
         }
@@ -418,6 +421,75 @@ export default function SiadilPage() {
     );
     setIsMoveModalOpen(false);
     setDocumentToMove(null);
+  };
+
+  const handleOpenAddModalInContext = () => {
+    if (currentFolderId === "root") {
+      alert(
+        "Silakan masuk ke salah satu arsip terlebih dahulu untuk menambahkan dokumen."
+      );
+      return;
+    }
+    const currentArchive = allArchives.find((a) => a.id === currentFolderId);
+    setNewDocument({
+      number: "",
+      title: "",
+      description: "",
+      documentDate: "",
+      archive: currentArchive ? currentArchive.code : "",
+      expireDate: "",
+      file: null,
+    });
+    setIsAddModalOpen(true);
+  };
+
+  const quickAccessDocuments = useMemo(() => {
+    return [...allDocuments]
+      .sort(
+        (a, b) =>
+          new Date(b.updatedDate).getTime() - new Date(a.updatedDate).getTime()
+      )
+      .slice(0, 5);
+  }, []);
+
+  const starredDocuments = useMemo(() => {
+    return documents.filter((doc) => doc.isStarred);
+  }, [documents]);
+
+  // ▼▼▼ FUNGSI BARU UNTUK NAVIGASI DAN PEMILIHAN ▼▼▼
+  const handleQuickAccessClick = (doc: Document) => {
+    // 1. Dapatkan daftar dokumen yang akan ada di folder tujuan
+    const docsInTargetFolder = documents
+      .filter((d) => d.parentId === doc.parentId)
+      .sort((a, b) => {
+        // Pastikan urutannya sama dengan yang akan ditampilkan
+        if (!sortColumn) return 0;
+        const aValue = a[sortColumn];
+        const bValue = b[sortColumn];
+        if (aValue == null || bValue == null) return 0;
+        let comparison = 0;
+        if (sortColumn === "documentDate" || sortColumn === "updatedDate") {
+          comparison =
+            new Date(aValue as string).getTime() -
+            new Date(bValue as string).getTime();
+        } else {
+          comparison = String(aValue).localeCompare(String(bValue), undefined, {
+            numeric: true,
+          });
+        }
+        return sortOrder === "asc" ? comparison : -comparison;
+      });
+
+    // 2. Cari posisi/index dari dokumen yang diklik
+    const docIndex = docsInTargetFolder.findIndex((d) => d.id === doc.id);
+
+    // 3. Hitung halaman yang benar
+    const targetPage = Math.floor(docIndex / rowsPerPage) + 1;
+
+    // 4. Jalankan semua pembaruan state
+    setCurrentFolderId(doc.parentId);
+    setDocumentCurrentPage(targetPage);
+    setSelectedDocumentIds(new Set([doc.id]));
   };
 
   return (
@@ -532,208 +604,294 @@ export default function SiadilPage() {
               buttonRef={addNewButtonRef}
               onClose={() => setIsAddNewMenuOpen(false)}
               onNewFolder={() => setIsCreateModalOpen(true)}
-              onFileUpload={() => setIsAddModalOpen(true)}
+              onFileUpload={handleOpenAddModalInContext}
               context={currentFolderId === "root" ? "archives" : "documents"}
             />
           )}
         </div>
       </div>
 
-      <div className="mb-10">
-        {currentFolderId === "root" ? (
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-              Archives
-            </h2>
-            <div className="flex items-center gap-4">
-              <div className="relative w-full max-w-xs">
-                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                  <svg
-                    className="h-5 w-5 text-gray-400"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor">
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                    />
-                  </svg>
+      {currentFolderId === "root" && (
+        <div className="mb-10">
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">
+            Quick Access
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 lg:grid-cols-5 gap-5">
+            {quickAccessDocuments.map((doc) => (
+              <div
+                key={doc.id}
+                // ▼▼▼ GUNAKAN FUNGSI HANDLER BARU ▼▼▼
+                onClick={() => handleQuickAccessClick(doc)}
+                className="group relative rounded-lg border p-4 transition-all cursor-pointer border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800">
+                <div className="flex items-center">
+                  <div className="flex-shrink-0">
+                    <svg
+                      className="w-8 h-8 text-gray-400 dark:text-gray-500"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24">
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="1.5"
+                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                      />
+                    </svg>
+                  </div>
+                  <div className="ml-3 min-w-0">
+                    <h4
+                      className="text-sm font-bold text-gray-900 dark:text-white truncate"
+                      title={doc.title}>
+                      {doc.title}
+                    </h4>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                      Diubah:{" "}
+                      {new Date(doc.updatedDate).toLocaleDateString("id-ID")}
+                    </p>
+                  </div>
                 </div>
-                <input
-                  type="text"
-                  placeholder="Search Archive"
-                  value={searchQuery}
-                  onChange={(e) => {
-                    setSearchQuery(e.target.value);
-                    setArchiveCurrentPage(1);
-                  }}
-                  className="w-full rounded-md border border-gray-300 bg-white py-1.5 pl-10 pr-4 text-sm text-gray-900 placeholder-gray-500 focus:border-green-500 focus:ring-green-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:placeholder-gray-400"
-                />
               </div>
-            </div>
+            ))}
           </div>
-        ) : (
-          <div className="flex justify-between items-center mb-6">
-            <div className="flex items-center gap-3">
-              <button
-                onClick={() => setCurrentFolderId("root")}
-                className="p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-                title="Kembali ke Root">
-                <svg
-                  className="w-6 h-6 text-gray-600 dark:text-gray-300"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor">
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M10 19l-7-7m0 0l7-7m-7 7h18"
-                  />
-                </svg>
-              </button>
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-                {allArchives.find((a) => a.id === currentFolderId)?.name ||
-                  "Arsip"}
-              </h2>
-            </div>
-            {/* Omitted search and add new buttons for brevity in this view */}
-          </div>
-        )}
-        <div className="grid grid-cols-[repeat(auto-fill,minmax(200px,1fr))] gap-6">
-          {paginatedArchives.length === 0 ? (
-            <div className="col-span-full text-center py-12">
-              <p className="text-gray-500 dark:text-gray-400">
-                {searchQuery
-                  ? "Arsip tidak ditemukan."
-                  : "Folder arsip ini kosong."}
-              </p>
-            </div>
+        </div>
+      )}
+
+      {currentFolderId === "root" && (
+        <div className="mb-6 border-b border-gray-200 dark:border-gray-700">
+          <nav className="-mb-px flex space-x-6" aria-label="Tabs">
+            <button
+              onClick={() => setPageView("archives")}
+              className={`whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm ${
+                pageView === "archives"
+                  ? "border-demplon text-demplon"
+                  : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+              }`}>
+              My Archives
+            </button>
+            <button
+              onClick={() => setPageView("starred")}
+              className={`whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm ${
+                pageView === "starred"
+                  ? "border-demplon text-demplon"
+                  : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+              }`}>
+              Starred
+            </button>
+          </nav>
+        </div>
+      )}
+
+      {pageView === "starred" && currentFolderId === "root" ? (
+        <div className="mb-10">
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">
+            Starred Documents
+          </h2>
+          {starredDocuments.length > 0 ? (
+            <DocumentGrid
+              documents={starredDocuments}
+              selectedDocumentIds={selectedDocumentIds}
+              onDocumentSelect={handleDocumentSelect}
+              onMove={handleOpenMoveModal}
+              onToggleStar={handleToggleStar}
+            />
           ) : (
-            paginatedArchives.map((archive) =>
-              archive.code === "PERSONAL" ? (
-                <PersonalArchiveCard
-                  key={archive.id}
-                  archive={archive}
-                  onClick={() => setCurrentFolderId(archive.id)}
-                />
-              ) : (
-                <ArchiveCard
-                  key={archive.id}
-                  archive={archive}
-                  docCount={archiveDocCounts[archive.code] || 0}
-                  onClick={() => setCurrentFolderId(archive.id)}
-                />
-              )
-            )
+            <p className="text-center text-gray-500 dark:text-gray-400 py-10">
+              No starred documents.
+            </p>
           )}
         </div>
-        {totalPages > 1 && (
-          <div className="mt-8 flex justify-center items-center space-x-2">
-            <button
-              onClick={() => setArchiveCurrentPage((p) => Math.max(1, p - 1))}
-              disabled={archiveCurrentPage === 1}
-              className="px-3 py-1 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md disabled:opacity-50 hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700">
-              Previous
-            </button>
-            <span className="text-sm text-gray-700 dark:text-gray-300">
-              Page {archiveCurrentPage} of {totalPages}
-            </span>
-            <button
-              onClick={() =>
-                setArchiveCurrentPage((p) => Math.min(totalPages, p + 1))
-              }
-              disabled={archiveCurrentPage === totalPages}
-              className="px-3 py-1 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md disabled:opacity-50 hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700">
-              Next
-            </button>
-          </div>
-        )}
-      </div>
-      <div className="mb-10">
-        <Dropzone onFilesAdded={handleFilesAdded} />
-      </div>
-
-      {/* ===== PERUBAHAN 2: Logika untuk menampilkan DocumentsContainer atau Dropzone ===== */}
-      {currentFolderId !== "root" && (
-        <div className="relative">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-              Dokumen
-            </h2>
-            <div className="flex items-center gap-3">
-              <button
-                onClick={() => setIsSearchPopupOpen(true)}
-                className="px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-600 focus:ring-2 focus:ring-blue-500 focus:border-transparent text-left flex items-center gap-2">
-                <svg
-                  className="text-gray-400 w-4 h-4"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24">
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+      ) : (
+        <>
+          <div className="mb-10">
+            {currentFolderId === "root" ? (
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+                  Archives
+                </h2>
+                <div className="flex items-center gap-4">
+                  <div className="relative w-full max-w-xs">
+                    <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                      <svg
+                        className="h-5 w-5 text-gray-400"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                        />
+                      </svg>
+                    </div>
+                    <input
+                      type="text"
+                      placeholder="Search Archive"
+                      value={searchQuery}
+                      onChange={(e) => {
+                        setSearchQuery(e.target.value);
+                        setArchiveCurrentPage(1);
+                      }}
+                      className="w-full rounded-md border border-gray-300 bg-white py-1.5 pl-10 pr-4 text-sm text-gray-900 placeholder-gray-500 focus:border-green-500 focus:ring-green-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:placeholder-gray-400"
+                    />
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="flex justify-between items-center mb-6">
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={() => setCurrentFolderId("root")}
+                    className="p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                    title="Kembali ke Root">
+                    <svg
+                      className="w-6 h-6 text-gray-600 dark:text-gray-300"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor">
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M10 19l-7-7m0 0l7-7m-7 7h18"
+                      />
+                    </svg>
+                  </button>
+                  <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+                    {allArchives.find((a) => a.id === currentFolderId)?.name ||
+                      "Arsip"}
+                  </h2>
+                </div>
+              </div>
+            )}
+            <div className="grid grid-cols-[repeat(auto-fill,minmax(200px,1fr))] gap-6">
+              {paginatedArchives.map((archive) =>
+                archive.code === "PERSONAL" ? (
+                  <PersonalArchiveCard
+                    key={archive.id}
+                    archive={archive}
+                    onClick={() => setCurrentFolderId(archive.id)}
                   />
-                </svg>
-                <span>Search Document</span>
-              </button>
-              <ViewModeToggle viewMode={viewMode} setViewMode={setViewMode} />
-            </div>
-          </div>
-
-          {hasDocuments ? (
-            <DocumentsContainer
-              archives={allArchives}
-              filters={filters}
-              onFilterChange={handleFilterChange}
-              onCheckboxChange={handleCheckboxChange}
-              onFilterReset={handleFilterReset}
-              pagination={pagination}
-              onPageChange={setDocumentCurrentPage}
-              onRowsPerPageChange={handleRowsPerPageChange}
-              expireFilterMethod={expireFilterMethod}
-              setExpireFilterMethod={handleExpireMethodChange}
-              allTableColumns={allTableColumns}
-              visibleColumns={visibleColumns}
-              onColumnToggle={handleColumnToggle}
-              isExporting={isExporting}
-              onArchiveCheckboxChange={handleArchiveCheckboxChange}
-              onExport={handleExport}>
-              {viewMode === "list" ? (
-                <DocumentTable
-                  documents={paginatedDocuments}
-                  visibleColumns={visibleColumns}
-                  onSortChange={handleSort}
-                  sortColumn={sortColumn}
-                  sortOrder={sortOrder}
-                  onColumnToggle={handleColumnToggle}
-                  selectedDocumentIds={selectedDocumentIds}
-                  onDocumentSelect={handleDocumentSelect}
-                  onMove={handleOpenMoveModal}
-                />
-              ) : (
-                <DocumentGrid
-                  documents={paginatedDocuments}
-                  selectedDocumentIds={selectedDocumentIds}
-                  onDocumentSelect={handleDocumentSelect}
-                  onMove={handleOpenMoveModal}
-                />
+                ) : (
+                  <ArchiveCard
+                    key={archive.id}
+                    archive={archive}
+                    docCount={archiveDocCounts[archive.code] || 0}
+                    onClick={() => setCurrentFolderId(archive.id)}
+                  />
+                )
               )}
-            </DocumentsContainer>
-          ) : (
-            <Dropzone onFilesAdded={handleFilesAdded} />
-          )}
+            </div>
+            {totalPages > 1 && (
+              <div className="mt-8 flex justify-center items-center space-x-2">
+                <button
+                  onClick={() =>
+                    setArchiveCurrentPage((p) => Math.max(1, p - 1))
+                  }
+                  disabled={archiveCurrentPage === 1}
+                  className="px-3 py-1 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md disabled:opacity-50 hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700">
+                  Previous
+                </button>
+                <span className="text-sm text-gray-700 dark:text-gray-300">
+                  Page {archiveCurrentPage} of {totalPages}
+                </span>
+                <button
+                  onClick={() =>
+                    setArchiveCurrentPage((p) => Math.min(totalPages, p + 1))
+                  }
+                  disabled={archiveCurrentPage === totalPages}
+                  className="px-3 py-1 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md disabled:opacity-50 hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700">
+                  Next
+                </button>
+              </div>
+            )}
+          </div>
 
-          <InfoPanel
-            selectedDocument={selectedDocument}
-            onClose={handleCloseInfoPanel}
-          />
-        </div>
+          {currentFolderId !== "root" && (
+            <div className="relative">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+                <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+                  Dokumen
+                </h2>
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={() => setIsSearchPopupOpen(true)}
+                    className="px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-600 focus:ring-2 focus:ring-blue-500 focus:border-transparent text-left flex items-center gap-2">
+                    <svg
+                      className="text-gray-400 w-4 h-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24">
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                      />
+                    </svg>
+                    <span>Search Document</span>
+                  </button>
+                  <ViewModeToggle
+                    viewMode={viewMode}
+                    setViewMode={setViewMode}
+                  />
+                </div>
+              </div>
+
+              {hasDocuments ? (
+                <div className="mt-6">
+                  <DocumentsContainer
+                    archives={allArchives}
+                    filters={filters}
+                    onFilterChange={handleFilterChange}
+                    onCheckboxChange={handleCheckboxChange}
+                    onFilterReset={handleFilterReset}
+                    pagination={pagination}
+                    onPageChange={setDocumentCurrentPage}
+                    onRowsPerPageChange={handleRowsPerPageChange}
+                    expireFilterMethod={expireFilterMethod}
+                    setExpireFilterMethod={handleExpireMethodChange}
+                    allTableColumns={allTableColumns}
+                    visibleColumns={visibleColumns}
+                    onColumnToggle={handleColumnToggle}
+                    isExporting={isExporting}
+                    onArchiveCheckboxChange={handleArchiveCheckboxChange}
+                    onExport={handleExport}>
+                    {viewMode === "list" ? (
+                      <DocumentTable
+                        documents={paginatedDocuments}
+                        visibleColumns={visibleColumns}
+                        onSortChange={handleSort}
+                        sortColumn={sortColumn}
+                        sortOrder={sortOrder}
+                        onColumnToggle={handleColumnToggle}
+                        selectedDocumentIds={selectedDocumentIds}
+                        onDocumentSelect={handleDocumentSelect}
+                        onMove={handleOpenMoveModal}
+                      />
+                    ) : (
+                      <DocumentGrid
+                        documents={paginatedDocuments}
+                        selectedDocumentIds={selectedDocumentIds}
+                        onDocumentSelect={handleDocumentSelect}
+                        onMove={handleOpenMoveModal}
+                        onToggleStar={handleToggleStar}
+                      />
+                    )}
+                  </DocumentsContainer>
+                </div>
+              ) : (
+                <Dropzone onFilesAdded={handleFilesAdded} />
+              )}
+
+              <InfoPanel
+                selectedDocument={selectedDocument}
+                onClose={handleCloseInfoPanel}
+              />
+            </div>
+          )}
+        </>
       )}
 
       {isCreateModalOpen && (

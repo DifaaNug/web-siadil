@@ -29,6 +29,13 @@ export const allArchives: Archive[] = [
     code: "TIK-Proyek",
     parentId: "tik",
   },
+  // --- PENAMBAHAN FOLDER BARU UNTUK TESTING ---
+  {
+    id: "arsip-kosong-test",
+    name: "Arsip Kosong (Test)",
+    code: "TEST-EMPTY",
+    parentId: "root",
+  },
 ];
 
 // Data sampel baru yang lebih realistis
@@ -107,8 +114,10 @@ const formatDateTime = (date: Date): string => {
 export const generateDummyData = (count: number): Document[] => {
   const generatedDocs: Document[] = [];
 
+  const foldersToFillCount = allArchives.length - 3;
+
   for (let i = 1; i <= count; i++) {
-    const parentFolder = allArchives[i % allArchives.length];
+    const parentFolder = allArchives[i % foldersToFillCount];
     const appData = sampleApps[i % sampleApps.length];
 
     const createdDate = new Date(2024, 0, 1 + i, i % 24, i % 60);
@@ -122,7 +131,7 @@ export const generateDummyData = (count: number): Document[] => {
     );
 
     const doc: Document = {
-      id: `${75000 + i}`, // ID numerik
+      id: `${75000 + i}`,
       parentId: parentFolder.id,
       number: appData.number,
       title: appData.title,
@@ -137,10 +146,10 @@ export const generateDummyData = (count: number): Document[] => {
       archive: parentFolder.code,
       expireDate: expireDate.toISOString().split("T")[0],
       status: Math.random() > 0.1 ? "Active" : "Expired",
-      updatedBy: sampleUserIDs[i % sampleUserIDs.length], // ID Pengguna numerik
-      createdBy: sampleUserIDs[(i + 1) % sampleUserIDs.length], // ID Pengguna numerik
-      createdDate: formatDateTime(createdDate), // Format YYYY-MM-DD HH:mm
-      updatedDate: formatDateTime(updatedDate), // Format YYYY-MM-DD HH:mm
+      updatedBy: sampleUserIDs[i % sampleUserIDs.length],
+      createdBy: sampleUserIDs[(i + 1) % sampleUserIDs.length],
+      createdDate: formatDateTime(createdDate),
+      updatedDate: formatDateTime(updatedDate),
     };
     generatedDocs.push(doc);
   }

@@ -1,8 +1,8 @@
-// src/app/dashboard/siadil/components/ActionMenu.tsx
 "use client";
 
 import { useEffect, useRef, useState } from "react";
 import { useOnClickOutside } from "../hooks/useOnClickOutside";
+// PERBAIKAN: Impor setiap ikon secara spesifik, bukan 'ActionIcons'
 import {
   IconDelete,
   IconDetail,
@@ -15,14 +15,14 @@ type ActionMenuProps = {
   documentId: string;
   onClose: () => void;
   buttonEl: HTMLButtonElement;
-  onMove: (documentId: string) => void; // <-- Prop yang ditambahkan
+  onMove: (documentId: string) => void;
 };
 
 export const ActionMenu = ({
   documentId,
   onClose,
   buttonEl,
-  onMove, // <-- Prop yang ditambahkan
+  onMove,
 }: ActionMenuProps) => {
   const menuRef = useRef<HTMLDivElement>(null);
   const [style, setStyle] = useState<React.CSSProperties>({
@@ -69,7 +69,6 @@ export const ActionMenu = ({
       icon: <IconEdit />,
       onClick: () => alert(`Edit for ${documentId}`),
     },
-    // Item "Pindahkan" ditambahkan di sini
     {
       label: "Pindahkan",
       icon: <IconManageFiles />,

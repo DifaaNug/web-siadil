@@ -21,6 +21,7 @@ export type Document = {
   createdDate: string;
   updatedDate: string;
   parentId: string;
+  isStarred?: boolean;
 };
 export type Filters = {
   keyword: string;
