@@ -616,7 +616,7 @@ export default function SiadilPage() {
           <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">
             Quick Access
           </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 lg:grid-cols-5 gap-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3  lg:grid-cols-5 gap-5">
             {quickAccessDocuments.map((doc) => (
               <div
                 key={doc.id}
