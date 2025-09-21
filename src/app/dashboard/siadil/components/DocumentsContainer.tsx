@@ -5,7 +5,6 @@ import { FilterPopover } from "./FilterPopover";
 import { ColumnTogglePopover } from "./ColumnTogglePopover";
 import { Filters, Archive } from "../types";
 import { ArchiveFilterPopover } from "./ArchiveFilterPopover";
-import ViewModeToggle from "./ViewModeToggle";
 
 type Column = {
   id: string;
@@ -55,8 +54,6 @@ export const DocumentsContainer = ({
   onExport,
   isExporting,
   onArchiveCheckboxChange,
-  viewMode,
-  setViewMode,
 }: DocumentsContainerProps) => {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [isColumnToggleOpen, setIsColumnToggleOpen] = useState(false);
@@ -224,35 +221,36 @@ export const DocumentsContainer = ({
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-md border border-gray-200 dark:border-gray-700">
-      <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center flex-wrap gap-3">
-        <div className="flex items-center gap-2 flex-grow flex-wrap">
-          <div className="flex-grow min-w-[250px] max-w-sm">
-            <div className="relative">
-              <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                <svg
-                  className="h-5 w-5 text-gray-400"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 22 22"
-                  stroke="currentColor">
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                  />
-                </svg>
-              </div>
-              <input
-                type="text"
-                name="keyword"
-                id="keyword"
-                placeholder="Search by number, title..."
-                value={filters.keyword}
-                onChange={onFilterChange}
-                className="w-full rounded-md border border-gray-300 bg-white py-1.5 pl-10 pr-4 text-sm text-gray-900 placeholder-gray-500 focus:border-green-500 focus:ring-green-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:placeholder-gray-400"
-              />
+      <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center gap-4">
+        {/* 1. Wrapper untuk Search Bar dibuat lebih sederhana dan fleksibel */}
+        <div className="flex-1 max-w-md">
+          {" "}
+          {/* Menggunakan flex-1 dan max-w-md */}
+          <div className="relative">
+            <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+              <svg
+                className="h-5 w-5 text-gray-400"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 22 22"
+                stroke="currentColor">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                />
+              </svg>
             </div>
+            <input
+              type="text"
+              name="keyword"
+              id="keyword"
+              placeholder="Search by number, title..."
+              value={filters.keyword}
+              onChange={onFilterChange}
+              className="w-full rounded-md border border-gray-300 bg-white py-1.5 pl-10 pr-4 text-sm text-gray-900 placeholder-gray-500 focus:border-green-500 focus:ring-green-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:placeholder-gray-400"
+            />
           </div>
         </div>
 
@@ -376,7 +374,7 @@ export const DocumentsContainer = ({
             document.body
           )}
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-shrink-0">
           <button
             ref={archiveFilterButtonRef}
             onClick={() => setIsArchiveFilterOpen((v) => !v)}

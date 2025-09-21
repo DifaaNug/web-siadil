@@ -124,8 +124,7 @@ export const generateDummyData = (): Document[] => {
   );
 
   archivesToFill.forEach((archive) => {
-    // Buat 15 sampai 40 dokumen acak untuk setiap arsip
-    const docCount = Math.floor(Math.random() * 25) + 15;
+    const docCount = 20;
 
     for (let i = 0; i < docCount; i++) {
       docIdCounter++;
