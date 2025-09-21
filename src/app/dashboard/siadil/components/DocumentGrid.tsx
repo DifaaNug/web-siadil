@@ -1,3 +1,5 @@
+// difaanug/web-siadil/web-siadil-9d382b671ccebb6b16f9f0993135c2cbb491120b/src/app/dashboard/siadil/components/DocumentGrid.tsx
+
 import { useState } from "react";
 import { Document } from "../types";
 import { ActionMenu } from "./ActionMenu";
@@ -36,29 +38,27 @@ export const DocumentGrid = ({
     setContextMenu(null);
   };
 
-  // Fungsi helper untuk format tanggal
   const formatDate = (dateString: string) =>
     new Date(dateString).toLocaleDateString("id-ID");
 
   return (
     <>
-      <div className="p-5 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
+      <div className="p-5 grid grid-cols-[repeat(auto-fill,minmax(200px,1fr))] gap-5">
         {documents.map((doc) => (
           <div
             key={doc.id}
+            id={`doc-grid-${doc.id}`} // <-- PERBAIKAN: Tambahkan ID unik di sini
             onContextMenu={(e) => handleContextMenu(e, doc.id)}
             onClick={(e) => onDocumentSelect(doc.id, e)}
-            // ▼▼▼ PERUBAHAN 1: Tambahkan flexbox untuk layout yang lebih baik ▼▼▼
             className={`group relative rounded-lg border p-4 transition-all cursor-pointer flex flex-col h-full ${
               selectedDocumentIds.has(doc.id)
                 ? "bg-green-50 border-green-500 dark:bg-green-900/50 dark:border-green-700 ring-2 ring-green-500"
                 : "border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800"
             }`}>
-            {/* --- Bagian Header Kartu (untuk Ikon) --- */}
+            {/* ... sisa kode komponen tidak berubah ... */}
             <div className="flex justify-between items-center mb-1">
               <button
                 onClick={(e) => onToggleStar(doc.id, e)}
-                // ▼▼▼ PERUBAHAN 2: Sesuaikan posisi dan ukuran ikon bintang ▼▼▼
                 className="relative z-10 p-1 text-gray-400 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700"
                 aria-label="Toggle Star">
                 <svg
@@ -99,11 +99,7 @@ export const DocumentGrid = ({
                 </svg>
               </button>
             </div>
-
-            {/* --- Bagian Konten Kartu --- */}
             <div className="flex-grow">
-              {" "}
-              {/* flex-grow agar konten mengisi ruang */}
               <div className="flex items-start">
                 <div className="flex-shrink-0">
                   <svg
@@ -129,9 +125,6 @@ export const DocumentGrid = ({
                 </div>
               </div>
             </div>
-
-            {/* --- Bagian Footer Kartu (untuk Tanggal) --- */}
-            {/* ▼▼▼ PERUBAHAN 3: Tampilkan Created & Updated Date ▼▼▼ */}
             <div className="mt-auto pt-3">
               <p className="text-xs text-gray-500 dark:text-gray-400">
                 Updated: {formatDate(doc.updatedDate)}

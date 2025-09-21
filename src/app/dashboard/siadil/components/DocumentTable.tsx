@@ -1,4 +1,5 @@
-// src/app/dashboard/siadil/components/DocumentTable.tsx
+// difaanug/web-siadil/web-siadil-9d382b671ccebb6b16f9f0993135c2cbb491120b/src/app/dashboard/siadil/components/DocumentTable.tsx
+
 import { useState } from "react";
 import { Document } from "../types";
 import { ActionMenu } from "./ActionMenu";
@@ -48,7 +49,7 @@ export const DocumentTable = ({
 
   const handleContextMenu = (event: React.MouseEvent, docId: string) => {
     event.preventDefault();
-    onDocumentSelect(docId); // Pilih dokumen saat klik kanan
+    onDocumentSelect(docId);
     setContextMenu({ x: event.clientX, y: event.clientY, documentId: docId });
   };
 
@@ -181,6 +182,7 @@ export const DocumentTable = ({
           {documents.map((doc) => (
             <tr
               key={doc.id}
+              id={`doc-table-${doc.id}`} // <-- PERBAIKAN: Tambahkan ID unik di sini
               onContextMenu={(e) => handleContextMenu(e, doc.id)}
               onClick={(e) => onDocumentSelect(doc.id, e)}
               className={`transition-colors cursor-pointer ${

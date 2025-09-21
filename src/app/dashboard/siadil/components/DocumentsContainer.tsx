@@ -7,12 +7,14 @@ import { FilterPopover } from "./FilterPopover";
 import { ColumnTogglePopover } from "./ColumnTogglePopover";
 import { Filters, Archive } from "../types";
 import { ArchiveFilterPopover } from "./ArchiveFilterPopover";
+import ViewModeToggle from "./ViewModeToggle";
 
 type Column = {
   id: string;
   label: string;
 };
 
+// PERBAIKAN UTAMA ADA DI BLOK TIPE INI
 type DocumentsContainerProps = {
   children: ReactNode;
   archives: Archive[];
@@ -33,6 +35,8 @@ type DocumentsContainerProps = {
   onExport: () => void;
   isExporting: boolean;
   onArchiveCheckboxChange: (archiveCode: string, isChecked: boolean) => void;
+  viewMode: "list" | "grid";
+  setViewMode: (mode: "list" | "grid") => void;
 };
 
 export const DocumentsContainer = ({
@@ -53,6 +57,8 @@ export const DocumentsContainer = ({
   onExport,
   isExporting,
   onArchiveCheckboxChange,
+  viewMode,
+  setViewMode,
 }: DocumentsContainerProps) => {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [isColumnToggleOpen, setIsColumnToggleOpen] = useState(false);
@@ -178,10 +184,6 @@ export const DocumentsContainer = ({
     }
   }, [isExportMenuOpen]);
 
-  const handleFilterToggle = () => setIsFilterOpen((v) => !v);
-  const handleColumnToggle = () => setIsColumnToggleOpen((v) => !v);
-  const handleExportMenuToggle = () => setIsExportMenuOpen((v) => !v);
-
   const [isArchiveFilterOpen, setIsArchiveFilterOpen] = useState(false);
   const archiveFilterButtonRef = useRef<HTMLButtonElement>(null);
   const archiveFilterPopoverRef = useRef<HTMLDivElement>(null);
@@ -205,7 +207,6 @@ export const DocumentsContainer = ({
         const margin = 8;
 
         let top = buttonRect.bottom + margin;
-        // Posisikan popover di atas tombol jika tidak cukup ruang di bawah
         if (top + popoverHeight > window.innerHeight) {
           top = buttonRect.top - popoverHeight - margin;
         }
@@ -213,7 +214,6 @@ export const DocumentsContainer = ({
         setArchiveFilterPopoverPosition({ top, left: buttonRect.left });
       };
 
-      // Beri sedikit waktu agar popover sempat di-render sebelum kalkulasi
       const timer = setTimeout(calculatePosition, 0);
       window.addEventListener("resize", calculatePosition);
 
@@ -289,7 +289,6 @@ export const DocumentsContainer = ({
             document.body
           )}
 
-        {/* TAMBAHKAN BLOK PORTAL BARU INI */}
         {isClient &&
           isArchiveFilterOpen &&
           ReactDOM.createPortal(
@@ -420,7 +419,7 @@ export const DocumentsContainer = ({
           </button>
           <button
             ref={filterButtonRef}
-            onClick={handleFilterToggle}
+            onClick={() => setIsFilterOpen((v) => !v)}
             className="px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 flex items-center space-x-2">
             <svg
               width="14"
@@ -461,7 +460,7 @@ export const DocumentsContainer = ({
           </button>
           <button
             ref={exportMenuButtonRef}
-            onClick={handleExportMenuToggle}
+            onClick={() => setIsExportMenuOpen((v) => !v)}
             className="px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 flex items-center space-x-2">
             <svg width="14" height="14" viewBox="0 0 22 22" fill="none">
               <path
@@ -476,7 +475,7 @@ export const DocumentsContainer = ({
           </button>
           <button
             ref={columnToggleButtonRef}
-            onClick={handleColumnToggle}
+            onClick={() => setIsColumnToggleOpen((v) => !v)}
             className="px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 flex items-center space-x-2">
             <svg width="14" height="14" viewBox="0 0 22 22" fill="none">
               <path
@@ -489,6 +488,8 @@ export const DocumentsContainer = ({
             </svg>
             <span>View</span>
           </button>
+
+          <ViewModeToggle viewMode={viewMode} setViewMode={setViewMode} />
 
           {isClient &&
             isColumnToggleOpen &&

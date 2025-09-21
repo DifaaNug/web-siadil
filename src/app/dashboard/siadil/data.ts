@@ -1,3 +1,5 @@
+// difaanug/web-siadil/web-siadil-9d382b671ccebb6b16f9f0993135c2cbb491120b/src/app/dashboard/siadil/data.ts
+
 import { Archive, Document } from "./types";
 
 export const allArchives: Archive[] = [
@@ -111,53 +113,72 @@ const formatDateTime = (date: Date): string => {
   return `${year}-${month}-${day} ${hours}:${minutes}`;
 };
 
-export const generateDummyData = (count: number): Document[] => {
+// ▼▼▼ PERUBAIKAN: Fungsi generateDummyData diperbarui ▼▼▼
+export const generateDummyData = (): Document[] => {
   const generatedDocs: Document[] = [];
+  let docIdCounter = 75000;
 
-  const foldersToFillCount = allArchives.length - 3;
+  // Filter arsip yang akan diisi data, kecuali 'Personal' dan 'Arsip Kosong'
+  const archivesToFill = allArchives.filter(
+    (a) => a.code !== "PERSONAL" && a.code !== "TEST-EMPTY"
+  );
 
-  for (let i = 1; i <= count; i++) {
-    const parentFolder = allArchives[i % foldersToFillCount];
-    const appData = sampleApps[i % sampleApps.length];
+  archivesToFill.forEach((archive) => {
+    // Buat 15 sampai 40 dokumen acak untuk setiap arsip
+    const docCount = Math.floor(Math.random() * 25) + 15;
 
-    const createdDate = new Date(2024, 0, 1 + i, i % 24, i % 60);
-    const updatedDate = new Date(
-      createdDate.getTime() + 2 * 24 * 60 * 60 * 1000
-    );
-    const expireDate = new Date(
-      updatedDate.getFullYear() + 2,
-      updatedDate.getMonth(),
-      updatedDate.getDate()
-    );
+    for (let i = 0; i < docCount; i++) {
+      docIdCounter++;
+      const appData = sampleApps[docIdCounter % sampleApps.length];
 
-    const doc: Document = {
-      id: `${75000 + i}`,
-      parentId: parentFolder.id,
-      number: appData.number,
-      title: appData.title,
-      description: appData.description,
-      documentDate: createdDate.toISOString().split("T")[0],
-      contributors: [
-        {
-          name: sampleContributors[i % sampleContributors.length],
-          role: "Penulis",
-        },
-      ],
-      archive: parentFolder.code,
-      expireDate: expireDate.toISOString().split("T")[0],
-      status: Math.random() > 0.1 ? "Active" : "Expired",
-      updatedBy: sampleUserIDs[i % sampleUserIDs.length],
-      createdBy: sampleUserIDs[(i + 1) % sampleUserIDs.length],
-      createdDate: formatDateTime(createdDate),
-      updatedDate: formatDateTime(updatedDate),
-    };
-    generatedDocs.push(doc);
-  }
+      const createdDate = new Date(
+        2024,
+        0,
+        1 + (docIdCounter % 365),
+        i % 24,
+        i % 60
+      );
+      const updatedDate = new Date(
+        createdDate.getTime() + Math.random() * 30 * 24 * 60 * 60 * 1000 // Update acak dalam 30 hari
+      );
+      const expireDate = new Date(
+        updatedDate.getFullYear() + 2,
+        updatedDate.getMonth(),
+        updatedDate.getDate()
+      );
+
+      const doc: Document = {
+        id: `${docIdCounter}`,
+        parentId: archive.id, // Gunakan parentId dari arsip saat ini
+        number: `${archive.code}-${100 + i}`, // Nomor yang lebih unik
+        title: `${appData.title} (${archive.name})`, // Judul yang lebih deskriptif
+        description: appData.description,
+        documentDate: createdDate.toISOString().split("T")[0],
+        contributors: [
+          {
+            name: sampleContributors[docIdCounter % sampleContributors.length],
+            role: "Penulis",
+          },
+        ],
+        archive: archive.code, // Gunakan code dari arsip saat ini
+        expireDate: expireDate.toISOString().split("T")[0],
+        status: Math.random() > 0.1 ? "Active" : "Expired",
+        updatedBy: sampleUserIDs[docIdCounter % sampleUserIDs.length],
+        createdBy: sampleUserIDs[(docIdCounter + 1) % sampleUserIDs.length],
+        createdDate: formatDateTime(createdDate),
+        updatedDate: formatDateTime(updatedDate),
+        isStarred: Math.random() < 0.1, // 10% kemungkinan di-star
+      };
+      generatedDocs.push(doc);
+    }
+  });
+
   return generatedDocs;
 };
 
-// Generate lebih banyak data
-export const allDocuments: Document[] = generateDummyData(250);
+// Generate data baru dengan fungsi yang telah diperbarui
+export const allDocuments: Document[] = generateDummyData();
+// ▲▲▲ BATAS PERUBAIKAN ▲▲▲
 
 export const reminders = [
   {
