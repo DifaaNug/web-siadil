@@ -853,7 +853,10 @@ export default function SiadilPage() {
                       </svg>
                       <span>Search Document</span>
                     </button>
-                    {/* ViewModeToggle dihapus dari sini */}
+                    <ViewModeToggle
+                      viewMode={viewMode}
+                      setViewMode={setViewMode}
+                    />
                   </div>
                 </div>
                 {/* ▲▲▲ BATAS PERBAIKAN 1 ▲▲▲ */}

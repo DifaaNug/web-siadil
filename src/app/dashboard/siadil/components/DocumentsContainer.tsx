@@ -1,5 +1,3 @@
-// File: DocumentsContainer.tsx
-
 import { useState, useEffect, useRef, ReactNode, ChangeEvent } from "react";
 import ReactDOM from "react-dom";
 import { useOnClickOutside } from "../hooks/useOnClickOutside";
@@ -488,8 +486,6 @@ export const DocumentsContainer = ({
             </svg>
             <span>View</span>
           </button>
-
-          <ViewModeToggle viewMode={viewMode} setViewMode={setViewMode} />
 
           {isClient &&
             isColumnToggleOpen &&
