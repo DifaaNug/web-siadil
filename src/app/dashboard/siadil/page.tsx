@@ -76,6 +76,31 @@ export default function SiadilPage() {
 
   const [pageView, setPageView] = useState<"archives" | "starred">("archives");
 
+  const getAllDescendantIds = (folderId: string): string[] => {
+    const directChildren = allArchives
+      .filter((archive) => archive.parentId === folderId)
+      .map((archive) => archive.id);
+
+    const allChildren = [...directChildren];
+    directChildren.forEach((childId) => {
+      allChildren.push(...getAllDescendantIds(childId));
+    });
+    return allChildren;
+  };
+
+  const searchableDocuments = useMemo(() => {
+    if (currentFolderId === "root") {
+      return documents;
+    }
+
+    const relevantFolderIds = [
+      currentFolderId,
+      ...getAllDescendantIds(currentFolderId),
+    ];
+
+    return documents.filter((doc) => relevantFolderIds.includes(doc.parentId));
+  }, [currentFolderId, documents]);
+
   const handleToggleStar = (docId: string, event: React.MouseEvent) => {
     event.stopPropagation();
     setDocuments((docs) =>
@@ -497,6 +522,40 @@ export default function SiadilPage() {
       (archive) => archive.parentId === currentFolderId
     );
   }, [currentFolderId]);
+
+  const handleSearchSelect = (doc: Document) => {
+    setIsSearchPopupOpen(false);
+    setCurrentFolderId(doc.parentId);
+    setSelectedDocumentIds(new Set([doc.id]));
+
+    const docsInTargetFolder = allDocuments.filter(
+      (d) => d.parentId === doc.parentId
+    );
+    const docIndex = docsInTargetFolder.findIndex((d) => d.id === doc.id);
+
+    if (docIndex !== -1) {
+      const targetPage = Math.floor(docIndex / rowsPerPage) + 1;
+      setDocumentCurrentPage(targetPage);
+    }
+  };
+
+  useEffect(() => {
+    if (selectedDocumentIds.size === 1) {
+      const selectedId = Array.from(selectedDocumentIds)[0];
+
+      setTimeout(() => {
+        const element =
+          document.getElementById(`doc-grid-${selectedId}`) ||
+          document.getElementById(`doc-table-${selectedId}`);
+        if (element) {
+          element.scrollIntoView({
+            behavior: "smooth",
+            block: "center",
+          });
+        }
+      }, 100);
+    }
+  }, [selectedDocumentIds, paginatedDocuments]);
 
   return (
     <>
@@ -934,7 +993,8 @@ export default function SiadilPage() {
           onClose={() => setIsSearchPopupOpen(false)}
           searchQuery={searchQuery}
           setSearchQuery={setSearchQuery}
-          documents={allDocuments}
+          documents={searchableDocuments}
+          onDocumentSelect={handleSearchSelect}
         />
       )}
       {isMoveModalOpen && (
