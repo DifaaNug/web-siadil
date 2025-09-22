@@ -131,9 +131,14 @@ export const generateDummyData = (): Document[] => {
         i % 24,
         i % 60
       );
+
+      // --- PERBAIKAN 1: Menghilangkan Math.random() dari updatedDate ---
+      // Membuat tanggal update menjadi deterministik (selalu sama)
       const updatedDate = new Date(
-        createdDate.getTime() + Math.random() * 30 * 24 * 60 * 60 * 1000
+        createdDate.getTime() + (i + 1) * 24 * 60 * 60 * 1000 // Ditambah (i + 1) hari
       );
+      // --- Batas Perbaikan 1 ---
+
       const expireDate = new Date(
         updatedDate.getFullYear() + 2,
         updatedDate.getMonth(),
@@ -143,8 +148,8 @@ export const generateDummyData = (): Document[] => {
       const doc: Document = {
         id: `${docIdCounter}`,
         parentId: archive.id,
-        number: `${archive.code}-${100 + i}`, // Nomor yang lebih unik
-        title: `${appData.title} (${archive.name})`, // Judul yang lebih deskriptif
+        number: `${archive.code}-${100 + i}`,
+        title: `${appData.title} (${archive.name})`,
         description: appData.description,
         documentDate: createdDate.toISOString().split("T")[0],
         contributors: [
@@ -153,14 +158,21 @@ export const generateDummyData = (): Document[] => {
             role: "Penulis",
           },
         ],
-        archive: archive.code, // Gunakan code dari arsip saat ini
+        archive: archive.code,
         expireDate: expireDate.toISOString().split("T")[0],
-        status: Math.random() > 0.1 ? "Active" : "Expired",
+
+        // --- PERBAIKAN 2: Mengganti Math.random() dengan operator modulo ---
+        // Membuat status "Expired" menjadi deterministik
+        status: docIdCounter % 10 === 0 ? "Expired" : "Active",
+
         updatedBy: sampleUserIDs[docIdCounter % sampleUserIDs.length],
         createdBy: sampleUserIDs[(docIdCounter + 1) % sampleUserIDs.length],
         createdDate: formatDateTime(createdDate),
         updatedDate: formatDateTime(updatedDate),
-        isStarred: Math.random() < 0.1, // 10% kemungkinan di-star
+
+        // Membuat status "Starred" menjadi deterministik
+        isStarred: docIdCounter % 10 === 0, // 1 dari 10 dokumen akan di-star
+        // --- Batas Perbaikan 2 ---
       };
       generatedDocs.push(doc);
     }
