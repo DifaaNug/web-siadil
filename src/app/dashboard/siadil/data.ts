@@ -1,5 +1,3 @@
-// difaanug/web-siadil/web-siadil-9d382b671ccebb6b16f9f0993135c2cbb491120b/src/app/dashboard/siadil/data.ts
-
 import { Archive, Document } from "./types";
 
 export const allArchives: Archive[] = [
@@ -31,7 +29,7 @@ export const allArchives: Archive[] = [
     code: "TIK-Proyek",
     parentId: "tik",
   },
-  // --- PENAMBAHAN FOLDER BARU UNTUK TESTING ---
+
   {
     id: "arsip-kosong-test",
     name: "Arsip Kosong (Test)",
@@ -40,7 +38,6 @@ export const allArchives: Archive[] = [
   },
 ];
 
-// Data sampel baru yang lebih realistis
 const sampleApps = [
   {
     number: "JAJAPWEB",
@@ -103,7 +100,6 @@ const sampleContributors = [
   "Rina Hartono",
 ];
 
-// Helper untuk format tanggal YYYY-MM-DD HH:mm
 const formatDateTime = (date: Date): string => {
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, "0");
@@ -113,12 +109,10 @@ const formatDateTime = (date: Date): string => {
   return `${year}-${month}-${day} ${hours}:${minutes}`;
 };
 
-// ▼▼▼ PERUBAIKAN: Fungsi generateDummyData diperbarui ▼▼▼
 export const generateDummyData = (): Document[] => {
   const generatedDocs: Document[] = [];
   let docIdCounter = 75000;
 
-  // Filter arsip yang akan diisi data, kecuali 'Personal' dan 'Arsip Kosong'
   const archivesToFill = allArchives.filter(
     (a) => a.code !== "PERSONAL" && a.code !== "TEST-EMPTY"
   );
@@ -138,7 +132,7 @@ export const generateDummyData = (): Document[] => {
         i % 60
       );
       const updatedDate = new Date(
-        createdDate.getTime() + Math.random() * 30 * 24 * 60 * 60 * 1000 // Update acak dalam 30 hari
+        createdDate.getTime() + Math.random() * 30 * 24 * 60 * 60 * 1000
       );
       const expireDate = new Date(
         updatedDate.getFullYear() + 2,
@@ -148,7 +142,7 @@ export const generateDummyData = (): Document[] => {
 
       const doc: Document = {
         id: `${docIdCounter}`,
-        parentId: archive.id, // Gunakan parentId dari arsip saat ini
+        parentId: archive.id,
         number: `${archive.code}-${100 + i}`, // Nomor yang lebih unik
         title: `${appData.title} (${archive.name})`, // Judul yang lebih deskriptif
         description: appData.description,
