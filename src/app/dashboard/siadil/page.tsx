@@ -843,24 +843,26 @@ export default function SiadilPage() {
                   </div>
                 </div>
               )}
-              <div className="grid grid-cols-[repeat(auto-fill,minmax(200px,1fr))] gap-6">
-                {paginatedArchives.map((archive) =>
-                  archive.code === "PERSONAL" ? (
-                    <PersonalArchiveCard
-                      key={archive.id}
-                      archive={archive}
-                      onClick={() => setCurrentFolderId(archive.id)}
-                    />
-                  ) : (
-                    <ArchiveCard
-                      key={archive.id}
-                      archive={archive}
-                      docCount={archiveDocCounts[archive.code] || 0}
-                      onClick={() => setCurrentFolderId(archive.id)}
-                    />
-                  )
-                )}
-              </div>
+              {(paginatedArchives.length > 0 || currentFolderId === "root") && (
+                <div className="grid grid-cols-[repeat(auto-fill,minmax(200px,1fr))] gap-6">
+                  {paginatedArchives.map((archive) =>
+                    archive.code === "PERSONAL" ? (
+                      <PersonalArchiveCard
+                        key={archive.id}
+                        archive={archive}
+                        onClick={() => setCurrentFolderId(archive.id)}
+                      />
+                    ) : (
+                      <ArchiveCard
+                        key={archive.id}
+                        archive={archive}
+                        docCount={archiveDocCounts[archive.code] || 0}
+                        onClick={() => setCurrentFolderId(archive.id)}
+                      />
+                    )
+                  )}
+                </div>
+              )}
               {totalPages > 1 && (
                 <div className="mt-8 flex justify-center items-center space-x-2">
                   <button
