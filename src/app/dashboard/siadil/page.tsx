@@ -1,9 +1,11 @@
+// difaanug/web-siadil/web-siadil-6134629268562a3c7478da8c0ce268a6e60c31e9/src/app/dashboard/siadil/page.tsx
+
 "use client";
 
 import { useState, useMemo, ChangeEvent, useRef, useEffect } from "react";
 import Breadcrumb from "./components/Breadcrumb";
 import CreateArchiveModal from "./components/CreateArchiveModal";
-import { Filters, NewDocumentData, Document } from "./types";
+import { Filters, NewDocumentData, Document, Archive } from "./types"; // Pastikan 'Archive' diimpor
 import { allArchives, allDocuments, reminders } from "./data";
 import { AddDocumentModal } from "./components/AddDocumentModal";
 import { DocumentsContainer } from "./components/DocumentsContainer";
@@ -27,7 +29,24 @@ const allTableColumns = [
   { id: "actions", label: "Actions" },
 ];
 
+// --- PERBAIKAN 1: Perbaiki definisi fungsi agar menerima 'archives' sebagai parameter ---
+const getAllDescendantIds = (
+  folderId: string,
+  archives: Archive[]
+): string[] => {
+  const directChildren = archives
+    .filter((archive) => archive.parentId === folderId)
+    .map((archive) => archive.id);
+
+  const allChildren = [...directChildren];
+  directChildren.forEach((childId) => {
+    allChildren.push(...getAllDescendantIds(childId, archives));
+  });
+  return allChildren;
+};
+
 export default function SiadilPage() {
+  // ... (semua state useState Anda tetap sama) ...
   const [sortOrder, setSortOrder] = useState<"asc" | "desc" | null>(null);
   const [sortColumn, setSortColumn] = useState<keyof Document | null>(null);
   const [isSearchPopupOpen, setIsSearchPopupOpen] = useState(false);
@@ -73,37 +92,32 @@ export default function SiadilPage() {
   const [isMoveModalOpen, setIsMoveModalOpen] = useState(false);
   const [documentToMove, setDocumentToMove] = useState<string | null>(null);
   const [documents, setDocuments] = useState<Document[]>(allDocuments);
-
   const [pageView, setPageView] = useState<"archives" | "starred">("archives");
-
-  const getAllDescendantIds = (folderId: string): string[] => {
-    const directChildren = allArchives
-      .filter((archive) => archive.parentId === folderId)
-      .map((archive) => archive.id);
-
-    const allChildren = [...directChildren];
-    directChildren.forEach((childId) => {
-      allChildren.push(...getAllDescendantIds(childId));
-    });
-    return allChildren;
-  };
 
   const searchableDocuments = useMemo(() => {
     if (currentFolderId === "root") {
       return documents;
     }
-
     const relevantFolderIds = [
       currentFolderId,
-      ...getAllDescendantIds(currentFolderId),
+      ...getAllDescendantIds(currentFolderId, allArchives),
     ];
+    return documents.filter((doc) => relevantFolderIds.includes(doc.parentId));
+  }, [currentFolderId, documents]);
 
+  const documentsForFiltering = useMemo(() => {
+    if (currentFolderId === "root") {
+      return [];
+    }
+    const relevantFolderIds = [
+      currentFolderId,
+      ...getAllDescendantIds(currentFolderId, allArchives),
+    ];
     return documents.filter((doc) => relevantFolderIds.includes(doc.parentId));
   }, [currentFolderId, documents]);
 
   const handleGoBack = () => {
     const currentFolder = allArchives.find((a) => a.id === currentFolderId);
-
     if (currentFolder && currentFolder.parentId) {
       setCurrentFolderId(currentFolder.parentId);
     } else {
@@ -124,6 +138,7 @@ export default function SiadilPage() {
     setFilters(initialFilters);
     setDocumentCurrentPage(1);
   };
+
   const handleRowsPerPageChange = (value: number) => {
     setRowsPerPage(value);
     setDocumentCurrentPage(1);
@@ -176,13 +191,6 @@ export default function SiadilPage() {
     }));
   }, [currentFolderId]);
 
-  const documentsInCurrentFolder = useMemo(() => {
-    if (currentFolderId === "root") {
-      return []; // Dokumen tidak ada di root, hanya arsip
-    }
-    return documents.filter((d) => d.parentId === currentFolderId);
-  }, [currentFolderId, documents]);
-
   const handleColumnToggle = (columnId: string) => {
     setVisibleColumns((prev) => {
       const newSet = new Set(prev);
@@ -202,6 +210,7 @@ export default function SiadilPage() {
     setFilters((prev) => ({ ...prev, [name]: value }));
     setDocumentCurrentPage(1);
   };
+
   const handleCheckboxChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { value, checked } = e.target;
     setFilters((prev) => {
@@ -230,7 +239,7 @@ export default function SiadilPage() {
   };
 
   const filteredDocuments = useMemo(() => {
-    return [...documentsInCurrentFolder]
+    return [...documentsForFiltering]
       .filter((doc) => {
         const keywordMatch =
           filters.keyword.toLowerCase() === "" ||
@@ -295,7 +304,7 @@ export default function SiadilPage() {
         return sortOrder === "asc" ? comparison : -comparison;
       });
   }, [
-    documentsInCurrentFolder,
+    documentsForFiltering,
     filters,
     sortOrder,
     sortColumn,
@@ -535,6 +544,7 @@ export default function SiadilPage() {
 
   const handleSearchSelect = (doc: Document) => {
     setIsSearchPopupOpen(false);
+    setSearchQuery("");
     setCurrentFolderId(doc.parentId);
     setSelectedDocumentIds(new Set([doc.id]));
 
@@ -918,58 +928,55 @@ export default function SiadilPage() {
                     />
                   </div>
                 </div>
-
-                {hasDocuments ? (
-                  <div className="mt-6">
-                    <DocumentsContainer
-                      archives={subfolderArchives}
-                      filters={filters}
-                      onFilterChange={handleFilterChange}
-                      onCheckboxChange={handleCheckboxChange}
-                      onFilterReset={handleFilterReset}
-                      pagination={pagination}
-                      onPageChange={setDocumentCurrentPage}
-                      onRowsPerPageChange={handleRowsPerPageChange}
-                      expireFilterMethod={expireFilterMethod}
-                      setExpireFilterMethod={handleExpireMethodChange}
-                      allTableColumns={allTableColumns}
-                      visibleColumns={visibleColumns}
-                      onColumnToggle={handleColumnToggle}
-                      isExporting={isExporting}
-                      onArchiveCheckboxChange={handleArchiveCheckboxChange}
-                      onExport={handleExport}
-                      viewMode={viewMode}
-                      setViewMode={setViewMode}>
-                      {viewMode === "list" ? (
-                        <DocumentTable
-                          documents={paginatedDocuments}
-                          visibleColumns={visibleColumns}
-                          onSortChange={handleSort}
-                          sortColumn={sortColumn}
-                          sortOrder={sortOrder}
-                          onColumnToggle={handleColumnToggle}
-                          selectedDocumentIds={selectedDocumentIds}
-                          onDocumentSelect={handleDocumentSelect}
-                          onMove={handleOpenMoveModal}
-                        />
-                      ) : (
-                        <DocumentGrid
-                          documents={paginatedDocuments}
-                          selectedDocumentIds={selectedDocumentIds}
-                          onDocumentSelect={handleDocumentSelect}
-                          onMove={handleOpenMoveModal}
-                          onToggleStar={handleToggleStar}
-                        />
-                      )}
-                    </DocumentsContainer>
-                  </div>
-                ) : (
-                  <div className="py-10 text-center">
-                    <p className="text-gray-500">
-                      Tidak ada dokumen yang ditemukan.
-                    </p>
-                  </div>
-                )}
+                <DocumentsContainer
+                  archives={subfolderArchives}
+                  filters={filters}
+                  onFilterChange={handleFilterChange}
+                  onCheckboxChange={handleCheckboxChange}
+                  onFilterReset={handleFilterReset}
+                  pagination={pagination}
+                  onPageChange={setDocumentCurrentPage}
+                  onRowsPerPageChange={handleRowsPerPageChange}
+                  expireFilterMethod={expireFilterMethod}
+                  setExpireFilterMethod={handleExpireMethodChange}
+                  allTableColumns={allTableColumns}
+                  visibleColumns={visibleColumns}
+                  onColumnToggle={handleColumnToggle}
+                  isExporting={isExporting}
+                  onArchiveCheckboxChange={handleArchiveCheckboxChange}
+                  onExport={handleExport}
+                  viewMode={viewMode}
+                  setViewMode={setViewMode}>
+                  {hasDocuments ? (
+                    viewMode === "list" ? (
+                      <DocumentTable
+                        documents={paginatedDocuments}
+                        visibleColumns={visibleColumns}
+                        onSortChange={handleSort}
+                        sortColumn={sortColumn}
+                        sortOrder={sortOrder}
+                        onColumnToggle={handleColumnToggle}
+                        selectedDocumentIds={selectedDocumentIds}
+                        onDocumentSelect={handleDocumentSelect}
+                        onMove={handleOpenMoveModal}
+                      />
+                    ) : (
+                      <DocumentGrid
+                        documents={paginatedDocuments}
+                        selectedDocumentIds={selectedDocumentIds}
+                        onDocumentSelect={handleDocumentSelect}
+                        onMove={handleOpenMoveModal}
+                        onToggleStar={handleToggleStar}
+                      />
+                    )
+                  ) : (
+                    <div className="py-10 text-center">
+                      <p className="text-gray-500 dark:text-gray-400">
+                        Tidak ada dokumen yang cocok dengan pencarian Anda.
+                      </p>
+                    </div>
+                  )}
+                </DocumentsContainer>
               </div>
             )}
           </>
