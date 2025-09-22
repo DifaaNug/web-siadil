@@ -260,7 +260,10 @@ export const DocumentTable = ({
               {visibleColumns.has("actions") && (
                 <td className="px-4 py-4 whitespace-nowrap text-right text-sm font-medium relative">
                   <button
-                    onClick={(e) => handleMenuToggle(doc.id, e.currentTarget)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleMenuToggle(doc.id, e.currentTarget);
+                    }}
                     className="text-gray-500 hover:text-gray-900 dark:hover:text-white p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-600">
                     <svg
                       className="w-5 h-5"
