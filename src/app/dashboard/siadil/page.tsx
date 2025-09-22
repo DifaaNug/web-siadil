@@ -101,6 +101,16 @@ export default function SiadilPage() {
     return documents.filter((doc) => relevantFolderIds.includes(doc.parentId));
   }, [currentFolderId, documents]);
 
+  const handleGoBack = () => {
+    const currentFolder = allArchives.find((a) => a.id === currentFolderId);
+
+    if (currentFolder && currentFolder.parentId) {
+      setCurrentFolderId(currentFolder.parentId);
+    } else {
+      setCurrentFolderId("root");
+    }
+  };
+
   const handleToggleStar = (docId: string, event: React.MouseEvent) => {
     event.stopPropagation();
     setDocuments((docs) =>
@@ -810,9 +820,9 @@ export default function SiadilPage() {
                 <div className="flex justify-between items-center mb-6">
                   <div className="flex items-center gap-3">
                     <button
-                      onClick={() => setCurrentFolderId("root")}
+                      onClick={handleGoBack}
                       className="p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-                      title="Kembali ke Root">
+                      title="Kembali">
                       <svg
                         className="w-6 h-6 text-gray-600 dark:text-gray-300"
                         fill="none"
