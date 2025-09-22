@@ -135,7 +135,7 @@ export const generateDummyData = (): Document[] => {
       const updatedDate = new Date(createdDate);
       updatedDate.setDate(createdDate.getDate() + (i + 1));
       const now = new Date();
-      const randomDaysToAdd = (docIdCounter % 365) - 60;
+      const randomDaysToAdd = i < 3 ? -30 * (i + 1) : docIdCounter % 300;
       const expireDate = new Date(now.setDate(now.getDate() + randomDaysToAdd));
 
       const doc: Document = {
