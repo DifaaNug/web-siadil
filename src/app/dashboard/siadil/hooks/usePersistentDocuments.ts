@@ -1,5 +1,3 @@
-// difaanug/web-siadil/web-siadil-feefdaefad62b0389061cbee5841f984748552df/src/app/dashboard/siadil/hooks/usePersistentDocuments.ts
-
 import { useState, useEffect } from "react";
 import { Document } from "../types";
 import { allDocuments } from "../data";

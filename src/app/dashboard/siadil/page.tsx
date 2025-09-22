@@ -264,13 +264,16 @@ export default function SiadilPage() {
           if (activeExpireInPeriods.length > 0) {
             finalExpireMatch = activeExpireInPeriods.some((period) => {
               const now = new Date();
+              now.setHours(0, 0, 0, 0);
               const expireDate = new Date(doc.expireDate);
+              expireDate.setHours(0, 0, 0, 0);
               if (period === "expired") return expireDate < now;
               const targetDate = new Date();
+              const duration = parseInt(period.replace(/\D/g, ""));
               if (period.endsWith("w")) {
-                targetDate.setDate(now.getDate() + parseInt(period) * 7);
+                targetDate.setDate(now.getDate() + duration * 7);
               } else if (period.endsWith("m")) {
-                targetDate.setMonth(now.getMonth() + parseInt(period));
+                targetDate.setMonth(now.getMonth() + duration);
               }
               return expireDate >= now && expireDate <= targetDate;
             });

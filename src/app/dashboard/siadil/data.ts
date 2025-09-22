@@ -132,18 +132,11 @@ export const generateDummyData = (): Document[] => {
         i % 60
       );
 
-      // --- PERBAIKAN 1: Menghilangkan Math.random() dari updatedDate ---
-      // Membuat tanggal update menjadi deterministik (selalu sama)
-      const updatedDate = new Date(
-        createdDate.getTime() + (i + 1) * 24 * 60 * 60 * 1000 // Ditambah (i + 1) hari
-      );
-      // --- Batas Perbaikan 1 ---
-
-      const expireDate = new Date(
-        updatedDate.getFullYear() + 2,
-        updatedDate.getMonth(),
-        updatedDate.getDate()
-      );
+      const updatedDate = new Date(createdDate);
+      updatedDate.setDate(createdDate.getDate() + (i + 1));
+      const now = new Date();
+      const randomDaysToAdd = (docIdCounter % 365) - 60;
+      const expireDate = new Date(now.setDate(now.getDate() + randomDaysToAdd));
 
       const doc: Document = {
         id: `${docIdCounter}`,
@@ -160,19 +153,14 @@ export const generateDummyData = (): Document[] => {
         ],
         archive: archive.code,
         expireDate: expireDate.toISOString().split("T")[0],
-
-        // --- PERBAIKAN 2: Mengganti Math.random() dengan operator modulo ---
-        // Membuat status "Expired" menjadi deterministik
-        status: docIdCounter % 10 === 0 ? "Expired" : "Active",
+        status: new Date(expireDate) < new Date() ? "Expired" : "Active",
 
         updatedBy: sampleUserIDs[docIdCounter % sampleUserIDs.length],
         createdBy: sampleUserIDs[(docIdCounter + 1) % sampleUserIDs.length],
         createdDate: formatDateTime(createdDate),
         updatedDate: formatDateTime(updatedDate),
 
-        // Membuat status "Starred" menjadi deterministik
-        isStarred: docIdCounter % 10 === 0, // 1 dari 10 dokumen akan di-star
-        // --- Batas Perbaikan 2 ---
+        isStarred: docIdCounter % 10 === 0,
       };
       generatedDocs.push(doc);
     }
@@ -181,9 +169,7 @@ export const generateDummyData = (): Document[] => {
   return generatedDocs;
 };
 
-// Generate data baru dengan fungsi yang telah diperbarui
 export const allDocuments: Document[] = generateDummyData();
-// ▲▲▲ BATAS PERUBAIKAN ▲▲▲
 
 export const reminders = [
   {
