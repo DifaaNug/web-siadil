@@ -1,10 +1,10 @@
-// src/app/dashboard/siadil/components/ArchiveFilterPopover.tsx
+"use client";
 
 import { forwardRef, useState } from "react";
 import { Archive } from "../types";
 
 type Props = {
-  allArchives: Archive[]; // Kita ganti nama prop ini agar lebih jelas
+  allArchives: Archive[];
   selectedArchives: string[];
   onArchiveChange: (archiveCode: string, isChecked: boolean) => void;
 };
@@ -14,13 +14,10 @@ export const ArchiveFilterPopover = forwardRef<HTMLDivElement, Props>(
     { allArchives: archivesToDisplay, selectedArchives, onArchiveChange },
     ref
   ) => {
-    // Nama prop diubah di sini
     const [searchTerm, setSearchTerm] = useState("");
 
-    const filteredArchives = archivesToDisplay.filter(
-      (
-        archive // Gunakan prop baru
-      ) => archive.name.toLowerCase().includes(searchTerm.toLowerCase())
+    const filteredArchives = archivesToDisplay.filter((archive) =>
+      archive.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
     return (
@@ -41,12 +38,10 @@ export const ArchiveFilterPopover = forwardRef<HTMLDivElement, Props>(
           />
         </div>
 
-        {/* Daftar Checkbox */}
         <div className="p-3 space-y-2 overflow-y-auto max-h-60">
-          {/* PERBAIKAN LOGIKA TAMPILAN KOSONG */}
           {archivesToDisplay.length === 0 ? (
             <p className="text-sm text-gray-500 dark:text-gray-400 text-center py-4">
-              Tidak ada sub-folder.
+              Tidak ada sub-folder di sini.
             </p>
           ) : filteredArchives.length > 0 ? (
             filteredArchives.map((archive) => (
