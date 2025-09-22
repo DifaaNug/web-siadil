@@ -13,7 +13,6 @@ import { ArchiveCard, PersonalArchiveCard } from "./components/ArchiveCards";
 import ViewModeToggle from "./components/ViewModeToggle";
 import { SearchPopup } from "./components/SearchPopup";
 import { FolderIcon } from "./components/FolderIcon";
-import { Dropzone } from "./components/DropZone";
 import { AddNewMenu } from "./components/AddNewMenu";
 import { InfoPanel } from "./components/InfoPanel";
 import { MoveToModal } from "./components/MoveToModal";
@@ -340,25 +339,6 @@ export default function SiadilPage() {
       alert("Fitur export belum diimplementasikan.");
       console.log("Simulasi selesai.");
     }, 2000);
-  };
-
-  const handleFilesAdded = (files: File[]) => {
-    if (files.length === 0) return;
-    if (currentFolderId === "root") {
-      alert(
-        "Silakan masuk ke salah satu arsip terlebih dahulu untuk menambahkan dokumen."
-      );
-      return;
-    }
-    const file = files[0];
-    const currentArchive = allArchives.find((a) => a.id === currentFolderId);
-    setNewDocument((prev) => ({
-      ...prev,
-      file: file,
-      title: file.name.split(".").slice(0, -1).join("."),
-      archive: currentArchive ? currentArchive.code : "",
-    }));
-    setIsAddModalOpen(true);
   };
 
   const handleDocumentSelect = (docId: string, event?: React.MouseEvent) => {
@@ -908,10 +888,13 @@ export default function SiadilPage() {
                         />
                       )}
                     </DocumentsContainer>
-                    {/* ▲▲▲ BATAS PERBAIKAN 2 ▲▲▲ */}
                   </div>
                 ) : (
-                  <Dropzone onFilesAdded={handleFilesAdded} />
+                  <div className="py-10 text-center">
+                    <p className="text-gray-500">
+                      Tidak ada dokumen yang ditemukan.
+                    </p>
+                  </div>
                 )}
               </div>
             )}
