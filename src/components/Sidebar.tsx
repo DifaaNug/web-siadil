@@ -78,9 +78,11 @@ const Sidebar = ({ onCollapseChange }: SidebarProps) => {
               <Image
                 src="/logo-demplon.png"
                 alt="Demplon Logo"
-                width={isCollapsed ? 60 : 150}
-                height={isCollapsed ? 60 : 150}
-                className="rounded transition-all duration-300"
+                width={280} // <-- Gunakan lebar asli
+                height={60} // <-- Gunakan tinggi asli
+                className={`rounded transition-all duration-300 ${
+                  isCollapsed ? "w-[60px] h-auto" : "w-[150px] h-auto"
+                }`}
                 priority
               />
             </div>
@@ -297,7 +299,7 @@ const Sidebar = ({ onCollapseChange }: SidebarProps) => {
             <path
               strokeLinecap="round"
               strokeLinejoin="round"
-              strokeWidth={2}
+              strokeWidth="2"
               d="M12 19l-7-7m0 0l7-7m-7 7h13"
             />
           </svg>
