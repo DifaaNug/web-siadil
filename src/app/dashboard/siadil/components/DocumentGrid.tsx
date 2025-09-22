@@ -27,6 +27,7 @@ export const DocumentGrid = ({
   const [contextMenu, setContextMenu] = useState<ContextMenuState>(null);
 
   const handleContextMenu = (event: React.MouseEvent, docId: string) => {
+    event.stopPropagation();
     event.preventDefault();
     if (!selectedDocumentIds.has(docId)) {
       onDocumentSelect(docId, event);
