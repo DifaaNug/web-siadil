@@ -509,6 +509,12 @@ export default function SiadilPage() {
     }
   }, [paginatedDocuments, selectedDocumentIds]);
 
+  const subfolderArchives = useMemo(() => {
+    return allArchives.filter(
+      (archive) => archive.parentId === currentFolderId
+    );
+  }, [currentFolderId]);
+
   return (
     <>
       <div
@@ -830,7 +836,6 @@ export default function SiadilPage() {
 
             {currentFolderId !== "root" && (
               <div className="relative">
-                {/* ▼▼▼ PERBAIKAN 1: Hapus ViewModeToggle dari sini ▼▼▼ */}
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
                   <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
                     Dokumen
@@ -859,13 +864,11 @@ export default function SiadilPage() {
                     />
                   </div>
                 </div>
-                {/* ▲▲▲ BATAS PERBAIKAN 1 ▲▲▲ */}
 
                 {hasDocuments ? (
                   <div className="mt-6">
-                    {/* ▼▼▼ PERBAIKAN 2: Teruskan props viewMode dan setViewMode ke DocumentsContainer ▼▼▼ */}
                     <DocumentsContainer
-                      archives={allArchives}
+                      archives={subfolderArchives}
                       filters={filters}
                       onFilterChange={handleFilterChange}
                       onCheckboxChange={handleCheckboxChange}
