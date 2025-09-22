@@ -4,17 +4,23 @@ import { forwardRef, useState } from "react";
 import { Archive } from "../types";
 
 type Props = {
-  allArchives: Archive[];
+  allArchives: Archive[]; // Kita ganti nama prop ini agar lebih jelas
   selectedArchives: string[];
   onArchiveChange: (archiveCode: string, isChecked: boolean) => void;
 };
 
 export const ArchiveFilterPopover = forwardRef<HTMLDivElement, Props>(
-  ({ allArchives, selectedArchives, onArchiveChange }, ref) => {
+  (
+    { allArchives: archivesToDisplay, selectedArchives, onArchiveChange },
+    ref
+  ) => {
+    // Nama prop diubah di sini
     const [searchTerm, setSearchTerm] = useState("");
 
-    const filteredArchives = allArchives.filter((archive) =>
-      archive.name.toLowerCase().includes(searchTerm.toLowerCase())
+    const filteredArchives = archivesToDisplay.filter(
+      (
+        archive // Gunakan prop baru
+      ) => archive.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
     return (
@@ -24,11 +30,11 @@ export const ArchiveFilterPopover = forwardRef<HTMLDivElement, Props>(
         {/* Header dan Search Input */}
         <div className="p-3 border-b border-gray-200 dark:border-gray-700">
           <h3 className="font-semibold text-gray-800 dark:text-white mb-2">
-            Archive Filter
+            Filter by Subfolder
           </h3>
           <input
             type="text"
-            placeholder="Search Archive"
+            placeholder="Search Subfolder"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full rounded-md border border-gray-300 bg-white py-1.5 px-3 text-sm text-gray-900 placeholder-gray-500 focus:border-green-500 focus:ring-green-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:placeholder-gray-400"
@@ -37,7 +43,12 @@ export const ArchiveFilterPopover = forwardRef<HTMLDivElement, Props>(
 
         {/* Daftar Checkbox */}
         <div className="p-3 space-y-2 overflow-y-auto max-h-60">
-          {filteredArchives.length > 0 ? (
+          {/* PERBAIKAN LOGIKA TAMPILAN KOSONG */}
+          {archivesToDisplay.length === 0 ? (
+            <p className="text-sm text-gray-500 dark:text-gray-400 text-center py-4">
+              Tidak ada sub-folder.
+            </p>
+          ) : filteredArchives.length > 0 ? (
             filteredArchives.map((archive) => (
               <label
                 key={archive.id}
@@ -57,7 +68,7 @@ export const ArchiveFilterPopover = forwardRef<HTMLDivElement, Props>(
             ))
           ) : (
             <p className="text-sm text-gray-500 dark:text-gray-400 text-center py-4">
-              Arsip tidak ditemukan.
+              Sub-folder tidak ditemukan.
             </p>
           )}
         </div>
