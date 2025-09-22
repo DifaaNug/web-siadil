@@ -409,8 +409,8 @@ export const DocumentsContainer = ({
             </svg>
             <span>
               {filters.archive.length === 0
-                ? "All Archives"
-                : `${filters.archive.length} Archives Selected`}
+                ? "Filter by Subfolder"
+                : `${filters.archive.length} Subfolder(s) Selected`}
             </span>
           </button>
           <button
