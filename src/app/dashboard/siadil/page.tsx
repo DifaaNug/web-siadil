@@ -490,6 +490,9 @@ export default function SiadilPage() {
   }, [paginatedDocuments, selectedDocumentIds]);
 
   const subfolderArchives = useMemo(() => {
+    if (currentFolderId === "root") {
+      return [];
+    }
     return allArchives.filter(
       (archive) => archive.parentId === currentFolderId
     );
