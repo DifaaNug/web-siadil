@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useMemo, ChangeEvent, useRef, useEffect } from "react";
-import Breadcrumb from "@/components/Breadcrumb";
-import CreateArchiveModal from "@/components/CreateArchiveModal";
+import Breadcrumb from "./components/Breadcrumb";
+import CreateArchiveModal from "./components/CreateArchiveModal";
 import { Filters, NewDocumentData, Document } from "./types";
 import { allArchives, allDocuments, reminders } from "./data";
 import { AddDocumentModal } from "./components/AddDocumentModal";
@@ -31,7 +31,7 @@ export default function SiadilPage() {
   const [sortOrder, setSortOrder] = useState<"asc" | "desc" | null>(null);
   const [sortColumn, setSortColumn] = useState<keyof Document | null>(null);
   const [isSearchPopupOpen, setIsSearchPopupOpen] = useState(false);
-  const [viewMode, setViewMode] = useState<"list" | "grid">("grid");
+  const [viewMode, setViewMode] = useState<"list" | "grid">("list");
   const [currentFolderId, setCurrentFolderId] = useState("root");
   const [isAddNewMenuOpen, setIsAddNewMenuOpen] = useState(false);
   const addNewButtonRef = useRef<HTMLButtonElement>(null);
