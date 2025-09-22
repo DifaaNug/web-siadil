@@ -22,6 +22,7 @@ export type Document = {
   updatedDate: string;
   parentId: string;
   isStarred?: boolean;
+  lastAccessed?: string;
 };
 export type Filters = {
   keyword: string;

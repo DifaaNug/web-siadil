@@ -1,11 +1,9 @@
-// difaanug/web-siadil/web-siadil-6134629268562a3c7478da8c0ce268a6e60c31e9/src/app/dashboard/siadil/page.tsx
-
 "use client";
 
 import { useState, useMemo, ChangeEvent, useRef, useEffect } from "react";
 import Breadcrumb from "./components/Breadcrumb";
 import CreateArchiveModal from "./components/CreateArchiveModal";
-import { Filters, NewDocumentData, Document, Archive } from "./types"; // Pastikan 'Archive' diimpor
+import { Filters, NewDocumentData, Document, Archive } from "./types";
 import { allArchives, allDocuments, reminders } from "./data";
 import { AddDocumentModal } from "./components/AddDocumentModal";
 import { DocumentsContainer } from "./components/DocumentsContainer";
@@ -18,6 +16,7 @@ import { FolderIcon } from "./components/FolderIcon";
 import { AddNewMenu } from "./components/AddNewMenu";
 import { InfoPanel } from "./components/InfoPanel";
 import { MoveToModal } from "./components/MoveToModal";
+import { usePersistentDocuments } from "./hooks/usePersistentDocuments";
 
 const allTableColumns = [
   { id: "numberAndTitle", label: "Number & Title" },
@@ -29,7 +28,6 @@ const allTableColumns = [
   { id: "actions", label: "Actions" },
 ];
 
-// --- PERBAIKAN 1: Perbaiki definisi fungsi agar menerima 'archives' sebagai parameter ---
 const getAllDescendantIds = (
   folderId: string,
   archives: Archive[]
@@ -46,7 +44,6 @@ const getAllDescendantIds = (
 };
 
 export default function SiadilPage() {
-  // ... (semua state useState Anda tetap sama) ...
   const [sortOrder, setSortOrder] = useState<"asc" | "desc" | null>(null);
   const [sortColumn, setSortColumn] = useState<keyof Document | null>(null);
   const [isSearchPopupOpen, setIsSearchPopupOpen] = useState(false);
@@ -91,7 +88,8 @@ export default function SiadilPage() {
   );
   const [isMoveModalOpen, setIsMoveModalOpen] = useState(false);
   const [documentToMove, setDocumentToMove] = useState<string | null>(null);
-  const [documents, setDocuments] = useState<Document[]>(allDocuments);
+
+  const [documents, setDocuments] = usePersistentDocuments();
   const [pageView, setPageView] = useState<"archives" | "starred">("archives");
 
   const searchableDocuments = useMemo(() => {
@@ -386,6 +384,14 @@ export default function SiadilPage() {
   };
 
   const handleDocumentSelect = (docId: string, event?: React.MouseEvent) => {
+    setDocuments((prevDocs) =>
+      prevDocs.map((doc) =>
+        doc.id === docId
+          ? { ...doc, lastAccessed: new Date().toISOString() }
+          : doc
+      )
+    );
+
     const newSelection = new Set(selectedDocumentIds);
     if (event?.ctrlKey || event?.metaKey) {
       if (newSelection.has(docId)) {
@@ -467,13 +473,15 @@ export default function SiadilPage() {
   };
 
   const quickAccessDocuments = useMemo(() => {
-    return [...allDocuments]
+    return [...documents]
+      .filter((doc) => doc.lastAccessed) // Ambil hanya yang pernah diakses
       .sort(
         (a, b) =>
-          new Date(b.updatedDate).getTime() - new Date(a.updatedDate).getTime()
+          new Date(b.lastAccessed!).getTime() - // Sortir berdasarkan lastAccessed
+          new Date(a.lastAccessed!).getTime()
       )
       .slice(0, 5);
-  }, []);
+  }, [documents]);
 
   const starredDocuments = useMemo(() => {
     return documents.filter((doc) => doc.isStarred);
