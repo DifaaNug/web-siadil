@@ -43,7 +43,7 @@ const ArchiveView: React.FC<ArchiveViewProps> = ({
         <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
           Archives
         </h2>
-        <div className="relative w-full max-w-xs">
+        <div className="relative max-w-xs">
           <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
             <svg
               className="h-5 w-5 text-gray-400"
