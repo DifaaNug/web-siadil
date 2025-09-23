@@ -119,7 +119,8 @@ export const ActionMenu = ({
             return (
               <li key={index}>
                 <button
-                  onClick={() => {
+                  onClick={(e) => {
+                    e.stopPropagation();
                     item.onClick?.();
                     onClose();
                   }}
