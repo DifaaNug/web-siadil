@@ -16,6 +16,7 @@ type ActionMenuProps = {
   buttonEl: HTMLButtonElement;
   onMove: (documentId: string) => void;
   onEdit: (documentId: string) => void;
+  onDelete: (documentId: string) => void;
 };
 
 export const ActionMenu = ({
@@ -24,6 +25,7 @@ export const ActionMenu = ({
   buttonEl,
   onMove,
   onEdit,
+  onDelete,
 }: ActionMenuProps) => {
   const menuRef = useRef<HTMLDivElement>(null);
   const [style, setStyle] = useState<React.CSSProperties>({
@@ -73,7 +75,7 @@ export const ActionMenu = ({
     {
       label: "Delete",
       icon: <IconDelete />,
-      onClick: () => alert(`Delete ${documentId}`),
+      onClick: () => onDelete(documentId),
       isDestructive: true,
     },
     { isSeparator: true },

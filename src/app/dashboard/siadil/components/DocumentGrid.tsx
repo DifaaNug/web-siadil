@@ -11,7 +11,8 @@ type DocumentGridProps = {
   onDocumentSelect: (id: string, event?: React.MouseEvent) => void;
   onMove: (docId: string) => void;
   onToggleStar: (docId: string, event: React.MouseEvent) => void;
-  onEdit: (docId: string) => void; // Prop onEdit yang dibutuhkan
+  onEdit: (docId: string) => void;
+  onDelete: (docId: string) => void;
 };
 
 export const DocumentGrid = ({
@@ -21,6 +22,7 @@ export const DocumentGrid = ({
   onMove,
   onToggleStar,
   onEdit,
+  onDelete,
 }: DocumentGridProps) => {
   const [activeActionMenu, setActiveActionMenu] = useState<null | {
     docId: string;
@@ -143,6 +145,7 @@ export const DocumentGrid = ({
                 buttonEl={activeActionMenu.buttonEl}
                 onMove={onMove}
                 onEdit={onEdit}
+                onDelete={onDelete}
               />
             )}
           </div>
@@ -157,6 +160,7 @@ export const DocumentGrid = ({
           onClose={handleCloseContextMenu}
           onMove={onMove}
           onEdit={onEdit}
+          onDelete={onDelete}
         />
       )}
     </>

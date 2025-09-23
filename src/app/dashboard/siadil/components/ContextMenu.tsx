@@ -11,6 +11,7 @@ type ContextMenuProps = {
   onClose: () => void;
   onMove: (documentId: string) => void;
   onEdit: (documentId: string) => void;
+  onDelete: (documentId: string) => void;
 };
 
 export const ContextMenu = ({
@@ -20,6 +21,7 @@ export const ContextMenu = ({
   onClose,
   onMove,
   onEdit,
+  onDelete,
 }: ContextMenuProps) => {
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -50,7 +52,7 @@ export const ContextMenu = ({
       label: "Delete",
       icon: <IconDelete />,
       isDestructive: true,
-      action: () => alert(`Delete ${documentId}`),
+      action: () => onDelete(documentId),
     },
   ];
 

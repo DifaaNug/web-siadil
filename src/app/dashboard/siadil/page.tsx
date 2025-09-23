@@ -114,6 +114,33 @@ export default function SiadilPage() {
     }
   };
 
+  const handleDeleteDocument = (docId: string) => {
+    const docToDelete = documents.find((doc) => doc.id === docId);
+    if (!docToDelete) return;
+
+    // Tampilkan dialog konfirmasi
+    if (
+      window.confirm(
+        `Apakah Anda yakin ingin menghapus dokumen "${docToDelete.title}"?`
+      )
+    ) {
+      // Filter dokumen dan perbarui state
+      setDocuments((currentDocs) =>
+        currentDocs.filter((doc) => doc.id !== docId)
+      );
+
+      // Tutup panel detail jika dokumen yang dihapus sedang ditampilkan
+      if (infoPanelDocument?.id === docId) {
+        setInfoPanelDocument(null);
+      }
+
+      // Kosongkan seleksi
+      setSelectedDocumentIds(new Set());
+
+      alert(`Dokumen "${docToDelete.title}" berhasil dihapus.`);
+    }
+  };
+
   const [documents, setDocuments] = usePersistentDocuments();
   const [archives, setArchives] = usePersistentArchives();
   const [pageView, setPageView] = useState<"archives" | "starred">("archives");
@@ -141,7 +168,7 @@ export default function SiadilPage() {
   }, [currentFolderId, documents]);
 
   const handleGoBack = () => {
-    const currentFolder = allArchives.find((a) => a.id === currentFolderId);
+    const currentFolder = archives.find((a) => a.id === currentFolderId);
     if (currentFolder && currentFolder.parentId) {
       setCurrentFolderId(currentFolder.parentId);
     } else {
@@ -360,7 +387,7 @@ export default function SiadilPage() {
   }, []);
 
   const filteredArchives = useMemo(() => {
-    const archivesInCurrentFolder = allArchives.filter(
+    const archivesInCurrentFolder = archives.filter(
       (a) => a.parentId === currentFolderId
     );
     if (!searchQuery) {
@@ -369,7 +396,7 @@ export default function SiadilPage() {
     return archivesInCurrentFolder.filter((archive) =>
       archive.name.toLowerCase().includes(searchQuery.toLowerCase())
     );
-  }, [currentFolderId, searchQuery]);
+  }, [currentFolderId, searchQuery, archives]);
 
   const paginatedArchives = useMemo(() => {
     const startIndex = (archiveCurrentPage - 1) * ITEMS_PER_PAGE;
@@ -413,19 +440,46 @@ export default function SiadilPage() {
       );
       alert(`Dokumen ID: ${editingDocId} berhasil diperbarui.`);
     } else {
+      if (!newDocument.file) {
+        alert("Silakan pilih file untuk diunggah.");
+        return;
+      }
+
+      const getNextId = () => {
+        const numericIds = documents
+          .map((doc) => parseInt(doc.id, 10))
+          .filter((id) => !isNaN(id));
+
+        if (numericIds.length === 0) {
+          return "75001";
+        }
+
+        const maxId = Math.max(...numericIds);
+        return (maxId + 1).toString();
+      };
+
       const newDoc: Document = {
-        id: `doc-${Date.now()}`,
+        id: getNextId(),
         parentId: currentFolderId,
+        title: newDocument.title || newDocument.file.name,
+        number: newDocument.number,
+        description: newDocument.description,
+        documentDate:
+          newDocument.documentDate || new Date().toISOString().split("T")[0],
+        archive: newDocument.archive,
+        expireDate: newDocument.expireDate,
+        contributors: [{ name: "Someone", role: "Uploader" }],
+        status: "Active",
         createdBy: "10122059",
         updatedBy: "10122059",
         createdDate: new Date().toISOString(),
         updatedDate: new Date().toISOString(),
-        status: "Active",
-        contributors: [],
-        ...newDocument,
       };
+
       setDocuments((docs) => [...docs, newDoc]);
-      alert(`Dokumen "${newDocument.title}" berhasil ditambahkan.`);
+      alert(
+        `Dokumen "${newDoc.title}" berhasil diunggah dengan ID: ${newDoc.id}.`
+      );
     }
 
     setIsAddModalOpen(false);
@@ -878,6 +932,7 @@ export default function SiadilPage() {
                 onDocumentSelect={handleDocumentSelect}
                 onEdit={handleOpenEditModal}
                 onMove={handleOpenMoveModal}
+                onDelete={handleDeleteDocument}
                 onToggleStar={handleToggleStar}
               />
             ) : (
@@ -945,8 +1000,8 @@ export default function SiadilPage() {
                       </svg>
                     </button>
                     <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-                      {allArchives.find((a) => a.id === currentFolderId)
-                        ?.name || "Arsip"}
+                      {archives.find((a) => a.id === currentFolderId)?.name ||
+                        "Arsip"}
                     </h2>
                   </div>
                 </div>
@@ -1058,6 +1113,7 @@ export default function SiadilPage() {
                         onDocumentSelect={handleDocumentSelect}
                         onMove={handleOpenMoveModal}
                         onEdit={handleOpenEditModal}
+                        onDelete={handleDeleteDocument}
                       />
                     ) : (
                       <DocumentGrid
@@ -1066,6 +1122,7 @@ export default function SiadilPage() {
                         onDocumentSelect={handleDocumentSelect}
                         onMove={handleOpenMoveModal}
                         onEdit={handleOpenEditModal}
+                        onDelete={handleDeleteDocument}
                         onToggleStar={handleToggleStar}
                       />
                     )

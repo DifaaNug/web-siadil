@@ -236,6 +236,7 @@ export const AddDocumentModal = ({
                         type="file"
                         onChange={handleInputChange}
                         className="sr-only"
+                        accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx"
                       />
                     </label>
                     <p className="pl-1">or drag and drop</p>
@@ -246,7 +247,7 @@ export const AddDocumentModal = ({
                     </p>
                   ) : (
                     <p className="text-xs text-gray-500">
-                      PNG, JPG, PDF up to 10MB
+                      PDF, DOC, XLS, PPT up to 10MB
                     </p>
                   )}
                 </div>
