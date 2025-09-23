@@ -52,6 +52,8 @@ export default function SiadilPage() {
   const addNewButtonRef = useRef<HTMLButtonElement>(null);
   const [isExporting, setIsExporting] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+
+  const [documentCurrentPage, setDocumentCurrentPage] = useState(1);
   const [visibleColumns, setVisibleColumns] = useState(
     new Set(allTableColumns.map((c) => c.id))
   );
@@ -83,15 +85,6 @@ export default function SiadilPage() {
     handleToggleStar,
   } = useData(currentFolderId);
 
-  const { sortOrder, sortColumn, handleSort, sortedDocuments } =
-    useDocumentSorters(documentsForFiltering);
-  const {
-    setDocumentCurrentPage,
-    rowsPerPage,
-    handleRowsPerPageChange,
-    paginatedDocuments,
-    pagination,
-  } = useDocumentPagination(sortedDocuments);
   const {
     filters,
     expireFilterMethod,
@@ -102,6 +95,20 @@ export default function SiadilPage() {
     handleFilterReset,
     filteredDocuments,
   } = useDocumentFilters(documentsForFiltering, setDocumentCurrentPage);
+
+  const { sortOrder, sortColumn, handleSort, sortedDocuments } =
+    useDocumentSorters(filteredDocuments);
+
+  const {
+    rowsPerPage,
+    handleRowsPerPageChange,
+    paginatedDocuments,
+    pagination,
+  } = useDocumentPagination(
+    sortedDocuments,
+    documentCurrentPage,
+    setDocumentCurrentPage
+  );
 
   const {
     selectedDocumentIds,
@@ -173,8 +180,7 @@ export default function SiadilPage() {
     const { name, parentId } = archiveData;
     const newArchive: Archive = {
       id: name.toLowerCase().replace(/\s+/g, "-") + `-${Date.now()}`,
-      code:
-        name.substring(0, 5).toUpperCase() + Math.floor(Math.random() * 100),
+      code: name.toUpperCase().replace(/\s+/g, ""),
       name: name,
       parentId: parentId,
     };
@@ -277,7 +283,36 @@ export default function SiadilPage() {
         { wch: 12 },
         { wch: 18 },
       ];
-      XLSX.writeFile(workbook, "Daftar_Dokumen_SIADIL.xlsx");
+
+      const currentFolder = archives.find((a) => a.id === currentFolderId);
+      let folderName = currentFolder ? currentFolder.name : "SIADIL";
+
+      const hasSubfolders = subfolderArchives.length > 0;
+
+      if (currentFolder && currentFolder.parentId === "root" && hasSubfolders) {
+        const uniqueArchivesInExport = [
+          ...new Set(filteredDocuments.map((doc) => doc.archive)),
+        ];
+
+        if (uniqueArchivesInExport.length > 1) {
+          folderName = `${folderName}_dan_Subfolder`;
+        } else if (uniqueArchivesInExport.length === 1) {
+          const singleArchiveCode = uniqueArchivesInExport[0];
+          const archiveName = archives.find(
+            (a) => a.code === singleArchiveCode
+          )?.name;
+          if (archiveName) {
+            folderName = archiveName;
+          }
+        }
+      }
+
+      const safeFolderName = folderName
+        .replace(/\s+/g, "_")
+        .replace(/[^a-zA-Z0-9_]/g, "");
+      const fileName = `Daftar_Dokumen_${safeFolderName}.xlsx`;
+
+      XLSX.writeFile(workbook, fileName);
       setIsExporting(false);
     }, 500);
   };
@@ -318,7 +353,7 @@ export default function SiadilPage() {
     setIsSearchPopupOpen(false);
     setSearchQuery("");
     setCurrentFolderId(doc.parentId);
-    setSelectedDocumentIds(new Set([doc.id]));
+    handleDocumentSelect(doc.id); // Ganti dengan fungsi ini
     const docsInTargetFolder = documents.filter(
       (d) => d.parentId === doc.parentId
     );
