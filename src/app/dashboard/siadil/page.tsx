@@ -151,10 +151,10 @@ export default function SiadilPage() {
     }
     const relevantFolderIds = [
       currentFolderId,
-      ...getAllDescendantIds(currentFolderId, allArchives),
+      ...getAllDescendantIds(currentFolderId, archives),
     ];
     return documents.filter((doc) => relevantFolderIds.includes(doc.parentId));
-  }, [currentFolderId, documents]);
+  }, [currentFolderId, documents, archives]);
 
   const documentsForFiltering = useMemo(() => {
     if (currentFolderId === "root") {
@@ -162,10 +162,11 @@ export default function SiadilPage() {
     }
     const relevantFolderIds = [
       currentFolderId,
-      ...getAllDescendantIds(currentFolderId, allArchives),
+      ...getAllDescendantIds(currentFolderId, archives),
     ];
+
     return documents.filter((doc) => relevantFolderIds.includes(doc.parentId));
-  }, [currentFolderId, documents]);
+  }, [currentFolderId, documents, archives]);
 
   const handleGoBack = () => {
     const currentFolder = archives.find((a) => a.id === currentFolderId);
@@ -379,12 +380,14 @@ export default function SiadilPage() {
   };
 
   const archiveDocCounts = useMemo(() => {
-    return allDocuments.reduce((acc, doc) => {
-      const archiveCode = doc.archive;
-      acc[archiveCode] = (acc[archiveCode] || 0) + 1;
+    return documents.reduce((acc, doc) => {
+      const parentArchive = archives.find((a) => a.id === doc.parentId);
+      if (parentArchive) {
+        acc[parentArchive.code] = (acc[parentArchive.code] || 0) + 1;
+      }
       return acc;
     }, {} as Record<string, number>);
-  }, []);
+  }, [documents, archives]);
 
   const filteredArchives = useMemo(() => {
     const archivesInCurrentFolder = archives.filter(
@@ -687,9 +690,6 @@ export default function SiadilPage() {
   }, [paginatedDocuments, selectedDocumentIds]);
 
   const subfolderArchives = useMemo(() => {
-    if (currentFolderId === "root") {
-      return [];
-    }
     return archives.filter((archive) => archive.parentId === currentFolderId);
   }, [currentFolderId, archives]);
 
