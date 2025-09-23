@@ -1,7 +1,9 @@
-"use client"; // Pastikan "use client" ada di atas
+"use client";
 
+import { useRef, useEffect } from "react";
 import { Document } from "../types";
-import { allArchives } from "../data"; // Impor allArchives
+import { allArchives } from "../data";
+import { useOnClickOutside } from "../hooks/useOnClickOutside";
 
 type SearchPopupProps = {
   isOpen: boolean;
@@ -9,7 +11,6 @@ type SearchPopupProps = {
   searchQuery: string;
   setSearchQuery: (query: string) => void;
   documents: Document[];
-  // ▼▼▼ TAMBAHKAN PROPERTI BARU INI ▼▼▼
   onDocumentSelect: (document: Document) => void;
 };
 
@@ -19,11 +20,26 @@ export const SearchPopup = ({
   searchQuery,
   setSearchQuery,
   documents,
-  onDocumentSelect, // <-- Ambil prop baru
+  onDocumentSelect,
 }: SearchPopupProps) => {
+  const popupRef = useRef<HTMLDivElement>(null);
+  useOnClickOutside(popupRef, onClose);
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        onClose();
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [onClose]);
+
   if (!isOpen) return null;
 
-  // Fungsi helper untuk mendapatkan nama arsip dari kodenya
   const getArchivePath = (parentId: string): string => {
     const path = [];
     let currentId = parentId;
@@ -48,7 +64,9 @@ export const SearchPopup = ({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-start justify-center p-4 sm:p-16 z-50">
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-2xl flex flex-col max-h-full">
+      <div
+        ref={popupRef}
+        className="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-2xl flex flex-col max-h-full">
         <div className="p-4 border-b border-gray-200 dark:border-gray-700">
           <div className="relative">
             <svg
@@ -71,13 +89,6 @@ export const SearchPopup = ({
               className="w-full pl-10 pr-10 py-2 text-sm border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500 bg-white text-gray-900 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
               autoFocus
             />
-            <button
-              onClick={onClose}
-              className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
-              <kbd className="inline-flex items-center border bg-gray-100 dark:bg-gray-900 rounded px-2 text-xs font-sans font-normal text-gray-400">
-                Esc
-              </kbd>
-            </button>
           </div>
         </div>
         <div className="overflow-y-auto">

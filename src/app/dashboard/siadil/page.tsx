@@ -18,6 +18,7 @@ import { InfoPanel } from "./components/InfoPanel";
 import { MoveToModal } from "./components/MoveToModal";
 import { usePersistentDocuments } from "./hooks/usePersistentDocuments";
 import { usePersistentArchives } from "./hooks/usePersistentArchives";
+import * as XLSX from "xlsx";
 
 const allTableColumns = [
   { id: "numberAndTitle", label: "Number & Title" },
@@ -501,13 +502,65 @@ export default function SiadilPage() {
   const [isExporting, setIsExporting] = useState(false);
 
   const handleExport = () => {
-    console.log("Tombol export diklik, simulasi dimulai...");
+    if (filteredDocuments.length === 0) {
+      alert("Tidak ada data untuk diekspor.");
+      return;
+    }
+
     setIsExporting(true);
+    console.log("Memulai proses export...");
+
+    // Simulasi penundaan kecil agar user melihat status "Exporting..."
     setTimeout(() => {
+      // 1. Siapkan data: Pilih kolom yang ingin diekspor dan ganti nama header-nya
+      const dataToExport = filteredDocuments.map((doc) => ({
+        ID: doc.id,
+        "Nomor Dokumen": doc.number,
+        Judul: doc.title,
+        Deskripsi: doc.description,
+        "Tanggal Dokumen": new Date(doc.documentDate).toLocaleDateString(
+          "id-ID"
+        ),
+        Arsip: doc.archive,
+        Status: doc.status,
+        "Tanggal Kedaluwarsa": new Date(doc.expireDate).toLocaleDateString(
+          "id-ID"
+        ),
+        "Dibuat Oleh": doc.createdBy,
+        "Tanggal Dibuat": new Date(doc.createdDate).toLocaleString("id-ID"),
+        "Diubah Oleh": doc.updatedBy,
+        "Tanggal Diubah": new Date(doc.updatedDate).toLocaleString("id-ID"),
+      }));
+
+      // 2. Buat worksheet dari data JSON
+      const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+
+      // 3. Buat workbook baru dan tambahkan worksheet ke dalamnya
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, "Dokumen");
+
+      // 4. Atur lebar kolom agar tidak terlalu sempit (opsional)
+      worksheet["!cols"] = [
+        { wch: 8 }, // ID
+        { wch: 20 }, // Nomor Dokumen
+        { wch: 40 }, // Judul
+        { wch: 50 }, // Deskripsi
+        { wch: 15 }, // Tanggal Dokumen
+        { wch: 15 }, // Arsip
+        { wch: 10 }, // Status
+        { wch: 18 }, // Tanggal Kedaluwarsa
+        { wch: 12 }, // Dibuat Oleh
+        { wch: 18 }, // Tanggal Dibuat
+        { wch: 12 }, // Diubah Oleh
+        { wch: 18 }, // Tanggal Diubah
+      ];
+
+      // 5. Generate file Excel dan picu download
+      XLSX.writeFile(workbook, "Daftar_Dokumen_SIADIL.xlsx");
+
       setIsExporting(false);
-      alert("Fitur export belum diimplementasikan.");
-      console.log("Simulasi selesai.");
-    }, 2000);
+      console.log("Proses export selesai.");
+    }, 500); // Penundaan 0.5 detik
   };
   const handleDocumentSelect = (docId: string, event?: React.MouseEvent) => {
     setDocuments((prevDocs) =>
@@ -770,7 +823,7 @@ export default function SiadilPage() {
                         </dt>
                         <dd>
                           <div className="text-2xl font-bold text-gray-900 dark:text-white">
-                            {allDocuments.length}
+                            {documents.length}
                           </div>
                         </dd>
                       </dl>
