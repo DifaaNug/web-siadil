@@ -1,7 +1,7 @@
 // src/app/dashboard/siadil/components/InfoPanel.tsx
 "use client";
 
-import { Document } from "../types";
+import { Document } from "../../types";
 
 type InfoPanelProps = {
   selectedDocument: Document | null;

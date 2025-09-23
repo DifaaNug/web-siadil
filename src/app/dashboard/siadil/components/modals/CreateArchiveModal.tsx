@@ -1,14 +1,5 @@
-// src/components/CreateArchiveModal.tsx
-
 import { useState } from "react";
-
-// Tipe data ini bisa diimpor dari file utama atau didefinisikan ulang
-type Archive = {
-  id: string;
-  name: string;
-  code: string;
-  parentId: string;
-};
+import { Archive } from "../../types";
 
 type CreateArchiveModalProps = {
   isOpen: boolean;

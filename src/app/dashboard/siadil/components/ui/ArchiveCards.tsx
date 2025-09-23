@@ -1,4 +1,4 @@
-import { Archive } from "../types";
+import { Archive } from "../../types";
 
 const PersonalArchiveCard = ({
   archive,

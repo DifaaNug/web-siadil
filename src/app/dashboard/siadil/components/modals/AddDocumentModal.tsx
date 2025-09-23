@@ -1,5 +1,5 @@
 import { ChangeEvent } from "react";
-import { NewDocumentData, Archive } from "../types";
+import { NewDocumentData, Archive } from "../../types";
 
 type AddDocumentModalProps = {
   onClose: () => void;

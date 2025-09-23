@@ -1,10 +1,10 @@
 import { useState, useEffect, useRef, ReactNode, ChangeEvent } from "react";
 import ReactDOM from "react-dom";
-import { useOnClickOutside } from "../hooks/useOnClickOutside";
-import { FilterPopover } from "./FilterPopover";
-import { ColumnTogglePopover } from "./ColumnTogglePopover";
-import { Filters, Archive } from "../types";
-import { ArchiveFilterPopover } from "./ArchiveFilterPopover";
+import { useOnClickOutside } from "../../hooks/useOnClickOutside";
+import { FilterPopover } from "../ui/FilterPopover";
+import { ColumnTogglePopover } from "../ui/ColumnTogglePopover";
+import { Filters, Archive } from "../../types";
+import { ArchiveFilterPopover } from "../ui/ArchiveFilterPopover";
 
 type Column = {
   id: string;

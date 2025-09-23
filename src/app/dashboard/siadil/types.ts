@@ -1,4 +1,3 @@
-// Tipe data (tidak ada perubahan)
 export type Contributor = { name: string; role: string };
 export type Archive = {
   id: string;
@@ -42,4 +41,15 @@ export type NewDocumentData = {
   archive: string;
   expireDate: string;
   file: File | null;
+};
+
+export type Pagination = {
+  totalRows: number;
+  rowsPerPage: number;
+  currentPage: number;
+};
+
+export type TableColumn = {
+  id: string;
+  label: string;
 };

@@ -2,14 +2,13 @@
 "use client";
 
 import { useRef, useEffect, useState } from "react";
-import { useOnClickOutside } from "../hooks/useOnClickOutside";
+import { useOnClickOutside } from "../../hooks/useOnClickOutside";
 
-// PERBAIKAN 1: Definisikan tipe untuk item menu
 type MenuItem = {
   label: string;
   icon: string;
   action: () => void;
-  isSeparator?: false; // Opsional, untuk membedakan
+  isSeparator?: false;
 };
 
 type MenuSeparator = {
@@ -60,7 +59,6 @@ export const AddNewMenu = ({
     onClose();
   };
 
-  // PERBAIKAN 2: Terapkan tipe yang sudah didefinisikan
   const menuItems: { [key in "archives" | "documents"]: MenuAction[] } = {
     archives: [
       {
@@ -103,7 +101,6 @@ export const AddNewMenu = ({
       },
     ],
   };
-  // --- Batas Perbaikan ---
 
   const itemsToRender = menuItems[context];
 

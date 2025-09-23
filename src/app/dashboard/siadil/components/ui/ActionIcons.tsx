@@ -1,5 +1,3 @@
-// src/app/dashboard/siadil/components/ActionIcons.tsx
-
 export const IconDetail = () => (
   <svg
     xmlns="http://www.w3.org/2000/svg"

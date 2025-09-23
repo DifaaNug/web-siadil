@@ -1,9 +1,9 @@
 "use client";
 
 import { useRef, useEffect } from "react";
-import { Document } from "../types";
-import { allArchives } from "../data";
-import { useOnClickOutside } from "../hooks/useOnClickOutside";
+import { Document } from "../../types";
+import { allArchives } from "../../data";
+import { useOnClickOutside } from "../../hooks/useOnClickOutside";
 
 type SearchPopupProps = {
   isOpen: boolean;

@@ -1,6 +1,6 @@
 import { forwardRef, ChangeEvent } from "react";
-import { Filters } from "../types";
-import { expireInOptions } from "../data";
+import { Filters } from "../../types";
+import { expireInOptions } from "../../data";
 
 type FilterPopoverProps = {
   filters: Filters;
@@ -113,17 +113,14 @@ export const FilterPopover = forwardRef<HTMLDivElement, FilterPopoverProps>(
                 {expireInOptions.map((option) => (
                   <label
                     key={option.id}
-                    // PERUBAHAN: Menambahkan cursor-pointer untuk UX
                     className="flex items-center space-x-2 text-sm cursor-pointer">
                     <input
                       type="checkbox"
-                      // PERUBAHAN: Mengganti 'name' menjadi 'value' agar bisa diklik
                       value={option.id}
                       checked={filters.expireIn[option.id] || false}
                       onChange={onCheckboxChange}
                       className="rounded text-demplon focus:ring-demplon/50 dark:bg-gray-600 dark:border-gray-500"
                     />
-                    {/* PERUBAHAN: Menambahkan warna teks light mode */}
                     <span className="text-gray-800 dark:text-gray-300">
                       {option.label}
                     </span>

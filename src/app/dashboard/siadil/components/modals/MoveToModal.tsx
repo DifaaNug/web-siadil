@@ -1,7 +1,7 @@
 "use client";
 
-import { Archive } from "../types";
-import { FolderTreeItem } from "./FolderTreeItem";
+import { Archive } from "../../types";
+import { FolderTreeItem } from "../ui/FolderTreeItem";
 
 type MoveToModalProps = {
   archives: Archive[];

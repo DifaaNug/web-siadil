@@ -1,7 +1,5 @@
-// difaanug/web-siadil/web-siadil-9d382b671ccebb6b16f9f0993135c2cbb491120b/src/app/dashboard/siadil/components/DocumentTable.tsx
-
 import { useState } from "react";
-import { Document } from "../types";
+import { Document } from "../../types";
 import { ActionMenu } from "./ActionMenu";
 import { HeaderSortMenu } from "./HeaderSortMenu";
 import { ContextMenu } from "./ContextMenu";

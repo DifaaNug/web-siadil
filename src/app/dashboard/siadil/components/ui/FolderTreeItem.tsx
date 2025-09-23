@@ -1,8 +1,7 @@
-// src/app/dashboard/siadil/components/FolderTreeItem.tsx
 "use client";
 
 import { useState } from "react";
-import { Archive } from "../types";
+import { Archive } from "../../types";
 
 type FolderTreeItemProps = {
   folder: Archive;
@@ -19,14 +18,12 @@ export const FolderTreeItem = ({
 }: FolderTreeItemProps) => {
   const [isOpen, setIsOpen] = useState(false);
 
-  // Cari semua subfolder dari folder saat ini
   const children = allFolders.filter((f) => f.parentId === folder.id);
 
   return (
     <li>
       <div
         className="flex items-center rounded-md hover:bg-gray-100 dark:hover:bg-gray-700"
-        // Atur indentasi berdasarkan level kedalaman folder
         style={{ paddingLeft: `${level * 24}px` }}>
         {/* Tombol expand/collapse yang lebih jelas */}
         <div className="flex items-center justify-center w-7 h-7">

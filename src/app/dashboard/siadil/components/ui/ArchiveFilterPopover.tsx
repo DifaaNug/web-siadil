@@ -1,7 +1,7 @@
 "use client";
 
 import { forwardRef, useState } from "react";
-import { Archive } from "../types";
+import { Archive } from "../../types";
 
 type Props = {
   allArchives: Archive[];

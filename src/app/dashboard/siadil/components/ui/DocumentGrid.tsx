@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Document } from "../types";
+import { Document } from "../../types";
 import { ActionMenu } from "./ActionMenu";
 import { ContextMenu } from "./ContextMenu";
 
