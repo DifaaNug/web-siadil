@@ -5,7 +5,6 @@ import { useOnClickOutside } from "../hooks/useOnClickOutside";
 // PERBAIKAN: Impor setiap ikon secara spesifik, bukan 'ActionIcons'
 import {
   IconDelete,
-  IconDetail,
   IconEdit,
   IconManageContributors,
   IconManageFiles,
@@ -60,11 +59,6 @@ export const ActionMenu = ({
 
   const menuItems = [
     {
-      label: "Detail",
-      icon: <IconDetail />,
-      onClick: () => alert(`Detail for ${documentId}`),
-    },
-    {
       label: "Edit",
       icon: <IconEdit />,
       onClick: () => alert(`Edit for ${documentId}`),
@@ -100,7 +94,7 @@ export const ActionMenu = ({
       className="w-56 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg z-50"
       style={style}>
       <div className="p-2">
-        <div className="px-2 py-1">
+        <div className="px-2 py-1 text-left">
           <p className="text-sm font-semibold text-gray-900 dark:text-white">
             ID #{documentId}
           </p>
