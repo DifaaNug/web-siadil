@@ -2,12 +2,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import {
-  IconDetail,
-  IconEdit,
-  IconDelete,
-  IconManageFiles,
-} from "./ActionIcons";
+import { IconEdit, IconDelete, IconManageFiles } from "./ActionIcons";
 
 type ContextMenuProps = {
   x: number;
@@ -39,11 +34,6 @@ export const ContextMenu = ({
   }, [onClose]);
 
   const menuItems = [
-    {
-      label: "Detail",
-      icon: <IconDetail />,
-      action: () => alert(`Detail for ${documentId}`),
-    },
     {
       label: "Edit",
       icon: <IconEdit />,
