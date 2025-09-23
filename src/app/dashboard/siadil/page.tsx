@@ -688,10 +688,8 @@ export default function SiadilPage() {
     if (currentFolderId === "root") {
       return [];
     }
-    return allArchives.filter(
-      (archive) => archive.parentId === currentFolderId
-    );
-  }, [currentFolderId]);
+    return archives.filter((archive) => archive.parentId === currentFolderId);
+  }, [currentFolderId, archives]);
 
   const handleSearchSelect = (doc: Document) => {
     setIsSearchPopupOpen(false);
