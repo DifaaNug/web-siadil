@@ -602,13 +602,15 @@ export default function SiadilPage() {
       );
       return;
     }
-    const currentArchive = allArchives.find((a) => a.id === currentFolderId);
+
+    const currentArchive = archives.find((a) => a.id === currentFolderId);
+
     setNewDocument({
       number: "",
       title: "",
       description: "",
       documentDate: "",
-      archive: currentArchive ? currentArchive.code : "",
+      archive: currentArchive ? currentArchive.code : "", // Ini akan mengisi 'abac code'
       expireDate: "",
       file: null,
     });
