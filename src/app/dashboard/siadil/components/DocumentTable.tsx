@@ -28,6 +28,7 @@ type DocumentTableProps = {
   selectedDocumentIds: Set<string>;
   onDocumentSelect: (id: string, event?: React.MouseEvent) => void;
   onMove: (docId: string) => void;
+  onEdit: (docId: string) => void;
 };
 
 export const DocumentTable = ({
@@ -40,6 +41,7 @@ export const DocumentTable = ({
   selectedDocumentIds,
   onDocumentSelect,
   onMove,
+  onEdit,
 }: DocumentTableProps) => {
   const [activeActionMenu, setActiveActionMenu] =
     useState<ActiveMenuState>(null);
@@ -287,6 +289,7 @@ export const DocumentTable = ({
                       onClose={() => setActiveActionMenu(null)}
                       buttonEl={activeActionMenu.buttonEl}
                       onMove={onMove}
+                      onEdit={onEdit}
                     />
                   )}
                 </td>
@@ -320,6 +323,7 @@ export const DocumentTable = ({
           documentId={contextMenu.documentId}
           onClose={handleCloseContextMenu}
           onMove={onMove}
+          onEdit={onEdit}
         />
       )}
     </>

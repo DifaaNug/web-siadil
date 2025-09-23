@@ -10,6 +10,7 @@ type ContextMenuProps = {
   documentId: string;
   onClose: () => void;
   onMove: (documentId: string) => void;
+  onEdit: (documentId: string) => void;
 };
 
 export const ContextMenu = ({
@@ -18,6 +19,7 @@ export const ContextMenu = ({
   documentId,
   onClose,
   onMove,
+  onEdit,
 }: ContextMenuProps) => {
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -37,7 +39,7 @@ export const ContextMenu = ({
     {
       label: "Edit",
       icon: <IconEdit />,
-      action: () => alert(`Edit for ${documentId}`),
+      onClick: () => onEdit(documentId),
     },
     {
       label: "Pindahkan",
@@ -69,7 +71,7 @@ export const ContextMenu = ({
             <button
               onClick={(e) => {
                 e.stopPropagation();
-                item.action();
+                item.action?.();
                 onClose();
               }}
               className={`w-full flex items-center px-2 py-1.5 text-sm rounded-md ${

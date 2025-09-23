@@ -1,5 +1,3 @@
-// difaanug/web-siadil/web-siadil-9d382b671ccebb6b16f9f0993135c2cbb491120b/src/app/dashboard/siadil/components/DocumentGrid.tsx
-
 import { useState } from "react";
 import { Document } from "../types";
 import { ActionMenu } from "./ActionMenu";
@@ -7,19 +5,23 @@ import { ContextMenu } from "./ContextMenu";
 
 type ContextMenuState = { x: number; y: number; documentId: string } | null;
 
+type DocumentGridProps = {
+  documents: Document[];
+  selectedDocumentIds: Set<string>;
+  onDocumentSelect: (id: string, event?: React.MouseEvent) => void;
+  onMove: (docId: string) => void;
+  onToggleStar: (docId: string, event: React.MouseEvent) => void;
+  onEdit: (docId: string) => void; // Prop onEdit yang dibutuhkan
+};
+
 export const DocumentGrid = ({
   documents,
   selectedDocumentIds,
   onDocumentSelect,
   onMove,
   onToggleStar,
-}: {
-  documents: Document[];
-  selectedDocumentIds: Set<string>;
-  onDocumentSelect: (id: string, event?: React.MouseEvent) => void;
-  onMove: (docId: string) => void;
-  onToggleStar: (docId: string, event: React.MouseEvent) => void;
-}) => {
+  onEdit,
+}: DocumentGridProps) => {
   const [activeActionMenu, setActiveActionMenu] = useState<null | {
     docId: string;
     buttonEl: HTMLButtonElement;
@@ -48,7 +50,7 @@ export const DocumentGrid = ({
         {documents.map((doc) => (
           <div
             key={doc.id}
-            id={`doc-grid-${doc.id}`} // <-- PERBAIKAN: Tambahkan ID unik di sini
+            id={`doc-grid-${doc.id}`}
             onContextMenu={(e) => handleContextMenu(e, doc.id)}
             onClick={(e) => onDocumentSelect(doc.id, e)}
             className={`group relative rounded-lg border p-4 transition-all cursor-pointer flex flex-col h-full ${
@@ -56,7 +58,6 @@ export const DocumentGrid = ({
                 ? "bg-green-50 border-green-500 dark:bg-green-900/50 dark:border-green-700 ring-2 ring-green-500"
                 : "border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800"
             }`}>
-            {/* ... sisa kode komponen tidak berubah ... */}
             <div className="flex justify-between items-center mb-1">
               <button
                 onClick={(e) => onToggleStar(doc.id, e)}
@@ -141,6 +142,7 @@ export const DocumentGrid = ({
                 onClose={() => setActiveActionMenu(null)}
                 buttonEl={activeActionMenu.buttonEl}
                 onMove={onMove}
+                onEdit={onEdit}
               />
             )}
           </div>
@@ -154,6 +156,7 @@ export const DocumentGrid = ({
           documentId={contextMenu.documentId}
           onClose={handleCloseContextMenu}
           onMove={onMove}
+          onEdit={onEdit}
         />
       )}
     </>

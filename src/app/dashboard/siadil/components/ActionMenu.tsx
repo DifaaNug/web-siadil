@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useOnClickOutside } from "../hooks/useOnClickOutside";
-// PERBAIKAN: Impor setiap ikon secara spesifik, bukan 'ActionIcons'
+
 import {
   IconDelete,
   IconEdit,
@@ -15,6 +15,7 @@ type ActionMenuProps = {
   onClose: () => void;
   buttonEl: HTMLButtonElement;
   onMove: (documentId: string) => void;
+  onEdit: (documentId: string) => void;
 };
 
 export const ActionMenu = ({
@@ -22,6 +23,7 @@ export const ActionMenu = ({
   onClose,
   buttonEl,
   onMove,
+  onEdit,
 }: ActionMenuProps) => {
   const menuRef = useRef<HTMLDivElement>(null);
   const [style, setStyle] = useState<React.CSSProperties>({
@@ -61,7 +63,7 @@ export const ActionMenu = ({
     {
       label: "Edit",
       icon: <IconEdit />,
-      onClick: () => alert(`Edit for ${documentId}`),
+      onClick: () => onEdit(documentId),
     },
     {
       label: "Pindahkan",

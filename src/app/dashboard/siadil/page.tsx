@@ -89,9 +89,29 @@ export default function SiadilPage() {
   const [isMoveModalOpen, setIsMoveModalOpen] = useState(false);
   const [documentToMove, setDocumentToMove] = useState<string | null>(null);
 
+  const [editingDocId, setEditingDocId] = useState<string | null>(null);
+
   const [infoPanelDocument, setInfoPanelDocument] = useState<Document | null>(
     null
   );
+
+  const handleOpenEditModal = (docId: string) => {
+    const docToEdit = documents.find((doc) => doc.id === docId);
+    if (docToEdit) {
+      setEditingDocId(docId);
+
+      setNewDocument({
+        number: docToEdit.number,
+        title: docToEdit.title,
+        description: docToEdit.description,
+        documentDate: docToEdit.documentDate,
+        archive: docToEdit.archive,
+        expireDate: docToEdit.expireDate,
+        file: null,
+      });
+      setIsAddModalOpen(true);
+    }
+  };
 
   const [documents, setDocuments] = usePersistentDocuments();
   const [pageView, setPageView] = useState<"archives" | "starred">("archives");
@@ -365,8 +385,38 @@ export default function SiadilPage() {
   };
 
   const handleSaveDocument = () => {
-    console.log("Saving new document:", newDocument);
+    if (editingDocId) {
+      setDocuments((docs) =>
+        docs.map((doc) =>
+          doc.id === editingDocId
+            ? {
+                ...doc,
+                ...newDocument,
+                id: editingDocId,
+                updatedDate: new Date().toISOString(),
+              }
+            : doc
+        )
+      );
+      alert(`Dokumen ID: ${editingDocId} berhasil diperbarui.`);
+    } else {
+      const newDoc: Document = {
+        id: `doc-${Date.now()}`,
+        parentId: currentFolderId,
+        createdBy: "10122059",
+        updatedBy: "10122059",
+        createdDate: new Date().toISOString(),
+        updatedDate: new Date().toISOString(),
+        status: "Active",
+        contributors: [],
+        ...newDocument,
+      };
+      setDocuments((docs) => [...docs, newDoc]);
+      alert(`Dokumen "${newDocument.title}" berhasil ditambahkan.`);
+    }
+
     setIsAddModalOpen(false);
+    setEditingDocId(null);
     setNewDocument({
       number: "",
       title: "",
@@ -402,19 +452,17 @@ export default function SiadilPage() {
     const isRightClick = event?.type === "contextmenu";
 
     if (!isRightClick && (event?.ctrlKey || event?.metaKey)) {
-      // Handle multi-selection with Ctrl/Cmd key
       if (newSelection.has(docId)) {
         newSelection.delete(docId);
       } else {
         newSelection.add(docId);
       }
-      setInfoPanelDocument(null); // Tutup panel saat multi-select
+      setInfoPanelDocument(null);
     } else if (
       !isRightClick &&
       event?.shiftKey &&
       paginatedDocuments.length > 0
     ) {
-      // Handle range selection with Shift key
       const lastSelected = Array.from(selectedDocumentIds).pop();
       if (lastSelected) {
         const lastIndex = paginatedDocuments.findIndex(
@@ -431,18 +479,14 @@ export default function SiadilPage() {
       } else {
         newSelection.add(docId);
       }
-      setInfoPanelDocument(null); // Tutup panel saat multi-select
+      setInfoPanelDocument(null);
     } else {
-      // Handle single selection (left-click) or context menu (right-click)
       if (newSelection.has(docId) && newSelection.size === 1 && !isRightClick) {
-        // Jika klik kiri pada item yang sudah terpilih, batalkan pilihan & tutup panel
         newSelection.clear();
         setInfoPanelDocument(null);
       } else {
-        // Pilih item baru
         newSelection.clear();
         newSelection.add(docId);
-        // Jika ini klik kiri, buka panel info. Jika klik kanan, pastikan panel tertutup.
         if (!isRightClick) {
           const docToShow = documents.find((d) => d.id === docId) || null;
           setInfoPanelDocument(docToShow);
@@ -819,6 +863,7 @@ export default function SiadilPage() {
                 documents={starredDocuments}
                 selectedDocumentIds={selectedDocumentIds}
                 onDocumentSelect={handleDocumentSelect}
+                onEdit={handleOpenEditModal}
                 onMove={handleOpenMoveModal}
                 onToggleStar={handleToggleStar}
               />
@@ -999,6 +1044,7 @@ export default function SiadilPage() {
                         selectedDocumentIds={selectedDocumentIds}
                         onDocumentSelect={handleDocumentSelect}
                         onMove={handleOpenMoveModal}
+                        onEdit={handleOpenEditModal}
                       />
                     ) : (
                       <DocumentGrid
@@ -1006,6 +1052,7 @@ export default function SiadilPage() {
                         selectedDocumentIds={selectedDocumentIds}
                         onDocumentSelect={handleDocumentSelect}
                         onMove={handleOpenMoveModal}
+                        onEdit={handleOpenEditModal}
                         onToggleStar={handleToggleStar}
                       />
                     )
@@ -1038,11 +1085,15 @@ export default function SiadilPage() {
       )}
       {isAddModalOpen && (
         <AddDocumentModal
-          onClose={() => setIsAddModalOpen(false)}
+          onClose={() => {
+            setIsAddModalOpen(false);
+            setEditingDocId(null); // Reset ID edit saat modal ditutup
+          }}
           onSave={handleSaveDocument}
           newDocument={newDocument}
           setNewDocument={setNewDocument}
           archives={allArchives}
+          editingDocId={editingDocId} // Kirim ID edit ke modal
         />
       )}
       {isSearchPopupOpen && (

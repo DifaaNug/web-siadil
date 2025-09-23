@@ -9,6 +9,7 @@ type AddDocumentModalProps = {
     value: NewDocumentData | ((prevState: NewDocumentData) => NewDocumentData)
   ) => void;
   archives: Archive[];
+  editingDocId: string | null;
 };
 
 export const AddDocumentModal = ({
@@ -17,7 +18,9 @@ export const AddDocumentModal = ({
   newDocument,
   setNewDocument,
   archives,
+  editingDocId,
 }: AddDocumentModalProps) => {
+  const isEditing = !!editingDocId;
   const handleInputChange = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
@@ -36,16 +39,17 @@ export const AddDocumentModal = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4 transition-opacity duration-300">
-      {/* Tambahkan max-h-[90vh] untuk membatasi tinggi modal */}
       <div className="flex w-full max-w-xl flex-col rounded-lg bg-white shadow-xl dark:bg-gray-800 max-h-[90vh]">
         {/* === HEADER === */}
         <div className="flex items-start justify-between rounded-t-lg border-b border-gray-200 p-5 dark:border-gray-700">
           <div>
             <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
-              Add New Document
+              {isEditing ? "Edit Document" : "Add New Document"}
             </h3>
             <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-              Add new document here. Click save when youre done.
+              {isEditing
+                ? "Update the document details below."
+                : "Add new document here. Click save when you're done."}
             </p>
           </div>
           <button
@@ -62,7 +66,6 @@ export const AddDocumentModal = ({
         </div>
 
         {/* === BODY === */}
-        {/* Tambahkan overflow-y-auto agar bagian ini bisa di-scroll */}
         <div className="overflow-y-auto p-5">
           <div className="grid grid-cols-1 gap-x-6 gap-y-5 md:grid-cols-2">
             {/* --- Archive --- */}
@@ -275,7 +278,7 @@ export const AddDocumentModal = ({
                 d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V3"
               />
             </svg>
-            Save Document
+            {isEditing ? "Save Changes" : "Save Document"}
           </button>
         </div>
       </div>
