@@ -89,6 +89,10 @@ export default function SiadilPage() {
   const [isMoveModalOpen, setIsMoveModalOpen] = useState(false);
   const [documentToMove, setDocumentToMove] = useState<string | null>(null);
 
+  const [infoPanelDocument, setInfoPanelDocument] = useState<Document | null>(
+    null
+  );
+
   const [documents, setDocuments] = usePersistentDocuments();
   const [pageView, setPageView] = useState<"archives" | "starred">("archives");
 
@@ -385,7 +389,6 @@ export default function SiadilPage() {
       console.log("Simulasi selesai.");
     }, 2000);
   };
-
   const handleDocumentSelect = (docId: string, event?: React.MouseEvent) => {
     setDocuments((prevDocs) =>
       prevDocs.map((doc) =>
@@ -396,13 +399,22 @@ export default function SiadilPage() {
     );
 
     const newSelection = new Set(selectedDocumentIds);
-    if (event?.ctrlKey || event?.metaKey) {
+    const isRightClick = event?.type === "contextmenu";
+
+    if (!isRightClick && (event?.ctrlKey || event?.metaKey)) {
+      // Handle multi-selection with Ctrl/Cmd key
       if (newSelection.has(docId)) {
         newSelection.delete(docId);
       } else {
         newSelection.add(docId);
       }
-    } else if (event?.shiftKey && paginatedDocuments.length > 0) {
+      setInfoPanelDocument(null); // Tutup panel saat multi-select
+    } else if (
+      !isRightClick &&
+      event?.shiftKey &&
+      paginatedDocuments.length > 0
+    ) {
+      // Handle range selection with Shift key
       const lastSelected = Array.from(selectedDocumentIds).pop();
       if (lastSelected) {
         const lastIndex = paginatedDocuments.findIndex(
@@ -419,26 +431,31 @@ export default function SiadilPage() {
       } else {
         newSelection.add(docId);
       }
+      setInfoPanelDocument(null); // Tutup panel saat multi-select
     } else {
-      if (newSelection.has(docId) && newSelection.size === 1) {
+      // Handle single selection (left-click) or context menu (right-click)
+      if (newSelection.has(docId) && newSelection.size === 1 && !isRightClick) {
+        // Jika klik kiri pada item yang sudah terpilih, batalkan pilihan & tutup panel
         newSelection.clear();
+        setInfoPanelDocument(null);
       } else {
+        // Pilih item baru
         newSelection.clear();
         newSelection.add(docId);
+        // Jika ini klik kiri, buka panel info. Jika klik kanan, pastikan panel tertutup.
+        if (!isRightClick) {
+          const docToShow = documents.find((d) => d.id === docId) || null;
+          setInfoPanelDocument(docToShow);
+        } else {
+          setInfoPanelDocument(null);
+        }
       }
     }
     setSelectedDocumentIds(newSelection);
   };
 
-  const selectedDocument = useMemo(() => {
-    if (selectedDocumentIds.size === 1) {
-      const lastSelectedId = Array.from(selectedDocumentIds)[0];
-      return allDocuments.find((doc) => doc.id === lastSelectedId) || null;
-    }
-    return null;
-  }, [selectedDocumentIds]);
-
   const handleCloseInfoPanel = () => {
+    setInfoPanelDocument(null);
     setSelectedDocumentIds(new Set());
   };
 
@@ -524,7 +541,7 @@ export default function SiadilPage() {
     setSelectedDocumentIds(new Set([doc.id]));
   };
 
-  const isInfoPanelOpen = selectedDocument !== null;
+  const isInfoPanelOpen = infoPanelDocument !== null;
 
   useEffect(() => {
     if (selectedDocumentIds.size === 1) {
@@ -995,10 +1012,9 @@ export default function SiadilPage() {
       </div>
 
       <InfoPanel
-        selectedDocument={selectedDocument}
+        selectedDocument={infoPanelDocument}
         onClose={handleCloseInfoPanel}
       />
-
       {isCreateModalOpen && (
         <CreateArchiveModal
           isOpen={isCreateModalOpen}

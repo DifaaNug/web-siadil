@@ -50,7 +50,9 @@ export const DocumentTable = ({
   const handleContextMenu = (event: React.MouseEvent, docId: string) => {
     event.preventDefault();
     event.stopPropagation();
-    onDocumentSelect(docId);
+    if (!selectedDocumentIds.has(docId)) {
+      onDocumentSelect(docId, event);
+    }
     setContextMenu({ x: event.clientX, y: event.clientY, documentId: docId });
   };
 
