@@ -1,7 +1,7 @@
-// src/app/dashboard/siadil/components/MoveToModal.tsx
 "use client";
 
 import { Archive } from "../types";
+import { FolderTreeItem } from "./FolderTreeItem";
 
 type MoveToModalProps = {
   archives: Archive[];
@@ -14,6 +14,7 @@ export const MoveToModal = ({
   onClose,
   onMove,
 }: MoveToModalProps) => {
+  const rootFolders = archives.filter((archive) => archive.parentId === "root");
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
       <div className="w-full max-w-md rounded-lg bg-white shadow-xl dark:bg-gray-800">
@@ -24,7 +25,7 @@ export const MoveToModal = ({
           </h3>
           <button
             onClick={onClose}
-            className="p-1 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600">
+            className="p-1 rounded-full hover:bg-gray-200 dark:hover:bg-gray-500 text-gray-400 dark:text-gray-700">
             <svg
               className="w-6 h-6"
               fill="none"
@@ -40,31 +41,16 @@ export const MoveToModal = ({
           </button>
         </div>
 
-        {/* Daftar Folder */}
         <div className="p-2 max-h-72 overflow-y-auto">
           <ul>
-            {archives.map((archive) => (
-              <li key={archive.id}>
-                <button
-                  onClick={() => onMove(archive.id)}
-                  className="w-full text-left flex items-center gap-3 px-3 py-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700">
-                  <svg
-                    className="w-5 h-5 text-gray-500"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor">
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"
-                    />
-                  </svg>
-                  <span className="text-sm text-gray-800 dark:text-gray-200">
-                    {archive.name}
-                  </span>
-                </button>
-              </li>
+            {rootFolders.map((archive) => (
+              <FolderTreeItem
+                key={archive.id}
+                folder={archive}
+                allFolders={archives}
+                onMove={onMove}
+                level={0}
+              />
             ))}
           </ul>
         </div>
