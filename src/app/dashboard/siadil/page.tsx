@@ -465,9 +465,21 @@ export default function SiadilPage() {
   };
 
   const handleConfirmMove = (targetArchiveId: string) => {
-    alert(
-      `Pindahkan dokumen ID: ${documentToMove} ke arsip ID: ${targetArchiveId}`
+    if (!documentToMove) return;
+
+    setDocuments((currentDocs) =>
+      currentDocs.map((doc) =>
+        doc.id === documentToMove ? { ...doc, parentId: targetArchiveId } : doc
+      )
     );
+
+    const targetArchive = allArchives.find((a) => a.id === targetArchiveId);
+    const targetName = targetArchive ? targetArchive.name : "folder tujuan";
+
+    alert(
+      `Dokumen ID: ${documentToMove} berhasil dipindahkan ke ${targetName}.`
+    );
+
     setIsMoveModalOpen(false);
     setDocumentToMove(null);
   };
