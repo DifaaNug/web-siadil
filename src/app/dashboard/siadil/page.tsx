@@ -17,6 +17,7 @@ import { AddNewMenu } from "./components/AddNewMenu";
 import { InfoPanel } from "./components/InfoPanel";
 import { MoveToModal } from "./components/MoveToModal";
 import { usePersistentDocuments } from "./hooks/usePersistentDocuments";
+import { usePersistentArchives } from "./hooks/usePersistentArchives";
 
 const allTableColumns = [
   { id: "numberAndTitle", label: "Number & Title" },
@@ -114,6 +115,7 @@ export default function SiadilPage() {
   };
 
   const [documents, setDocuments] = usePersistentDocuments();
+  const [archives, setArchives] = usePersistentArchives();
   const [pageView, setPageView] = useState<"archives" | "starred">("archives");
 
   const searchableDocuments = useMemo(() => {
@@ -197,7 +199,7 @@ export default function SiadilPage() {
     const path = [];
     let currentId = currentFolderId;
     while (currentId !== "root") {
-      const folder = allArchives.find((a) => a.id === currentId);
+      const folder = archives.find((a) => a.id === currentId);
       if (folder) {
         path.unshift({ label: folder.name, id: folder.id });
         currentId = folder.parentId;
@@ -211,7 +213,7 @@ export default function SiadilPage() {
       icon: <FolderIcon />,
       onClick: () => setCurrentFolderId(item.id),
     }));
-  }, [currentFolderId]);
+  }, [currentFolderId, archives]);
 
   const handleColumnToggle = (columnId: string) => {
     setVisibleColumns((prev) => {
@@ -380,8 +382,19 @@ export default function SiadilPage() {
     name: string;
     parentId: string;
   }) => {
-    console.log("Saving new archive:", archiveData);
-    alert(`Arsip "${archiveData.name}" berhasil disimpan!`);
+    const { name, parentId } = archiveData;
+
+    const newArchive: Archive = {
+      id: name.toLowerCase().replace(/\s+/g, "-") + `-${Date.now()}`,
+      code:
+        name.substring(0, 5).toUpperCase() + Math.floor(Math.random() * 100),
+      name: name,
+      parentId: parentId,
+    };
+
+    setArchives((currentArchives) => [...currentArchives, newArchive]);
+
+    alert(`Arsip "${name}" berhasil dibuat!`);
   };
 
   const handleSaveDocument = () => {
@@ -1079,7 +1092,7 @@ export default function SiadilPage() {
           isOpen={isCreateModalOpen}
           onClose={() => setIsCreateModalOpen(false)}
           onSave={handleSaveArchive}
-          archives={allArchives}
+          archives={archives}
           currentFolderId={currentFolderId}
         />
       )}
@@ -1092,7 +1105,7 @@ export default function SiadilPage() {
           onSave={handleSaveDocument}
           newDocument={newDocument}
           setNewDocument={setNewDocument}
-          archives={allArchives}
+          archives={archives}
           editingDocId={editingDocId} // Kirim ID edit ke modal
         />
       )}
@@ -1108,7 +1121,7 @@ export default function SiadilPage() {
       )}
       {isMoveModalOpen && (
         <MoveToModal
-          archives={allArchives}
+          archives={archives}
           onClose={() => setIsMoveModalOpen(false)}
           onMove={handleConfirmMove}
         />
