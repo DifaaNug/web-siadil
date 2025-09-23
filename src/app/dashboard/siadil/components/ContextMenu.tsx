@@ -77,8 +77,9 @@ export const ContextMenu = ({
         {menuItems.map((item, index) => (
           <li key={index}>
             <button
-              onClick={() => {
-                item.action(); // <-- Perbaikan logika di sini
+              onClick={(e) => {
+                e.stopPropagation();
+                item.action();
                 onClose();
               }}
               className={`w-full flex items-center px-2 py-1.5 text-sm rounded-md ${
