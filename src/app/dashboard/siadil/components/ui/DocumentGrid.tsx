@@ -13,6 +13,7 @@ type DocumentGridProps = {
   onToggleStar: (docId: string, event: React.MouseEvent) => void;
   onEdit: (docId: string) => void;
   onDelete: (docId: string) => void;
+  onManageContributors: (docId: string) => void;
 };
 
 export const DocumentGrid = ({
@@ -23,6 +24,7 @@ export const DocumentGrid = ({
   onToggleStar,
   onEdit,
   onDelete,
+  onManageContributors,
 }: DocumentGridProps) => {
   const [activeActionMenu, setActiveActionMenu] = useState<null | {
     docId: string;
@@ -146,6 +148,7 @@ export const DocumentGrid = ({
                 onMove={onMove}
                 onEdit={onEdit}
                 onDelete={onDelete}
+                onManageContributors={onManageContributors}
               />
             )}
           </div>

@@ -17,6 +17,7 @@ type ActionMenuProps = {
   onMove: (documentId: string) => void;
   onEdit: (documentId: string) => void;
   onDelete: (documentId: string) => void;
+  onManageContributors: (documentId: string) => void; // Tambahkan ini
 };
 
 export const ActionMenu = ({
@@ -26,6 +27,7 @@ export const ActionMenu = ({
   onMove,
   onEdit,
   onDelete,
+  onManageContributors, // Tambahkan ini
 }: ActionMenuProps) => {
   const menuRef = useRef<HTMLDivElement>(null);
   const [style, setStyle] = useState<React.CSSProperties>({
@@ -82,7 +84,7 @@ export const ActionMenu = ({
     {
       label: "Manage Contributors",
       icon: <IconManageContributors />,
-      onClick: () => alert(`Manage Contributors for ${documentId}`),
+      onClick: () => onManageContributors(documentId), // Ganti ini
     },
     { isSeparator: true },
     {

@@ -28,6 +28,7 @@ type DocumentTableProps = {
   onMove: (docId: string) => void;
   onEdit: (docId: string) => void;
   onDelete: (docId: string) => void;
+  onManageContributors: (docId: string) => void;
 };
 
 export const DocumentTable = ({
@@ -42,6 +43,7 @@ export const DocumentTable = ({
   onMove,
   onEdit,
   onDelete,
+  onManageContributors,
 }: DocumentTableProps) => {
   const [activeActionMenu, setActiveActionMenu] =
     useState<ActiveMenuState>(null);
@@ -291,6 +293,7 @@ export const DocumentTable = ({
                       onMove={onMove}
                       onEdit={onEdit}
                       onDelete={onDelete}
+                      onManageContributors={onManageContributors}
                     />
                   )}
                 </td>

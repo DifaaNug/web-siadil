@@ -1,9 +1,15 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo } from "react"; // <-- 1. Import useMemo
 import * as XLSX from "xlsx";
 
-import { Document, Archive, NewDocumentData, TableColumn } from "./types";
+import {
+  Document,
+  Archive,
+  NewDocumentData,
+  TableColumn,
+  Contributor,
+} from "./types";
 
 import { useData } from "./hooks/useData";
 import { useDocumentSorters } from "./hooks/useDocumentSorters";
@@ -17,12 +23,14 @@ import QuickAccessSection from "./components/views/QuickAccessSection";
 import ArchiveView from "./components/views/ArchiveView";
 import DocumentView from "./components/views/DocumentView";
 import StarredView from "./components/views/StarredView";
+import TrashView from "./components/views/TrashView"; // <-- 2. Import TrashView
 import { AddNewMenu } from "./components/ui/AddNewMenu";
 import { InfoPanel } from "./components/container/InfoPanel";
 import CreateArchiveModal from "./components/modals/CreateArchiveModal";
 import { AddDocumentModal } from "./components/modals/AddDocumentModal";
 import { SearchPopup } from "./components/modals/SearchPopup";
 import { MoveToModal } from "./components/modals/MoveToModal";
+import ManageContributorsModal from "./components/modals/ManageContributorsModal";
 
 const allTableColumns: TableColumn[] = [
   { id: "numberAndTitle", label: "Number & Title" },
@@ -47,7 +55,9 @@ const initialNewDocument: NewDocumentData = {
 export default function SiadilPage() {
   const [currentFolderId, setCurrentFolderId] = useState("root");
   const [viewMode, setViewMode] = useState<"list" | "grid">("list");
-  const [pageView, setPageView] = useState<"archives" | "starred">("archives");
+  const [pageView, setPageView] = useState<"archives" | "starred" | "trash">(
+    "archives"
+  ); // <-- 3. Perbarui tipe state
   const [isAddNewMenuOpen, setIsAddNewMenuOpen] = useState(false);
   const addNewButtonRef = useRef<HTMLButtonElement>(null);
   const [isExporting, setIsExporting] = useState(false);
@@ -58,18 +68,11 @@ export default function SiadilPage() {
     new Set(allTableColumns.map((c) => c.id))
   );
 
-  const handleColumnToggle = (columnId: string) => {
-    setVisibleColumns((prev) => {
-      const newSet = new Set(prev);
-      if (newSet.has(columnId)) {
-        newSet.delete(columnId);
-      } else {
-        newSet.add(columnId);
-      }
-      return newSet;
-    });
-  };
+  const [isContributorsModalOpen, setIsContributorsModalOpen] = useState(false);
+  const [selectedDocForContributors, setSelectedDocForContributors] =
+    useState<Document | null>(null);
 
+  // <-- 4. Pindahkan deklarasi hook dan variabel ke urutan yang benar -->
   const {
     documents,
     setDocuments,
@@ -84,6 +87,41 @@ export default function SiadilPage() {
     subfolderArchives,
     handleToggleStar,
   } = useData(currentFolderId);
+
+  const trashedDocuments = useMemo(() => {
+    return documents.filter((doc) => doc.status === "Trashed");
+  }, [documents]);
+
+  const handleOpenContributorsModal = (docId: string) => {
+    const doc = documents.find((d) => d.id === docId);
+    if (doc) {
+      setSelectedDocForContributors(doc);
+      setIsContributorsModalOpen(true);
+    }
+  };
+
+  const handleSaveContributors = (
+    docId: string,
+    newContributors: Contributor[]
+  ) => {
+    setDocuments((docs) =>
+      docs.map((doc) =>
+        doc.id === docId ? { ...doc, contributors: newContributors } : doc
+      )
+    );
+  };
+
+  const handleColumnToggle = (columnId: string) => {
+    setVisibleColumns((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(columnId)) {
+        newSet.delete(columnId);
+      } else {
+        newSet.add(columnId);
+      }
+      return newSet;
+    });
+  };
 
   const {
     filters,
@@ -154,22 +192,49 @@ export default function SiadilPage() {
   };
 
   const handleDeleteDocument = (docId: string) => {
-    const docToDelete = documents.find((doc) => doc.id === docId);
-    if (!docToDelete) return;
+    const docToTrash = documents.find((doc) => doc.id === docId);
+    if (!docToTrash) return;
 
     if (
       window.confirm(
-        `Apakah Anda yakin ingin menghapus dokumen "${docToDelete.title}"?`
+        `Apakah Anda yakin ingin memindahkan dokumen "${docToTrash.title}" ke Sampah?`
       )
     ) {
       setDocuments((currentDocs) =>
-        currentDocs.filter((doc) => doc.id !== docId)
+        currentDocs.map((doc) =>
+          doc.id === docId ? { ...doc, status: "Trashed" } : doc
+        )
       );
       if (infoPanelDocument?.id === docId) {
         setInfoPanelDocument(null);
       }
       setSelectedDocumentIds(new Set());
-      alert(`Dokumen "${docToDelete.title}" berhasil dihapus.`);
+      alert(`Dokumen "${docToTrash.title}" berhasil dipindahkan ke Sampah.`);
+    }
+  };
+
+  const handleRestoreDocument = (docId: string) => {
+    setDocuments((currentDocs) =>
+      currentDocs.map((doc) =>
+        doc.id === docId ? { ...doc, status: "Active" } : doc
+      )
+    );
+    alert(`Dokumen berhasil dipulihkan.`);
+  };
+
+  const handleDeletePermanently = (docId: string) => {
+    const docToDelete = documents.find((doc) => doc.id === docId);
+    if (!docToDelete) return;
+
+    if (
+      window.confirm(
+        `Dokumen "${docToDelete.title}" akan dihapus permanen. Anda yakin?`
+      )
+    ) {
+      setDocuments((currentDocs) =>
+        currentDocs.filter((doc) => doc.id !== docId)
+      );
+      alert(`Dokumen berhasil dihapus permanen.`);
     }
   };
 
@@ -436,46 +501,113 @@ export default function SiadilPage() {
         {currentFolderId === "root" && (
           <div className="mb-6 border-b border-gray-200 dark:border-gray-700">
             <nav className="-mb-px flex space-x-6" aria-label="Tabs">
+              {/* Tombol My Archives */}
               <button
                 onClick={() => setPageView("archives")}
-                className={`whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm ${
+                className={`flex items-center gap-2 whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm ${
                   pageView === "archives"
                     ? "border-demplon text-demplon"
                     : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
                 }`}>
-                My Archives
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round">
+                  <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+                </svg>
+                <span>My Archives</span>
               </button>
+
+              {/* Tombol Starred */}
               <button
                 onClick={() => setPageView("starred")}
-                className={`whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm ${
+                className={`flex items-center gap-2 whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm ${
                   pageView === "starred"
                     ? "border-demplon text-demplon"
                     : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
                 }`}>
-                Starred
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round">
+                  <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                </svg>
+                <span>Starred</span>
+              </button>
+
+              {/* Tombol Sampah */}
+              <button
+                onClick={() => setPageView("trash")}
+                className={`flex items-center gap-2 whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm ${
+                  pageView === "trash"
+                    ? "border-demplon text-demplon"
+                    : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                }`}>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round">
+                  <polyline points="3 6 5 6 21 6"></polyline>
+                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                </svg>
+                <span>Trash</span>
               </button>
             </nav>
           </div>
         )}
 
         {currentFolderId === "root" ? (
-          pageView === "starred" ? (
-            <StarredView
-              documents={starredDocuments}
-              selectedDocumentIds={selectedDocumentIds}
-              onDocumentSelect={handleDocumentSelect}
-              onEdit={handleOpenEditModal}
-              onMove={handleOpenMoveModal}
-              onDelete={handleDeleteDocument}
-              onToggleStar={handleToggleStar}
-            />
-          ) : (
-            <ArchiveView
-              archives={archives}
-              archiveDocCounts={archiveDocCounts}
-              onArchiveClick={setCurrentFolderId}
-            />
-          )
+          (() => {
+            switch (pageView) {
+              case "starred":
+                return (
+                  <StarredView
+                    documents={starredDocuments}
+                    selectedDocumentIds={selectedDocumentIds}
+                    onDocumentSelect={handleDocumentSelect}
+                    onEdit={handleOpenEditModal}
+                    onMove={handleOpenMoveModal}
+                    onDelete={handleDeleteDocument}
+                    onToggleStar={handleToggleStar}
+                  />
+                );
+              case "trash":
+                return (
+                  <TrashView
+                    documents={trashedDocuments}
+                    onRestore={handleRestoreDocument}
+                    onDeletePermanently={handleDeletePermanently}
+                  />
+                );
+              case "archives":
+              default:
+                return (
+                  <ArchiveView
+                    archives={archives}
+                    archiveDocCounts={archiveDocCounts}
+                    onArchiveClick={setCurrentFolderId}
+                  />
+                );
+            }
+          })()
         ) : (
           <DocumentView
             archives={subfolderArchives}
@@ -507,6 +639,7 @@ export default function SiadilPage() {
             onDocumentSelect={handleDocumentSelect}
             onMove={handleOpenMoveModal}
             onEdit={handleOpenEditModal}
+            onManageContributors={handleOpenContributorsModal}
             onDelete={handleDeleteDocument}
             onToggleStar={handleToggleStar}
             currentFolderName={
@@ -555,6 +688,15 @@ export default function SiadilPage() {
           archives={archives}
           onClose={() => setIsMoveModalOpen(false)}
           onMove={handleConfirmMove}
+        />
+      )}
+
+      {isContributorsModalOpen && (
+        <ManageContributorsModal
+          isOpen={isContributorsModalOpen}
+          onClose={() => setIsContributorsModalOpen(false)}
+          document={selectedDocForContributors}
+          onSave={handleSaveContributors}
         />
       )}
     </>

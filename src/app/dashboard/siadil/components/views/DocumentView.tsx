@@ -26,6 +26,7 @@ interface DocumentViewProps {
   viewMode: "list" | "grid";
   allTableColumns: TableColumn[];
   archiveDocCounts: Record<string, number>;
+  onManageContributors: (docId: string) => void;
 
   onGoBack: () => void;
   onSearchClick: () => void;
@@ -86,6 +87,7 @@ const DocumentView: React.FC<DocumentViewProps> = (props) => {
     currentFolderName,
     archiveDocCounts,
     onArchiveClick,
+    onManageContributors,
   } = props;
 
   const hasDocuments = paginatedDocuments.length > 0;
@@ -201,6 +203,7 @@ const DocumentView: React.FC<DocumentViewProps> = (props) => {
               onMove={onMove}
               onEdit={onEdit}
               onDelete={onDelete}
+              onManageContributors={onManageContributors}
             />
           ) : (
             <DocumentGrid
@@ -211,6 +214,7 @@ const DocumentView: React.FC<DocumentViewProps> = (props) => {
               onEdit={onEdit}
               onDelete={onDelete}
               onToggleStar={onToggleStar}
+              onManageContributors={onManageContributors}
             />
           )
         ) : (
