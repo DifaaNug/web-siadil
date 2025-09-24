@@ -6,12 +6,10 @@ type BreadcrumbItem = {
   onClick?: () => void;
 };
 
-// Pastikan tipe props ini didefinisikan dengan benar
 type BreadcrumbProps = {
   items: BreadcrumbItem[];
 };
 
-// Pastikan komponen menggunakan tipe props yang benar (BreadcrumbProps)
 const Breadcrumb: React.FC<BreadcrumbProps> = ({ items }) => {
   return (
     <nav aria-label="Breadcrumb">
@@ -41,9 +39,10 @@ const Breadcrumb: React.FC<BreadcrumbProps> = ({ items }) => {
                 </span>
               )}
 
+              {/* Tampilkan panah pemisah jika bukan item terakhir */}
               {!isLastItem && (
                 <svg
-                  className="h-3.5 w-3.5 flex-shrink-0 text-gray-400 dark:text-gray-500"
+                  className="h-3.5 w-3.5 flex-shrink-0 text-gray-400 dark:text-gray-500" // Ukuran diubah ke 16px
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
                   viewBox="0 0 24 24"
