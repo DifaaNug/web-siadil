@@ -10,6 +10,7 @@ interface StarredViewProps {
   onMove: (docId: string) => void;
   onDelete: (docId: string) => void;
   onToggleStar: (docId: string, event: React.MouseEvent) => void;
+  onManageContributors: (docId: string) => void; // <-- Tambahkan baris ini
 }
 
 const StarredView: React.FC<StarredViewProps> = (props) => {
@@ -21,6 +22,7 @@ const StarredView: React.FC<StarredViewProps> = (props) => {
     onMove,
     onDelete,
     onToggleStar,
+    onManageContributors, // <-- Tambahkan ini di destrukturisasi
   } = props;
 
   return (
@@ -37,6 +39,7 @@ const StarredView: React.FC<StarredViewProps> = (props) => {
           onMove={onMove}
           onDelete={onDelete}
           onToggleStar={onToggleStar}
+          onManageContributors={onManageContributors} // <-- Teruskan prop ke DocumentGrid
         />
       ) : (
         <p className="text-center text-gray-500 dark:text-gray-400 py-10">

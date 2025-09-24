@@ -589,6 +589,7 @@ export default function SiadilPage() {
                     onMove={handleOpenMoveModal}
                     onDelete={handleDeleteDocument}
                     onToggleStar={handleToggleStar}
+                    onManageContributors={handleOpenContributorsModal} // <-- Tambahkan baris ini
                   />
                 );
               case "trash":
