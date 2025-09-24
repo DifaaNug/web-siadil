@@ -11,6 +11,7 @@ import { useDocumentPagination } from "./hooks/useDocumentPagination";
 import { useDocumentFilters } from "./hooks/useDocumentFilters";
 import { useSelection } from "./hooks/useSelection";
 import { useModals } from "./hooks/useModals";
+import { useRouter } from "next/navigation";
 
 import HeaderSection from "./components/container/HeaderSection";
 import QuickAccessSection from "./components/views/QuickAccessSection";
@@ -52,6 +53,7 @@ export default function SiadilPage() {
   const addNewButtonRef = useRef<HTMLButtonElement>(null);
   const [isExporting, setIsExporting] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const router = useRouter();
 
   const [documentCurrentPage, setDocumentCurrentPage] = useState(1);
   const [visibleColumns, setVisibleColumns] = useState(
@@ -117,7 +119,7 @@ export default function SiadilPage() {
     setInfoPanelDocument,
     handleDocumentSelect,
     handleCloseInfoPanel,
-  } = useSelection(setDocuments, paginatedDocuments, documents);
+  } = useSelection(setDocuments, paginatedDocuments, documents, router);
 
   const {
     isCreateModalOpen,
@@ -204,10 +206,11 @@ export default function SiadilPage() {
       );
       alert(`Dokumen ID: ${editingDocId} berhasil diperbarui.`);
     } else {
-      if (!newDocument.file) {
-        alert("Silakan pilih file untuk diunggah.");
+      if (!newDocument.file && !newDocument.title) {
+        alert("Judul dokumen tidak boleh kosong.");
         return;
       }
+
       const getNextId = () => {
         const numericIds = documents
           .map((doc) => parseInt(doc.id, 10))
@@ -216,26 +219,31 @@ export default function SiadilPage() {
         const maxId = Math.max(...numericIds);
         return (maxId + 1).toString();
       };
+
       const newDoc: Document = {
         id: getNextId(),
         parentId: currentFolderId,
-        title: newDocument.title || newDocument.file.name,
+        title:
+          newDocument.title ||
+          (newDocument.file?.name ?? "Dokumen Tanpa Judul"),
         number: newDocument.number,
         description: newDocument.description,
         documentDate:
           newDocument.documentDate || new Date().toISOString().split("T")[0],
         archive: newDocument.archive,
         expireDate: newDocument.expireDate,
-        contributors: [{ name: "Someone", role: "Uploader" }],
+        contributors: [{ name: "Someone", role: "Creator" }],
         status: "Active",
         createdBy: "10122059",
         updatedBy: "10122059",
         createdDate: new Date().toISOString(),
         updatedDate: new Date().toISOString(),
+        docType: newDocument.file ? "file" : "text",
+        content: "",
       };
       setDocuments((docs) => [...docs, newDoc]);
       alert(
-        `Dokumen "${newDoc.title}" berhasil diunggah dengan ID: ${newDoc.id}.`
+        `Dokumen "${newDoc.title}" berhasil dibuat dengan ID: ${newDoc.id}.`
       );
     }
     closeModal();
