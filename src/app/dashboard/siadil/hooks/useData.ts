@@ -3,7 +3,10 @@ import { usePersistentDocuments } from "./usePersistentDocuments";
 import { usePersistentArchives } from "./usePersistentArchives";
 import { Archive } from "../types";
 
-const getAllDescendantIds = (folderId: string, archives: Archive[]): string[] => {
+const getAllDescendantIds = (
+  folderId: string,
+  archives: Archive[]
+): string[] => {
   const directChildren = archives
     .filter((archive) => archive.parentId === folderId)
     .map((archive) => archive.id);
@@ -20,17 +23,23 @@ export const useData = (currentFolderId: string) => {
   const [archives, setArchives] = usePersistentArchives();
 
   const searchableDocuments = useMemo(() => {
+    const activeDocuments = documents.filter((doc) => doc.status !== "Trashed");
+
     if (currentFolderId === "root") {
-      return documents;
+      return activeDocuments;
     }
     const relevantFolderIds = [
       currentFolderId,
       ...getAllDescendantIds(currentFolderId, archives),
     ];
-    return documents.filter((doc) => relevantFolderIds.includes(doc.parentId));
+    return activeDocuments.filter((doc) =>
+      relevantFolderIds.includes(doc.parentId)
+    );
   }, [currentFolderId, documents, archives]);
 
   const documentsForFiltering = useMemo(() => {
+    const activeDocuments = documents.filter((doc) => doc.status !== "Trashed");
+
     if (currentFolderId === "root") {
       return [];
     }
@@ -38,7 +47,9 @@ export const useData = (currentFolderId: string) => {
       currentFolderId,
       ...getAllDescendantIds(currentFolderId, archives),
     ];
-    return documents.filter((doc) => relevantFolderIds.includes(doc.parentId));
+    return activeDocuments.filter((doc) =>
+      relevantFolderIds.includes(doc.parentId)
+    );
   }, [currentFolderId, documents, archives]);
 
   const breadcrumbItems = useMemo(() => {
@@ -58,13 +69,15 @@ export const useData = (currentFolderId: string) => {
   }, [currentFolderId, archives]);
 
   const archiveDocCounts = useMemo(() => {
-    return documents.reduce((acc, doc) => {
-      const parentArchive = archives.find((a) => a.id === doc.parentId);
-      if (parentArchive) {
-        acc[parentArchive.code] = (acc[parentArchive.code] || 0) + 1;
-      }
-      return acc;
-    }, {} as Record<string, number>);
+    return documents
+      .filter((doc) => doc.status !== "Trashed")
+      .reduce((acc, doc) => {
+        const parentArchive = archives.find((a) => a.id === doc.parentId);
+        if (parentArchive) {
+          acc[parentArchive.code] = (acc[parentArchive.code] || 0) + 1;
+        }
+        return acc;
+      }, {} as Record<string, number>);
   }, [documents, archives]);
 
   const quickAccessDocuments = useMemo(() => {
