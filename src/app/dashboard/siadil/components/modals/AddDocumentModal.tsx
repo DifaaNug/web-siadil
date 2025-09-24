@@ -204,55 +204,57 @@ export const AddDocumentModal = ({
             </div>
 
             {/* --- File Input --- */}
-            <div className="md:col-span-2">
-              <label
-                htmlFor="file-upload"
-                className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                File
-              </label>
-              <div className="mt-1 flex justify-center rounded-lg border-2 border-dashed border-gray-300 px-6 pb-6 pt-5 dark:border-gray-600">
-                <div className="text-center">
-                  <svg
-                    className="mx-auto h-12 w-12 text-gray-400"
-                    stroke="currentColor"
-                    fill="none"
-                    viewBox="0 0 48 48"
-                    aria-hidden="true">
-                    <path
-                      d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
-                  <div className="mt-4 flex text-sm text-gray-600 dark:text-gray-400">
-                    <label
-                      htmlFor="file"
-                      className="relative cursor-pointer rounded-md bg-white font-medium text-green-600 focus-within:outline-none focus-within:ring-2 focus-within:ring-green-500 focus-within:ring-offset-2 hover:text-green-500 dark:bg-gray-800">
-                      <span>Upload a file</span>
-                      <input
-                        id="file"
-                        name="file"
-                        type="file"
-                        onChange={handleInputChange}
-                        className="sr-only"
-                        accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx"
+            {!isEditing && (
+              <div className="md:col-span-2">
+                <label
+                  htmlFor="file-upload"
+                  className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  File
+                </label>
+                <div className="mt-1 flex justify-center rounded-lg border-2 border-dashed border-gray-300 px-6 pb-6 pt-5 dark:border-gray-600">
+                  <div className="text-center">
+                    <svg
+                      className="mx-auto h-12 w-12 text-gray-400"
+                      stroke="currentColor"
+                      fill="none"
+                      viewBox="0 0 48 48"
+                      aria-hidden="true">
+                      <path
+                        d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
                       />
-                    </label>
-                    <p className="pl-1">or drag and drop</p>
+                    </svg>
+                    <div className="mt-4 flex text-sm text-gray-600 dark:text-gray-400">
+                      <label
+                        htmlFor="file"
+                        className="relative cursor-pointer rounded-md bg-white font-medium text-green-600 focus-within:outline-none focus-within:ring-2 focus-within:ring-green-500 focus-within:ring-offset-2 hover:text-green-500 dark:bg-gray-800">
+                        <span>Upload a file</span>
+                        <input
+                          id="file"
+                          name="file"
+                          type="file"
+                          onChange={handleInputChange}
+                          className="sr-only"
+                          accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx"
+                        />
+                      </label>
+                      <p className="pl-1">or drag and drop</p>
+                    </div>
+                    {newDocument.file ? (
+                      <p className="mt-2 text-sm font-semibold text-green-700 dark:text-green-400">
+                        {newDocument.file.name}
+                      </p>
+                    ) : (
+                      <p className="text-xs text-gray-500">
+                        PDF, DOC, XLS, PPT up to 10MB
+                      </p>
+                    )}
                   </div>
-                  {newDocument.file ? (
-                    <p className="mt-2 text-sm font-semibold text-green-700 dark:text-green-400">
-                      {newDocument.file.name}
-                    </p>
-                  ) : (
-                    <p className="text-xs text-gray-500">
-                      PDF, DOC, XLS, PPT up to 10MB
-                    </p>
-                  )}
                 </div>
               </div>
-            </div>
+            )}
           </div>
         </div>
 
