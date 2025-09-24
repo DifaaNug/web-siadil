@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect, useMemo } from "react"; // <-- 1. Import useMemo
+import { useState, useRef, useEffect, useMemo } from "react";
 import * as XLSX from "xlsx";
 
 import {
@@ -18,12 +18,14 @@ import { useDocumentFilters } from "./hooks/useDocumentFilters";
 import { useSelection } from "./hooks/useSelection";
 import { useModals } from "./hooks/useModals";
 
-import HeaderSection from "./components/container/HeaderSection";
+import HeaderSection, {
+  StatsAndReminders,
+} from "./components/container/HeaderSection";
 import QuickAccessSection from "./components/views/QuickAccessSection";
 import ArchiveView from "./components/views/ArchiveView";
 import DocumentView from "./components/views/DocumentView";
 import StarredView from "./components/views/StarredView";
-import TrashView from "./components/views/TrashView"; // <-- 2. Import TrashView
+import TrashView from "./components/views/TrashView";
 import { AddNewMenu } from "./components/ui/AddNewMenu";
 import { InfoPanel } from "./components/container/InfoPanel";
 import CreateArchiveModal from "./components/modals/CreateArchiveModal";
@@ -57,7 +59,7 @@ export default function SiadilPage() {
   const [viewMode, setViewMode] = useState<"list" | "grid">("list");
   const [pageView, setPageView] = useState<"archives" | "starred" | "trash">(
     "archives"
-  ); // <-- 3. Perbarui tipe state
+  );
   const [isAddNewMenuOpen, setIsAddNewMenuOpen] = useState(false);
   const addNewButtonRef = useRef<HTMLButtonElement>(null);
   const [isExporting, setIsExporting] = useState(false);
@@ -72,7 +74,6 @@ export default function SiadilPage() {
   const [selectedDocForContributors, setSelectedDocForContributors] =
     useState<Document | null>(null);
 
-  // <-- 4. Pindahkan deklarasi hook dan variabel ke urutan yang benar -->
   const {
     documents,
     setDocuments,
@@ -174,13 +175,7 @@ export default function SiadilPage() {
     handleOpenMoveModal,
     handleOpenAddModalInContext,
     closeModal,
-  } = useModals(
-    initialNewDocument,
-    documents,
-    archives,
-    currentFolderId,
-    setDocuments
-  );
+  } = useModals(initialNewDocument, documents, archives, currentFolderId);
 
   const handleGoBack = () => {
     const currentFolder = archives.find((a) => a.id === currentFolderId);
@@ -421,7 +416,7 @@ export default function SiadilPage() {
     setIsSearchPopupOpen(false);
     setSearchQuery("");
     setCurrentFolderId(doc.parentId);
-    handleDocumentSelect(doc.id); // Ganti dengan fungsi ini
+    handleDocumentSelect(doc.id);
     const docsInTargetFolder = documents.filter(
       (d) => d.parentId === doc.parentId
     );
@@ -446,6 +441,10 @@ export default function SiadilPage() {
     }
   }, [paginatedDocuments, selectedDocumentIds]);
 
+  const activeDocumentsCount = useMemo(() => {
+    return documents.filter((doc) => doc.status !== "Trashed").length;
+  }, [documents]);
+
   const isInfoPanelOpen = infoPanelDocument !== null;
 
   return (
@@ -454,40 +453,47 @@ export default function SiadilPage() {
         className={`transition-all duration-300 ease-in-out ${
           isInfoPanelOpen ? "mr-80" : "mr-0"
         }`}>
-        <HeaderSection
-          breadcrumbItems={breadcrumbItems}
-          totalDocuments={documents.length}
-          onBreadcrumbClick={setCurrentFolderId}
-        />
-
-        <div className="relative mb-10">
-          <button
-            ref={addNewButtonRef}
-            onClick={() => setIsAddNewMenuOpen(!isAddNewMenuOpen)}
-            className="bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 font-semibold px-5 py-2.5 rounded-lg shadow hover:shadow-lg transition-all duration-200 ease-in-out flex items-center border border-gray-200 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
-            <svg
-              className="w-5 h-5 mr-2 -ml-1"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 4v16m8-8H4"
-              />
-            </svg>
-            <span>Add New</span>
-          </button>
-          {isAddNewMenuOpen && (
-            <AddNewMenu
-              buttonRef={addNewButtonRef}
-              onClose={() => setIsAddNewMenuOpen(false)}
-              onNewFolder={() => setIsCreateModalOpen(true)}
-              onFileUpload={handleOpenAddModalInContext}
-              context={currentFolderId === "root" ? "archives" : "documents"}
+        <div className="flex items-start justify-between gap-6 mb-10">
+          <div className="flex-1">
+            <HeaderSection
+              breadcrumbItems={breadcrumbItems}
+              onBreadcrumbClick={setCurrentFolderId}
             />
-          )}
+
+            <div className="relative mt-10">
+              <button
+                ref={addNewButtonRef}
+                onClick={() => setIsAddNewMenuOpen(!isAddNewMenuOpen)}
+                className="bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 font-semibold px-5 py-2.5 rounded-lg shadow hover:shadow-lg transition-all duration-200 ease-in-out flex items-center border border-gray-200 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                <svg
+                  className="w-5 h-5 mr-2 -ml-1"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor">
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 4v16m8-8H4"
+                  />
+                </svg>
+                <span>Add New</span>
+              </button>
+              {isAddNewMenuOpen && (
+                <AddNewMenu
+                  buttonRef={addNewButtonRef}
+                  onClose={() => setIsAddNewMenuOpen(false)}
+                  onNewFolder={() => setIsCreateModalOpen(true)}
+                  onFileUpload={handleOpenAddModalInContext}
+                  context={
+                    currentFolderId === "root" ? "archives" : "documents"
+                  }
+                />
+              )}
+            </div>
+          </div>
+
+          <StatsAndReminders totalDocuments={activeDocumentsCount} />
         </div>
 
         {currentFolderId === "root" && (
@@ -497,11 +503,9 @@ export default function SiadilPage() {
           />
         )}
 
-        {/* Navigasi Tabs */}
         {currentFolderId === "root" && (
           <div className="mb-6 border-b border-gray-200 dark:border-gray-700">
             <nav className="-mb-px flex space-x-6" aria-label="Tabs">
-              {/* Tombol My Archives */}
               <button
                 onClick={() => setPageView("archives")}
                 className={`flex items-center gap-2 whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm ${
@@ -524,7 +528,6 @@ export default function SiadilPage() {
                 <span>My Archives</span>
               </button>
 
-              {/* Tombol Starred */}
               <button
                 onClick={() => setPageView("starred")}
                 className={`flex items-center gap-2 whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm ${
@@ -547,7 +550,6 @@ export default function SiadilPage() {
                 <span>Starred</span>
               </button>
 
-              {/* Tombol Sampah */}
               <button
                 onClick={() => setPageView("trash")}
                 className={`flex items-center gap-2 whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm ${
