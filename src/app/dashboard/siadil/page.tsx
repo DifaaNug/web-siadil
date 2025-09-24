@@ -410,8 +410,8 @@ export default function SiadilPage() {
     }
     setCurrentFolderId(doc.parentId);
     setSelectedDocumentIds(new Set([doc.id]));
+    setInfoPanelDocument(doc); // <-- Tambahkan baris ini
   };
-
   const handleSearchSelect = (doc: Document) => {
     setIsSearchPopupOpen(false);
     setSearchQuery("");
