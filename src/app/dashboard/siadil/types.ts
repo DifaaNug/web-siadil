@@ -22,7 +22,6 @@ export type Document = {
   parentId: string;
   isStarred?: boolean;
   lastAccessed?: string;
-  docType?: "file" | "text" | "spreadsheet" | "presentation";
   content?: string;
 };
 export type Filters = {

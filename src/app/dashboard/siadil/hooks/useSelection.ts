@@ -1,12 +1,10 @@
-import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { useState } from "react";
 import { Document } from "../types";
 
 export const useSelection = (
   setDocuments: (updater: (docs: Document[]) => Document[]) => void,
   paginatedDocuments: Document[],
-  documents: Document[],
-  router: AppRouterInstance
+  documents: Document[]
 ) => {
   const [selectedDocumentIds, setSelectedDocumentIds] = useState<Set<string>>(
     new Set()
@@ -16,13 +14,6 @@ export const useSelection = (
   );
 
   const handleDocumentSelect = (docId: string, event?: React.MouseEvent) => {
-    const docToShow = documents.find((d) => d.id === docId) || null;
-
-    if (docToShow && docToShow.docType === "text") {
-      router.push(`/dashboard/siadil/editor/${docId}`);
-      return;
-    }
-
     setDocuments((prevDocs) =>
       prevDocs.map((doc) =>
         doc.id === docId
