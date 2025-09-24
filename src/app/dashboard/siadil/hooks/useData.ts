@@ -3,7 +3,10 @@ import { usePersistentDocuments } from "./usePersistentDocuments";
 import { usePersistentArchives } from "./usePersistentArchives";
 import { Archive } from "../types";
 
-const getAllDescendantIds = (folderId: string, archives: Archive[]): string[] => {
+const getAllDescendantIds = (
+  folderId: string,
+  archives: Archive[]
+): string[] => {
   const directChildren = archives
     .filter((archive) => archive.parentId === folderId)
     .map((archive) => archive.id);
@@ -19,27 +22,29 @@ export const useData = (currentFolderId: string) => {
   const [documents, setDocuments] = usePersistentDocuments();
   const [archives, setArchives] = usePersistentArchives();
 
+  const activeDocuments = useMemo(() => {
+    return documents.filter((doc) => doc.status !== "Trashed");
+  }, [documents]);
+
   const searchableDocuments = useMemo(() => {
     if (currentFolderId === "root") {
-      return documents;
+      return activeDocuments;
     }
     const relevantFolderIds = [
       currentFolderId,
       ...getAllDescendantIds(currentFolderId, archives),
     ];
-    return documents.filter((doc) => relevantFolderIds.includes(doc.parentId));
-  }, [currentFolderId, documents, archives]);
+    return activeDocuments.filter((doc) =>
+      relevantFolderIds.includes(doc.parentId)
+    );
+  }, [currentFolderId, activeDocuments, archives]);
 
   const documentsForFiltering = useMemo(() => {
     if (currentFolderId === "root") {
       return [];
     }
-    const relevantFolderIds = [
-      currentFolderId,
-      ...getAllDescendantIds(currentFolderId, archives),
-    ];
-    return documents.filter((doc) => relevantFolderIds.includes(doc.parentId));
-  }, [currentFolderId, documents, archives]);
+    return activeDocuments.filter((doc) => doc.parentId === currentFolderId);
+  }, [currentFolderId, activeDocuments]);
 
   const breadcrumbItems = useMemo(() => {
     const path = [];
@@ -68,7 +73,7 @@ export const useData = (currentFolderId: string) => {
   }, [documents, archives]);
 
   const quickAccessDocuments = useMemo(() => {
-    return [...documents]
+    return [...activeDocuments]
       .filter((doc) => doc.lastAccessed)
       .sort(
         (a, b) =>
@@ -76,11 +81,11 @@ export const useData = (currentFolderId: string) => {
           new Date(a.lastAccessed!).getTime()
       )
       .slice(0, 5);
-  }, [documents]);
+  }, [activeDocuments]);
 
   const starredDocuments = useMemo(() => {
-    return documents.filter((doc) => doc.isStarred);
-  }, [documents]);
+    return activeDocuments.filter((doc) => doc.isStarred);
+  }, [activeDocuments]);
 
   const subfolderArchives = useMemo(() => {
     return archives.filter((archive) => archive.parentId === currentFolderId);
