@@ -179,6 +179,34 @@ export const reminders = [
     message: "This document is expired 2 months 1 days",
     type: "error" as const,
   },
+  {
+    id: "ssl-2",
+    title: "SSL",
+    description: "pupuk-kujang.co.id (Non GCP)",
+    message: "This document will expire in 2 months 11 days",
+    type: "warning" as const,
+  },
+  {
+    id: "kontrak-kerja",
+    title: "kontrak-kerja",
+    description: "pupuk-kujang.co.id (Non GCP)",
+    message: "This document will expire in 2 months 11 days",
+    type: "error" as const,
+  },
+  {
+    id: "kontrak-perusahaan",
+    title: "kontrak-perusahaan",
+    description: "pupuk-kujang.co.id (Non GCP)",
+    message: "This document will expire in 2 months 11 days",
+    type: "error" as const,
+  },
+  {
+    id: "Dokumen-legal",
+    title: "Dokumen-legal",
+    description: "pupuk-kujang.co.id (Non GCP)",
+    message: "This document will expire in 2 months 11 days",
+    type: "warning" as const,
+  },
 ];
 
 export const expireInOptions = [

@@ -59,7 +59,7 @@ const TrashView: React.FC<TrashViewProps> = ({
                   <button
                     onClick={() => onDeletePermanently(doc.id)}
                     className="px-3 py-1 text-sm font-semibold text-red-600 hover:text-red-800">
-                    Delete Permanently
+                    Delete 
                   </button>
                 </div>
               </li>
