@@ -86,7 +86,8 @@ export const DocumentTable = ({
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
-            strokeWidth={2}>
+            strokeWidth={2}
+          >
             <path
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -101,7 +102,8 @@ export const DocumentTable = ({
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
-          strokeWidth={2}>
+          strokeWidth={2}
+        >
           <path
             strokeLinecap="round"
             strokeLinejoin="round"
@@ -115,7 +117,8 @@ export const DocumentTable = ({
         className="w-4 h-4 text-gray-400"
         fill="none"
         viewBox="0 0 24 24"
-        stroke="currentColor">
+        stroke="currentColor"
+      >
         <path
           strokeLinecap="round"
           strokeLinejoin="round"
@@ -140,7 +143,8 @@ export const DocumentTable = ({
         onClick={(e) =>
           setActiveHeaderMenu({ columnId, buttonEl: e.currentTarget })
         }
-        className="flex items-center gap-2 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider hover:text-gray-800 dark:hover:text-white transition-colors">
+        className="flex items-center gap-2 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider hover:text-gray-800 dark:hover:text-white transition-colors"
+      >
         {label}
         <SortIndicator columnId={columnId} />
       </button>
@@ -152,6 +156,11 @@ export const DocumentTable = ({
       <table className="w-full">
         <thead className="bg-gray-50 dark:bg-gray-700">
           <tr>
+            {visibleColumns.has("actions") && (
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                Actions
+              </th>
+            )}
             <SortableHeader columnId="id" label="ID" />
             {visibleColumns.has("numberAndTitle") && (
               <SortableHeader columnId="number" label="Number & Title" />
@@ -178,11 +187,6 @@ export const DocumentTable = ({
                 label="Update & Create By"
               />
             )}
-            {visibleColumns.has("actions") && (
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                Actions
-              </th>
-            )}
           </tr>
         </thead>
         <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
@@ -196,7 +200,44 @@ export const DocumentTable = ({
                 selectedDocumentIds.has(doc.id)
                   ? "bg-green-50 dark:bg-green-900/50"
                   : "hover:bg-gray-50 dark:hover:bg-gray-700"
-              }`}>
+              }`}
+            >
+              {visibleColumns.has("actions") && (
+                <td className="px-4 py-4 whitespace-nowrap pl-7 text-sm font-medium relative">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleMenuToggle(doc.id, e.currentTarget);
+                    }}
+                    className="text-gray-500 hover:text-gray-900 dark:hover:text-white p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-600"
+                  >
+                    <svg
+                      className="w-5 h-5"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"
+                      />
+                    </svg>
+                  </button>
+                  {activeActionMenu?.docId === doc.id && (
+                    <ActionMenu
+                      documentId={doc.id}
+                      onClose={() => setActiveActionMenu(null)}
+                      buttonEl={activeActionMenu.buttonEl}
+                      onMove={onMove}
+                      onEdit={onEdit}
+                      onDelete={onDelete}
+                      onManageContributors={onManageContributors}
+                    />
+                  )}
+                </td>
+              )}
               <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
                 {doc.id}
               </td>
@@ -211,7 +252,8 @@ export const DocumentTable = ({
               {visibleColumns.has("description") && (
                 <td
                   className="px-4 py-4 text-sm text-gray-500 dark:text-gray-400 max-w-xs "
-                  title={doc.description}>
+                  title={doc.description}
+                >
                   {doc.description}
                 </td>
               )}
@@ -227,7 +269,8 @@ export const DocumentTable = ({
                       <div
                         key={i}
                         title={c.name}
-                        className="w-7 h-7 bg-gray-200 dark:bg-gray-600 rounded-full flex items-center justify-center text-xs font-medium text-gray-600 dark:text-gray-300 ring-2 ring-white dark:ring-gray-800">
+                        className="w-7 h-7 bg-gray-200 dark:bg-gray-600 rounded-full flex items-center justify-center text-xs font-medium text-gray-600 dark:text-gray-300 ring-2 ring-white dark:ring-gray-800"
+                      >
                         {c.name
                           .split(" ")
                           .map((n) => n[0])
@@ -262,40 +305,6 @@ export const DocumentTable = ({
                       Created by: {doc.createdBy}
                     </div>
                   </div>
-                </td>
-              )}
-              {visibleColumns.has("actions") && (
-                <td className="px-4 py-4 whitespace-nowrap text-right text-sm font-medium relative">
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleMenuToggle(doc.id, e.currentTarget);
-                    }}
-                    className="text-gray-500 hover:text-gray-900 dark:hover:text-white p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-600">
-                    <svg
-                      className="w-5 h-5"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor">
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"
-                      />
-                    </svg>
-                  </button>
-                  {activeActionMenu?.docId === doc.id && (
-                    <ActionMenu
-                      documentId={doc.id}
-                      onClose={() => setActiveActionMenu(null)}
-                      buttonEl={activeActionMenu.buttonEl}
-                      onMove={onMove}
-                      onEdit={onEdit}
-                      onDelete={onDelete}
-                      onManageContributors={onManageContributors}
-                    />
-                  )}
                 </td>
               )}
             </tr>

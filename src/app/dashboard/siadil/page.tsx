@@ -210,10 +210,10 @@ export default function SiadilPage() {
         doc.id === docId ? { ...doc, status: "Active" } : doc
       )
     );
-     toast.success("Dokumen Berhasil Dipulihkan", {
-    description: `Dokumen "${
+     toast.success("Documents Successfully Recovered", {
+    description: `Document "${
       docToRestore?.title || `ID: ${docId}`
-    }" Dukumen berhasil dipulihkan.`,
+    }" Successfully Recovered.`,
     });
   };
 
@@ -241,8 +241,8 @@ export default function SiadilPage() {
       );
       if (infoPanelDocument?.id === docId) setInfoPanelDocument(null);
       setSelectedDocumentIds(new Set());
-      toast.success("Dokumen Dipindahkan ke Sampah", {
-        description: `Dokumen "${docTitle}" telah berhasil dipindahkan.`,
+      toast.success("Document Moved to Trash", {
+        description: `Document "${docTitle}" has been successfully transferred.`,
       });
     } else if (action === "restore") {
       setDocuments((currentDocs) =>
@@ -250,15 +250,15 @@ export default function SiadilPage() {
           doc.id === docId ? { ...doc, status: "Active" } : doc
         )
       );
-      toast.success("Dokumen Berhasil Dipulihkan", {
-        description: `Dokumen "${docTitle}" telah dikembalikan dari sampah.`,
+      toast.success("Documents Successfully Recovered", {
+        description: `Document "${docTitle}" has been returned from the trash.`,
       });
     } else if (action === "delete") {
       setDocuments((currentDocs) =>
         currentDocs.filter((doc) => doc.id !== docId)
       );
-      toast.error("Dokumen Dihapus Permanen", {
-        description: `Dokumen "${docTitle}" telah berhasil dihapus secara permanen.`,
+      toast.error("Document Permanently Deleted", {
+        description: `Document "${docTitle}" has been successfully deleted permanently.`,
       });
     }
     setConfirmationAction(null); // Tutup modal
@@ -277,7 +277,7 @@ export default function SiadilPage() {
     };
     setArchives((currentArchives) => [...currentArchives, newArchive]);
 
-    alert(`Arsip "${name}" berhasil dibuat!`);
+    alert(`Archives "${name}" created successfully!`);
   };
 
   const handleSaveDocument = () => {
@@ -294,8 +294,8 @@ export default function SiadilPage() {
             : doc
         )
       );
-       toast.success("Dokumen Berhasil Diperbarui", {
-        description: `Perubahan pada dokumen ID: ${editingDocId} telah disimpan.`,
+       toast.success("Document Updated Successfully", {
+        description: `Changes to ID documents: ${editingDocId} has been saved.`,
       });
     } else {
       if (!newDocument.file) {
@@ -332,8 +332,8 @@ export default function SiadilPage() {
       };
       setDocuments((docs) => [...docs, newDoc]);
       // ▼▼▼ GANTI DENGAN TOAST SUKSES ▼▼▼
-      toast.success("Dokumen Berhasil Diunggah", {
-        description: `Dokumen "${newDoc.title}" telah ditambahkan dengan ID: ${newDoc.id}.`,
+      toast.success("Document Uploaded Successfully", {
+        description: `Document "${newDoc.title}" has been added with ID: ${newDoc.id}.`,
       });
     }
     closeModal();
@@ -341,7 +341,7 @@ export default function SiadilPage() {
 
   const handleExport = () => {
     if (filteredDocuments.length === 0) {
-      alert("Tidak ada data untuk diekspor.");
+      alert("No data to export.");
       return;
     }
     setIsExporting(true);
@@ -430,10 +430,10 @@ export default function SiadilPage() {
   );
 
   // Menampilkan notifikasi toast
-  toast.success("Dokumen Berhasil Dipindahkan", {
-    description: `Dokumen "${
+  toast.success("Documents Successfully Moved", {
+    description: `Document "${
       docDetails?.title || `ID: ${documentToMove}`
-    }" berhasil dipindahkan ke arsip "${targetArchive?.name || "tujuan"}".`,
+    }" successfully moved to archive "${targetArchive?.name || "objective"}".`,
   });
 
   // Menutup modal dan mereset state
@@ -492,22 +492,22 @@ export default function SiadilPage() {
     switch (confirmationAction.action) {
       case "trash":
         return {
-          title: "Pindahkan ke Sampah?",
-          body: `Apakah Anda yakin ingin memindahkan dokumen "${confirmationAction.docTitle}" ke sampah?`,
-          confirmText: "Ya, Pindahkan",
+          title: "Move to Trash?",
+          body: `Are you sure you want to move the "${confirmationAction.docTitle}" document to the trash?`,
+          confirmText: "Yes, Move to Trash",
           variant: "destructive" as const,
         };
       case "delete":
         return {
-          title: "Hapus Permanen?",
-          body: `Dokumen "${confirmationAction.docTitle}" akan dihapus permanen dan tidak dapat dipulihkan. Anda yakin?`,
-          confirmText: "Ya, Hapus Permanen",
+          title: "permanently delete?",
+          body: `"${confirmationAction.docTitle}" documents will be permanently deleted and cannot be recovered. Are you sure?`,
+          confirmText: "Yes, Permanent Delete",
           variant: "destructive" as const,
         };
       case "restore":
         return {
-          title: "Pulihkan Dokumen?",
-          body: `Apakah Anda yakin ingin memulihkan dokumen "${confirmationAction.docTitle}" dari sampah?`,
+          title: "Recover Documents?",
+          body: `Are you sure you want to recover the "${confirmationAction.docTitle}" document from the trash?`,
           confirmText: "Ya, Pulihkan",
           variant: "default" as const,
         };
