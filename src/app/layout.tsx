@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import "./transitions.css";
 import { Poppins } from "next/font/google";
-import { Toaster } from "@/components/ui/toaster";
+import { Toaster } from "@/components/ui/Toaster";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -37,7 +37,8 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className={`${poppins.variable} antialiased`}>{children}
+      <body className={`${poppins.variable} antialiased`}>
+        {children}
         <Toaster position="bottom-right" richColors />
       </body>
     </html>
