@@ -278,10 +278,14 @@ export default function SiadilPage() {
         return (maxId + 1).toString();
       };
 
+      const fileName = newDocument.file.name;
+      const fileExtension = fileName.split(".").pop()?.toLowerCase();
+
       const newDoc: Document = {
         id: getNextId(),
         parentId: currentFolderId,
         title: newDocument.title || newDocument.file.name,
+        fileType: fileExtension,
 
         number: newDocument.number,
         description: newDocument.description,
