@@ -56,3 +56,20 @@ export type TableColumn = {
   id: string;
   label: string;
 };
+
+export type ActivityLog = {
+  id: string;
+  action:
+    | "CREATE_DOCUMENT"
+    | "EDIT_DOCUMENT"
+    | "MOVE_DOCUMENT"
+    | "TRASH_DOCUMENT"
+    | "DELETE_DOCUMENT"
+    | "RESTORE_DOCUMENT"
+    | "CREATE_ARCHIVE";
+  documentTitle: string;
+  documentId?: string;
+  timestamp: string;
+  user: string;
+  details?: string;
+};

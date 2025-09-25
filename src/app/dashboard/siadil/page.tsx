@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect, useMemo } from "react";
 import * as XLSX from "xlsx";
+import { toast } from "sonner";
 
 import {
   Document,
@@ -17,25 +18,27 @@ import { useDocumentPagination } from "./hooks/useDocumentPagination";
 import { useDocumentFilters } from "./hooks/useDocumentFilters";
 import { useSelection } from "./hooks/useSelection";
 import { useModals } from "./hooks/useModals";
+import { usePersistentActivityLog } from "./hooks/usePersistentActivityLog";
 
 import HeaderSection, {
   StatsAndReminders,
 } from "./components/container/HeaderSection";
+import { InfoPanel } from "./components/container/InfoPanel";
+
 import QuickAccessSection from "./components/views/QuickAccessSection";
 import ArchiveView from "./components/views/ArchiveView";
 import DocumentView from "./components/views/DocumentView";
 import StarredView from "./components/views/StarredView";
 import TrashView from "./components/views/TrashView";
+import ActivityLogView from "./components/views/ActivityLogView";
+
 import { AddNewMenu } from "./components/ui/AddNewMenu";
-import { InfoPanel } from "./components/container/InfoPanel";
+
 import CreateArchiveModal from "./components/modals/CreateArchiveModal";
 import { AddDocumentModal } from "./components/modals/AddDocumentModal";
 import { SearchPopup } from "./components/modals/SearchPopup";
 import { MoveToModal } from "./components/modals/MoveToModal";
-
 import ManageContributorsModal from "./components/modals/ManageContributorsModal";
-
-import { toast } from "sonner";
 import { ConfirmationModal } from "./components/modals/ConfirmationModal";
 
 const allTableColumns: TableColumn[] = [
@@ -61,9 +64,10 @@ const initialNewDocument: NewDocumentData = {
 export default function SiadilPage() {
   const [currentFolderId, setCurrentFolderId] = useState("root");
   const [viewMode, setViewMode] = useState<"list" | "grid">("list");
-  const [pageView, setPageView] = useState<"archives" | "starred" | "trash">(
-    "archives"
-  );
+  const [pageView, setPageView] = useState<
+    "archives" | "starred" | "trash" | "activity"
+  >("archives");
+  const [activityLogs, logActivity] = usePersistentActivityLog();
   const [isAddNewMenuOpen, setIsAddNewMenuOpen] = useState(false);
   const addNewButtonRef = useRef<HTMLButtonElement>(null);
   const [isExporting, setIsExporting] = useState(false);
@@ -243,6 +247,12 @@ export default function SiadilPage() {
           doc.id === docId ? { ...doc, status: "Trashed" } : doc
         )
       );
+      logActivity({
+        action: "TRASH_DOCUMENT",
+        documentTitle: docTitle,
+        documentId: docId,
+        user: "Someone",
+      });
       if (infoPanelDocument?.id === docId) setInfoPanelDocument(null);
       setSelectedDocumentIds(new Set());
       toast.success("Dokumen Dipindahkan ke Sampah", {
@@ -280,6 +290,11 @@ export default function SiadilPage() {
       parentId: parentId,
     };
     setArchives((currentArchives) => [...currentArchives, newArchive]);
+    logActivity({
+      action: "CREATE_ARCHIVE",
+      documentTitle: newArchive.name,
+      user: "Someone", // Ganti dengan user yang login
+    });
     alert(`Arsip "${name}" berhasil dibuat!`);
   };
 
@@ -297,12 +312,17 @@ export default function SiadilPage() {
             : doc
         )
       );
+      logActivity({
+        action: "EDIT_DOCUMENT",
+        documentTitle: newDocument.title,
+        documentId: editingDocId,
+        user: "Someone",
+      });
       toast.success("Dokumen Berhasil Diperbarui", {
         description: `Perubahan pada dokumen ID: ${editingDocId} telah disimpan.`,
       });
     } else {
       if (!newDocument.file) {
-        // ▼▼▼ GANTI DENGAN TOAST ERROR ▼▼▼
         toast.error("File Belum Dipilih", {
           description: "Silakan pilih file yang akan diunggah.",
         });
@@ -341,7 +361,12 @@ export default function SiadilPage() {
         updatedDate: new Date().toISOString(),
       };
       setDocuments((docs) => [...docs, newDoc]);
-      // ▼▼▼ GANTI DENGAN TOAST SUKSES ▼▼▼
+      logActivity({
+        action: "CREATE_DOCUMENT",
+        documentTitle: newDoc.title,
+        documentId: newDoc.id,
+        user: "Someone",
+      });
       toast.success("Dokumen Berhasil Diunggah", {
         description: `Dokumen "${newDoc.title}" telah ditambahkan dengan ID: ${newDoc.id}.`,
       });
@@ -428,25 +453,29 @@ export default function SiadilPage() {
   const handleConfirmMove = (targetArchiveId: string) => {
     if (!documentToMove) return;
 
-    // Mendapatkan detail dokumen dan arsip tujuan (hanya sekali)
     const docDetails = documents.find((doc) => doc.id === documentToMove);
     const targetArchive = archives.find((a) => a.id === targetArchiveId);
 
-    // Memperbarui state dokumen
     setDocuments((currentDocs) =>
       currentDocs.map((doc) =>
         doc.id === documentToMove ? { ...doc, parentId: targetArchiveId } : doc
       )
     );
 
-    // Menampilkan notifikasi toast
+    logActivity({
+      action: "MOVE_DOCUMENT",
+      documentTitle: docDetails?.title || `ID: ${documentToMove}`,
+      documentId: documentToMove,
+      user: "Someone",
+      details: `Dipindahkan ke arsip "${targetArchive?.name || "tujuan"}"`,
+    });
+
     toast.success("Dokumen Berhasil Dipindahkan", {
       description: `Dokumen "${
         docDetails?.title || `ID: ${documentToMove}`
       }" berhasil dipindahkan ke arsip "${targetArchive?.name || "tujuan"}".`,
     });
 
-    // Menutup modal dan mereset state
     setIsMoveModalOpen(false);
     setDocumentToMove(null);
   };
@@ -655,6 +684,27 @@ export default function SiadilPage() {
                 </svg>
                 <span>Trash</span>
               </button>
+              <button
+                onClick={() => setPageView("activity")}
+                className={`flex items-center gap-2 whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm ${
+                  pageView === "activity"
+                    ? "border-demplon text-demplon"
+                    : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                }`}>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round">
+                  <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+                </svg>
+                <span>Aktivitas</span>
+              </button>
             </nav>
           </div>
         )}
@@ -672,7 +722,7 @@ export default function SiadilPage() {
                     onMove={handleOpenMoveModal}
                     onDelete={handleDeleteDocument}
                     onToggleStar={handleToggleStar}
-                    onManageContributors={handleOpenContributorsModal} // <-- Tambahkan baris ini
+                    onManageContributors={handleOpenContributorsModal}
                   />
                 );
               case "trash":
@@ -683,6 +733,8 @@ export default function SiadilPage() {
                     onDeletePermanently={handleDeletePermanently}
                   />
                 );
+              case "activity":
+                return <ActivityLogView logs={activityLogs} />;
               case "archives":
               default:
                 return (
