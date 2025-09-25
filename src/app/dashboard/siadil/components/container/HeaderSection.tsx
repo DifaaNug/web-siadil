@@ -2,8 +2,8 @@ import React from "react";
 import Breadcrumb from "../ui/Breadcrumb";
 import { reminders } from "../../data";
 import { FolderIcon } from "../ui/FolderIcon";
+import { UserInfoCard } from "../ui/UserInforCard";
 
-// Interface untuk props HeaderSection
 interface BreadcrumbItem {
   label: string;
   id: string;
@@ -11,93 +11,18 @@ interface BreadcrumbItem {
 
 interface HeaderSectionProps {
   breadcrumbItems: BreadcrumbItem[];
+  totalDocuments: number;
   onBreadcrumbClick: (id: string) => void;
+  onCreateNewArchive: () => void;
+  onViewAllReminders: () => void;
 }
 
-// Komponen baru untuk kartu di sebelah kanan
-export const StatsAndReminders: React.FC<{ totalDocuments: number }> = ({
-  totalDocuments,
-}) => (
-  <div className="flex flex-col space-y-4 w-[250px] shrink-0">
-    <div className="overflow-hidden rounded-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
-      <div className="p-5">
-        <div className="flex items-center">
-          <div className="flex-shrink-0 rounded-md bg-demplon dark:bg-green-800 p-3">
-            <svg
-              className="h-6 w-6 text-white dark:text-green-300"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-              />
-            </svg>
-          </div>
-          <div className="ml-4 w-0 flex-1">
-            <dl>
-              <dt className="truncate text-sm font-medium text-gray-500 dark:text-gray-400">
-                Total Dokumen
-              </dt>
-              <dd>
-                <div className="text-2xl font-bold text-gray-900 dark:text-white">
-                  {totalDocuments}
-                </div>
-              </dd>
-            </dl>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div className="">
-      <h3 className="text-base font-semibold text-gray-900 dark:text-white mb-3">
-        Reminders
-      </h3>
-      <div className="space-y-2">
-        {reminders.map((reminder) => (
-          <div
-            key={reminder.id}
-            className="bg-[#EF4444] text-white rounded-lg p-3 w-full">
-            <div className="flex items-start space-x-3">
-              <div className="flex-shrink-0 mt-0.5">
-                <div className="w-5 h-5 bg-red-600 rounded-full flex items-center justify-center">
-                  <svg
-                    className="w-3 h-3 text-white"
-                    fill="currentColor"
-                    viewBox="0 0 20 20">
-                    <path
-                      fillRule="evenodd"
-                      d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                </div>
-              </div>
-              <div className="flex-1">
-                <p className="font-semibold text-xs mb-1 text-white">
-                  {reminder.title}
-                </p>
-                <p className="text-xs text-white leading-relaxed opacity-90">
-                  {reminder.description}
-                </p>
-                <p className="text-xs text-white leading-relaxed opacity-90 mt-1">
-                  {reminder.message}
-                </p>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  </div>
-);
-
-// Komponen HeaderSection sekarang hanya berisi bagian kiri
 const HeaderSection: React.FC<HeaderSectionProps> = ({
   breadcrumbItems,
+  totalDocuments,
   onBreadcrumbClick,
+  onCreateNewArchive,
+  onViewAllReminders,
 }) => {
   const breadcrumbProps = breadcrumbItems.map((item) => ({
     label: item.label,
@@ -105,17 +30,166 @@ const HeaderSection: React.FC<HeaderSectionProps> = ({
     onClick: () => onBreadcrumbClick(item.id),
   }));
 
+  const getReminderStyles = (type: "error" | "warning" | undefined) => {
+    switch (type) {
+      case "error":
+        return {
+          bgColor: "bg-red-50 dark:bg-red-900/50",
+          borderColor: "border-red-200 dark:border-red-700",
+          iconBg: "bg-red-100 dark:bg-red-900",
+          iconColor: "text-red-600 dark:text-red-400",
+          titleColor: "text-red-800 dark:text-red-200",
+          icon: (
+            <svg fill="currentColor" viewBox="0 0 20 20">
+              <path
+                fillRule="evenodd"
+                d="M8.257 3.099c.636-1.026 2.85-1.026 3.486 0l5.58 8.998c.636 1.026-.234 2.403-1.743 2.403H4.42c-1.51 0-2.379-1.377-1.743-2.403l5.58-8.998zM10 13a1 1 0 100-2 1 1 0 000 2zm-1-4a1 1 0 011-1h.01a1 1 0 110 2H10a1 1 0 01-1-1z"
+                clipRule="evenodd"
+              />
+            </svg>
+          ),
+        };
+      default: // 'warning'
+        return {
+          bgColor: "bg-yellow-50 dark:bg-yellow-900/50",
+          borderColor: "border-yellow-200 dark:border-yellow-700",
+          iconBg: "bg-yellow-100 dark:bg-yellow-900",
+          iconColor: "text-yellow-600 dark:text-yellow-400",
+          titleColor: "text-yellow-800 dark:text-yellow-200",
+          icon: (
+            <svg fill="currentColor" viewBox="0 0 20 20">
+              <path
+                fillRule="evenodd"
+                d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                clipRule="evenodd"
+              />
+            </svg>
+          ),
+        };
+    }
+  };
+
   return (
     <div className="mb-6">
-      {" "}
-      {/* Mengurangi margin bawah */}
-      <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-        SIADIL
-      </h1>
-      <p className="text-gray-600 dark:text-gray-300 mb-4">
-        Sistem Arsip Digital
-      </p>
-      <Breadcrumb items={breadcrumbProps} />
+      <div className="flex items-start justify-between">
+        {/* === KOLOM KIRI === */}
+        <div className="flex flex-1 flex-col">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+              SIADIL
+            </h1>
+            <p className="mb-4 text-gray-600 dark:text-gray-300">
+              Sistem Arsip Digital
+            </p>
+            <Breadcrumb items={breadcrumbProps} />
+          </div>
+
+          <div className="mt-10 flex gap-6">
+            <div className="w-[240px] rounded-lg bg-demplon p-5 text-white">
+              <div className="flex items-center space-x-4">
+                <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-lg bg-white/20">
+                  <svg
+                    className="h-6 w-6 text-white"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                    />
+                  </svg>
+                </div>
+                <div>
+                  <p className="text-2xl font-bold">{totalDocuments}</p>
+                  <p className="text-sm">Total Dokumen</p>
+                </div>
+              </div>
+              <p className="mt-2 text-xs opacity-80">Per 24 September 2025</p>
+            </div>
+
+            <div
+              onClick={onCreateNewArchive}
+              className="flex w-[240px] cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-300 bg-white p-5 text-center text-gray-600 transition hover:border-gray-400 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-400 dark:hover:border-gray-500 dark:hover:bg-gray-700">
+              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-200 dark:bg-gray-700">
+                <svg
+                  className="h-5 w-5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor">
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                  />
+                </svg>
+              </div>
+              <p className="mt-2 text-sm font-semibold">Create New Archives</p>
+              <p className="text-xs">Folder Baru</p>
+            </div>
+          </div>
+        </div>
+
+        {/* === KOLOM KANAN === */}
+        <div className="ml-8 flex w-80 flex-shrink-0 flex-col">
+          <UserInfoCard />
+          <div className="flex w-full items-center justify-between mt-6 mb-3">
+            <h3 className="text-base font-semibold text-gray-900 dark:text-white">
+              Reminders
+            </h3>
+            <button
+              onClick={onViewAllReminders}
+              className="text-xs font-semibold text-demplon hover:underline">
+              View All
+            </button>
+          </div>
+          <div className="space-y-3 max-h-[7rem] overflow-y-auto pr-2">
+            {reminders.map((reminder) => {
+              const styles = getReminderStyles(reminder.type);
+              return (
+                <div
+                  key={reminder.id}
+                  className={`flex items-center justify-between rounded-lg border p-4 shadow-sm ${styles.bgColor} ${styles.borderColor}`}>
+                  <div className="flex items-center">
+                    <div
+                      className={`flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full ${styles.iconBg} ${styles.iconColor}`}>
+                      {styles.icon}
+                    </div>
+                    <div className="ml-4">
+                      <p
+                        className={`text-sm font-semibold ${styles.titleColor}`}>
+                        {reminder.title}
+                      </p>
+                      <p className="text-xs text-gray-600 dark:text-gray-400">
+                        {reminder.description}
+                      </p>
+                      <p className="mt-1 text-xs text-gray-500 dark:text-gray-500">
+                        {reminder.message}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex h-6 w-6 items-center justify-center rounded-full hover:bg-black/5 dark:hover:bg-white/10">
+                    <svg
+                      className="h-5 w-5 text-gray-400"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor">
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M9 5l7 7-7 7"
+                      />
+                    </svg>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
     </div>
   );
 };

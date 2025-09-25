@@ -17,22 +17,23 @@ import { useDocumentPagination } from "./hooks/useDocumentPagination";
 import { useDocumentFilters } from "./hooks/useDocumentFilters";
 import { useSelection } from "./hooks/useSelection";
 import { useModals } from "./hooks/useModals";
+import TrashView from "./components/views/TrashView";
+import ManageContributorsModal from "./components/modals/ManageContributorsModal";
 
-import HeaderSection, {
-  StatsAndReminders,
-} from "./components/container/HeaderSection";
+import HeaderSection from "./components/container/HeaderSection";
+
 import QuickAccessSection from "./components/views/QuickAccessSection";
 import ArchiveView from "./components/views/ArchiveView";
 import DocumentView from "./components/views/DocumentView";
 import StarredView from "./components/views/StarredView";
-import TrashView from "./components/views/TrashView";
 import { AddNewMenu } from "./components/ui/AddNewMenu";
 import { InfoPanel } from "./components/container/InfoPanel";
 import CreateArchiveModal from "./components/modals/CreateArchiveModal";
 import { AddDocumentModal } from "./components/modals/AddDocumentModal";
 import { SearchPopup } from "./components/modals/SearchPopup";
 import { MoveToModal } from "./components/modals/MoveToModal";
-import ManageContributorsModal from "./components/modals/ManageContributorsModal";
+import { AllRemindersModal } from "./components/modals/AllRemindersModal";
+import { reminders } from "./data";
 
 const allTableColumns: TableColumn[] = [
   { id: "numberAndTitle", label: "Number & Title" },
@@ -64,15 +65,28 @@ export default function SiadilPage() {
   const addNewButtonRef = useRef<HTMLButtonElement>(null);
   const [isExporting, setIsExporting] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [isRemindersModalOpen, setIsRemindersModalOpen] = useState(false);
+
+  const [isContributorsModalOpen, setIsContributorsModalOpen] = useState(false);
+  const [selectedDocForContributors, setSelectedDocForContributors] =
+    useState<Document | null>(null);
 
   const [documentCurrentPage, setDocumentCurrentPage] = useState(1);
   const [visibleColumns, setVisibleColumns] = useState(
     new Set(allTableColumns.map((c) => c.id))
   );
 
-  const [isContributorsModalOpen, setIsContributorsModalOpen] = useState(false);
-  const [selectedDocForContributors, setSelectedDocForContributors] =
-    useState<Document | null>(null);
+  const handleColumnToggle = (columnId: string) => {
+    setVisibleColumns((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(columnId)) {
+        newSet.delete(columnId);
+      } else {
+        newSet.add(columnId);
+      }
+      return newSet;
+    });
+  };
 
   const {
     documents,
@@ -110,18 +124,6 @@ export default function SiadilPage() {
         doc.id === docId ? { ...doc, contributors: newContributors } : doc
       )
     );
-  };
-
-  const handleColumnToggle = (columnId: string) => {
-    setVisibleColumns((prev) => {
-      const newSet = new Set(prev);
-      if (newSet.has(columnId)) {
-        newSet.delete(columnId);
-      } else {
-        newSet.add(columnId);
-      }
-      return newSet;
-    });
   };
 
   const {
@@ -239,12 +241,13 @@ export default function SiadilPage() {
   }) => {
     const { name, parentId } = archiveData;
     const newArchive: Archive = {
-      id: name.toLowerCase().replace(/\s+/g, "-") + `-${Date.now()}`,
+      id: `${name.toLowerCase().replace(/\s+/g, "-")}-${Date.now()}`,
       code: name.toUpperCase().replace(/\s+/g, ""),
       name: name,
       parentId: parentId,
     };
     setArchives((currentArchives) => [...currentArchives, newArchive]);
+
     alert(`Arsip "${name}" berhasil dibuat!`);
   };
 
@@ -268,7 +271,6 @@ export default function SiadilPage() {
         alert("Silakan pilih file untuk diunggah.");
         return;
       }
-
       const getNextId = () => {
         const numericIds = documents
           .map((doc) => parseInt(doc.id, 10))
@@ -277,12 +279,10 @@ export default function SiadilPage() {
         const maxId = Math.max(...numericIds);
         return (maxId + 1).toString();
       };
-
       const newDoc: Document = {
         id: getNextId(),
         parentId: currentFolderId,
         title: newDocument.title || newDocument.file.name,
-
         number: newDocument.number,
         description: newDocument.description,
         documentDate:
@@ -410,13 +410,13 @@ export default function SiadilPage() {
     }
     setCurrentFolderId(doc.parentId);
     setSelectedDocumentIds(new Set([doc.id]));
-    setInfoPanelDocument(doc); // <-- Tambahkan baris ini
   };
+
   const handleSearchSelect = (doc: Document) => {
     setIsSearchPopupOpen(false);
     setSearchQuery("");
     setCurrentFolderId(doc.parentId);
-    handleDocumentSelect(doc.id);
+    handleDocumentSelect(doc.id); // Ganti dengan fungsi ini
     const docsInTargetFolder = documents.filter(
       (d) => d.parentId === doc.parentId
     );
@@ -441,10 +441,6 @@ export default function SiadilPage() {
     }
   }, [paginatedDocuments, selectedDocumentIds]);
 
-  const activeDocumentsCount = useMemo(() => {
-    return documents.filter((doc) => doc.status !== "Trashed").length;
-  }, [documents]);
-
   const isInfoPanelOpen = infoPanelDocument !== null;
 
   return (
@@ -453,48 +449,48 @@ export default function SiadilPage() {
         className={`transition-all duration-300 ease-in-out ${
           isInfoPanelOpen ? "mr-80" : "mr-0"
         }`}>
-        <div className="flex items-start justify-between gap-6 mb-10">
-          <div className="flex-1">
-            <HeaderSection
-              breadcrumbItems={breadcrumbItems}
-              onBreadcrumbClick={setCurrentFolderId}
+        <HeaderSection
+          breadcrumbItems={breadcrumbItems}
+          totalDocuments={documents.length}
+          onBreadcrumbClick={setCurrentFolderId}
+          onCreateNewArchive={() => setIsCreateModalOpen(true)}
+          onViewAllReminders={() => setIsRemindersModalOpen(true)}
+        />
+        {/* --- AKHIR DARI LOKASI BARU --- */}
+        <div className="relative mb-10">
+          <button
+            ref={addNewButtonRef}
+            onClick={() => setIsAddNewMenuOpen(!isAddNewMenuOpen)}
+            className="bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 font-semibold px-5 py-2.5 rounded-lg shadow hover:shadow-lg transition-all duration-200 ease-in-out flex items-center border border-gray-200 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+            <svg
+              className="w-5 h-5 mr-2 -ml-1"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor">
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 4v16m8-8H4"
+              />
+            </svg>
+            <span>Add New</span>
+          </button>
+          {isAddNewMenuOpen && (
+            <AddNewMenu
+              buttonRef={addNewButtonRef}
+              onClose={() => setIsAddNewMenuOpen(false)}
+              onNewFolder={() => setIsCreateModalOpen(true)}
+              onFileUpload={handleOpenAddModalInContext}
+              context={currentFolderId === "root" ? "archives" : "documents"}
             />
-
-            <div className="relative mt-10">
-              <button
-                ref={addNewButtonRef}
-                onClick={() => setIsAddNewMenuOpen(!isAddNewMenuOpen)}
-                className="bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 font-semibold px-5 py-2.5 rounded-lg shadow hover:shadow-lg transition-all duration-200 ease-in-out flex items-center border border-gray-200 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
-                <svg
-                  className="w-5 h-5 mr-2 -ml-1"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor">
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 4v16m8-8H4"
-                  />
-                </svg>
-                <span>Add New</span>
-              </button>
-              {isAddNewMenuOpen && (
-                <AddNewMenu
-                  buttonRef={addNewButtonRef}
-                  onClose={() => setIsAddNewMenuOpen(false)}
-                  onNewFolder={() => setIsCreateModalOpen(true)}
-                  onFileUpload={handleOpenAddModalInContext}
-                  context={
-                    currentFolderId === "root" ? "archives" : "documents"
-                  }
-                />
-              )}
-            </div>
-          </div>
-
-          <StatsAndReminders totalDocuments={activeDocumentsCount} />
+          )}
         </div>
+        <AllRemindersModal
+          isOpen={isRemindersModalOpen}
+          onClose={() => setIsRemindersModalOpen(false)}
+          reminders={reminders}
+        />
 
         {currentFolderId === "root" && (
           <QuickAccessSection
@@ -503,6 +499,7 @@ export default function SiadilPage() {
           />
         )}
 
+        {/* Navigasi Tabs */}
         {currentFolderId === "root" && (
           <div className="mb-6 border-b border-gray-200 dark:border-gray-700">
             <nav className="-mb-px flex space-x-6" aria-label="Tabs">
@@ -589,7 +586,7 @@ export default function SiadilPage() {
                     onMove={handleOpenMoveModal}
                     onDelete={handleDeleteDocument}
                     onToggleStar={handleToggleStar}
-                    onManageContributors={handleOpenContributorsModal} // <-- Tambahkan baris ini
+                    onManageContributors={handleOpenContributorsModal}
                   />
                 );
               case "trash":
@@ -638,11 +635,11 @@ export default function SiadilPage() {
             onColumnToggle={handleColumnToggle}
             onArchiveCheckboxChange={handleArchiveCheckboxChange}
             onExport={handleExport}
+            onManageContributors={handleOpenContributorsModal}
             onSortChange={handleSort}
             onDocumentSelect={handleDocumentSelect}
             onMove={handleOpenMoveModal}
             onEdit={handleOpenEditModal}
-            onManageContributors={handleOpenContributorsModal}
             onDelete={handleDeleteDocument}
             onToggleStar={handleToggleStar}
             currentFolderName={
@@ -693,7 +690,6 @@ export default function SiadilPage() {
           onMove={handleConfirmMove}
         />
       )}
-
       {isContributorsModalOpen && (
         <ManageContributorsModal
           isOpen={isContributorsModalOpen}
