@@ -32,7 +32,11 @@ import CreateArchiveModal from "./components/modals/CreateArchiveModal";
 import { AddDocumentModal } from "./components/modals/AddDocumentModal";
 import { SearchPopup } from "./components/modals/SearchPopup";
 import { MoveToModal } from "./components/modals/MoveToModal";
+
 import ManageContributorsModal from "./components/modals/ManageContributorsModal";
+
+import { toast } from "sonner";
+import { ConfirmationModal } from "./components/modals/ConfirmationModal";
 
 const allTableColumns: TableColumn[] = [
   { id: "numberAndTitle", label: "Number & Title" },
@@ -73,6 +77,12 @@ export default function SiadilPage() {
   const [isContributorsModalOpen, setIsContributorsModalOpen] = useState(false);
   const [selectedDocForContributors, setSelectedDocForContributors] =
     useState<Document | null>(null);
+
+  const [confirmationAction, setConfirmationAction] = useState<{
+    action: "trash" | "delete" | "restore";
+    docId: string;
+    docTitle: string;
+  } | null>(null);
 
   const {
     documents,
@@ -188,49 +198,74 @@ export default function SiadilPage() {
 
   const handleDeleteDocument = (docId: string) => {
     const docToTrash = documents.find((doc) => doc.id === docId);
-    if (!docToTrash) return;
-
-    if (
-      window.confirm(
-        `Apakah Anda yakin ingin memindahkan dokumen "${docToTrash.title}" ke Sampah?`
-      )
-    ) {
-      setDocuments((currentDocs) =>
-        currentDocs.map((doc) =>
-          doc.id === docId ? { ...doc, status: "Trashed" } : doc
-        )
-      );
-      if (infoPanelDocument?.id === docId) {
-        setInfoPanelDocument(null);
-      }
-      setSelectedDocumentIds(new Set());
-      alert(`Dokumen "${docToTrash.title}" berhasil dipindahkan ke Sampah.`);
+    if (docToTrash) {
+      setConfirmationAction({
+        action: "trash",
+        docId,
+        docTitle: docToTrash.title,
+      });
     }
   };
 
   const handleRestoreDocument = (docId: string) => {
+    const docToRestore = documents.find((doc) => doc.id === docId);
     setDocuments((currentDocs) =>
       currentDocs.map((doc) =>
         doc.id === docId ? { ...doc, status: "Active" } : doc
       )
     );
-    alert(`Dokumen berhasil dipulihkan.`);
+    toast.success("Dokumen Berhasil Dipulihkan", {
+      description: `Dokumen "${
+        docToRestore?.title || `ID: ${docId}`
+      }" Dukumen berhasil dipulihkan.`,
+    });
   };
 
   const handleDeletePermanently = (docId: string) => {
     const docToDelete = documents.find((doc) => doc.id === docId);
-    if (!docToDelete) return;
+    if (docToDelete) {
+      setConfirmationAction({
+        action: "delete",
+        docId,
+        docTitle: docToDelete.title,
+      });
+    }
+  };
 
-    if (
-      window.confirm(
-        `Dokumen "${docToDelete.title}" akan dihapus permanen. Anda yakin?`
-      )
-    ) {
+  const handleConfirmAction = () => {
+    if (!confirmationAction) return;
+
+    const { action, docId, docTitle } = confirmationAction;
+
+    if (action === "trash") {
+      setDocuments((currentDocs) =>
+        currentDocs.map((doc) =>
+          doc.id === docId ? { ...doc, status: "Trashed" } : doc
+        )
+      );
+      if (infoPanelDocument?.id === docId) setInfoPanelDocument(null);
+      setSelectedDocumentIds(new Set());
+      toast.success("Dokumen Dipindahkan ke Sampah", {
+        description: `Dokumen "${docTitle}" telah berhasil dipindahkan.`,
+      });
+    } else if (action === "restore") {
+      setDocuments((currentDocs) =>
+        currentDocs.map((doc) =>
+          doc.id === docId ? { ...doc, status: "Active" } : doc
+        )
+      );
+      toast.success("Dokumen Berhasil Dipulihkan", {
+        description: `Dokumen "${docTitle}" telah dikembalikan dari sampah.`,
+      });
+    } else if (action === "delete") {
       setDocuments((currentDocs) =>
         currentDocs.filter((doc) => doc.id !== docId)
       );
-      alert(`Dokumen berhasil dihapus permanen.`);
+      toast.error("Dokumen Dihapus Permanen", {
+        description: `Dokumen "${docTitle}" telah berhasil dihapus secara permanen.`,
+      });
     }
+    setConfirmationAction(null); // Tutup modal
   };
 
   const handleSaveArchive = (archiveData: {
@@ -262,10 +297,15 @@ export default function SiadilPage() {
             : doc
         )
       );
-      alert(`Dokumen ID: ${editingDocId} berhasil diperbarui.`);
+      toast.success("Dokumen Berhasil Diperbarui", {
+        description: `Perubahan pada dokumen ID: ${editingDocId} telah disimpan.`,
+      });
     } else {
       if (!newDocument.file) {
-        alert("Silakan pilih file untuk diunggah.");
+        // ▼▼▼ GANTI DENGAN TOAST ERROR ▼▼▼
+        toast.error("File Belum Dipilih", {
+          description: "Silakan pilih file yang akan diunggah.",
+        });
         return;
       }
 
@@ -301,9 +341,10 @@ export default function SiadilPage() {
         updatedDate: new Date().toISOString(),
       };
       setDocuments((docs) => [...docs, newDoc]);
-      alert(
-        `Dokumen "${newDoc.title}" berhasil diunggah dengan ID: ${newDoc.id}.`
-      );
+      // ▼▼▼ GANTI DENGAN TOAST SUKSES ▼▼▼
+      toast.success("Dokumen Berhasil Diunggah", {
+        description: `Dokumen "${newDoc.title}" telah ditambahkan dengan ID: ${newDoc.id}.`,
+      });
     }
     closeModal();
   };
@@ -386,17 +427,26 @@ export default function SiadilPage() {
 
   const handleConfirmMove = (targetArchiveId: string) => {
     if (!documentToMove) return;
+
+    // Mendapatkan detail dokumen dan arsip tujuan (hanya sekali)
+    const docDetails = documents.find((doc) => doc.id === documentToMove);
+    const targetArchive = archives.find((a) => a.id === targetArchiveId);
+
+    // Memperbarui state dokumen
     setDocuments((currentDocs) =>
       currentDocs.map((doc) =>
         doc.id === documentToMove ? { ...doc, parentId: targetArchiveId } : doc
       )
     );
-    const targetArchive = archives.find((a) => a.id === targetArchiveId);
-    alert(
-      `Dokumen ID: ${documentToMove} berhasil dipindahkan ke ${
-        targetArchive?.name || "folder tujuan"
-      }.`
-    );
+
+    // Menampilkan notifikasi toast
+    toast.success("Dokumen Berhasil Dipindahkan", {
+      description: `Dokumen "${
+        docDetails?.title || `ID: ${documentToMove}`
+      }" berhasil dipindahkan ke arsip "${targetArchive?.name || "tujuan"}".`,
+    });
+
+    // Menutup modal dan mereset state
     setIsMoveModalOpen(false);
     setDocumentToMove(null);
   };
@@ -450,6 +500,35 @@ export default function SiadilPage() {
   }, [documents]);
 
   const isInfoPanelOpen = infoPanelDocument !== null;
+
+  const confirmationModalData = useMemo(() => {
+    if (!confirmationAction) return null;
+    switch (confirmationAction.action) {
+      case "trash":
+        return {
+          title: "Pindahkan ke Sampah?",
+          body: `Apakah Anda yakin ingin memindahkan dokumen "${confirmationAction.docTitle}" ke sampah?`,
+          confirmText: "Ya, Pindahkan",
+          variant: "destructive" as const,
+        };
+      case "delete":
+        return {
+          title: "Hapus Permanen?",
+          body: `Dokumen "${confirmationAction.docTitle}" akan dihapus permanen dan tidak dapat dipulihkan. Anda yakin?`,
+          confirmText: "Ya, Hapus Permanen",
+          variant: "destructive" as const,
+        };
+      case "restore":
+        return {
+          title: "Pulihkan Dokumen?",
+          body: `Apakah Anda yakin ingin memulihkan dokumen "${confirmationAction.docTitle}" dari sampah?`,
+          confirmText: "Ya, Pulihkan",
+          variant: "default" as const,
+        };
+      default:
+        return null;
+    }
+  }, [confirmationAction]);
 
   return (
     <>
@@ -705,6 +784,17 @@ export default function SiadilPage() {
           document={selectedDocForContributors}
           onSave={handleSaveContributors}
         />
+      )}
+      {confirmationModalData && (
+        <ConfirmationModal
+          isOpen={!!confirmationAction}
+          onClose={() => setConfirmationAction(null)}
+          onConfirm={handleConfirmAction}
+          title={confirmationModalData.title}
+          confirmText={confirmationModalData.confirmText}
+          variant={confirmationModalData.variant}>
+          <p>{confirmationModalData.body}</p>
+        </ConfirmationModal>
       )}
     </>
   );
