@@ -20,6 +20,7 @@ export type Document = {
   createdDate: string;
   updatedDate: string;
   parentId: string;
+  fileType?: string;
   isStarred?: boolean;
   lastAccessed?: string;
   content?: string;
@@ -32,6 +33,7 @@ export type Filters = {
   expireDateStart: string;
   expireDateEnd: string;
   expireIn: Record<string, boolean>;
+  fileType: string;
 };
 
 export type NewDocumentData = {
