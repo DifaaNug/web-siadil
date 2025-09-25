@@ -5,6 +5,11 @@ import { Document } from "../../types";
 import { allArchives } from "../../data";
 import { useOnClickOutside } from "../../hooks/useOnClickOutside";
 
+type SearchResult = {
+  doc: Document;
+  matchReason: string;
+};
+
 type SearchPopupProps = {
   isOpen: boolean;
   onClose: () => void;
@@ -55,12 +60,34 @@ export const SearchPopup = ({
     return path.join(" / ");
   };
 
-  const filteredDocuments = documents.filter(
-    (doc) =>
-      doc.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      doc.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      doc.number.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredDocuments: SearchResult[] = searchQuery
+    ? documents
+        .map((doc) => {
+          const query = searchQuery.toLowerCase();
+
+          if (doc.title.toLowerCase().includes(query)) {
+            return { doc, matchReason: `Cocok di judul` };
+          }
+          if (doc.number.toLowerCase().includes(query)) {
+            return { doc, matchReason: `Cocok di nomor: ${doc.number}` };
+          }
+          const matchingContributor = doc.contributors.find((c) =>
+            c.name.toLowerCase().includes(query)
+          );
+          if (matchingContributor) {
+            return {
+              doc,
+              matchReason: `Cocok di kontributor: ${matchingContributor.name}`,
+            };
+          }
+          if (doc.description.toLowerCase().includes(query)) {
+            return { doc, matchReason: `Cocok di deskripsi` };
+          }
+
+          return null;
+        })
+        .filter((result): result is SearchResult => result !== null)
+    : [];
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-start justify-center p-4 sm:p-16 z-50">
@@ -94,10 +121,10 @@ export const SearchPopup = ({
         <div className="overflow-y-auto">
           {searchQuery && filteredDocuments.length > 0 ? (
             <ul className="p-2">
-              {filteredDocuments.map((doc) => (
+              {/* PERHATIKAN PENGGUNAAN KURUNG KURAWAL {} PADA ARGUMEN MAP */}
+              {filteredDocuments.map(({ doc, matchReason }) => (
                 <li key={doc.id}>
                   <button
-                    // ▼▼▼ PERBAIKI AKSI onClick DI SINI ▼▼▼
                     onClick={() => onDocumentSelect(doc)}
                     className="w-full text-left flex items-start space-x-3 p-3 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg">
                     <div className="flex-shrink-0 w-8 h-8 bg-gray-100 dark:bg-gray-700 rounded-lg flex items-center justify-center">
@@ -118,9 +145,11 @@ export const SearchPopup = ({
                       <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
                         {doc.title}
                       </p>
-                      {/* Tampilkan lokasi file */}
                       <p className="text-xs text-gray-500 dark:text-gray-400">
                         In: {getArchivePath(doc.parentId) || "Root"}
+                      </p>
+                      <p className="mt-1 text-xs text-green-700 dark:text-green-400 bg-green-50 dark:bg-green-900/50 px-1.5 py-0.5 rounded-full inline-block">
+                        {matchReason}
                       </p>
                     </div>
                   </button>

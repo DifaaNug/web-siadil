@@ -37,7 +37,9 @@ export default function RootLayout({
           }}
         />
       </head>
+
       <body className={`${poppins.variable} antialiased`}>{children}
+
         <Toaster position="bottom-right" richColors />
       </body>
     </html>

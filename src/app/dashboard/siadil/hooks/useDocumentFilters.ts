@@ -9,6 +9,7 @@ const initialFilters: Filters = {
   expireDateStart: "",
   expireDateEnd: "",
   expireIn: {},
+  fileType: "",
 };
 
 export const useDocumentFilters = (
@@ -85,24 +86,29 @@ export const useDocumentFilters = (
         doc.number.toLowerCase().includes(filters.keyword.toLowerCase()) ||
         doc.title.toLowerCase().includes(filters.keyword.toLowerCase());
 
-      // ▼▼▼ INI BAGIAN LOGIKA PENTINGNYA ▼▼▼
       const archiveMatch =
         filters.archive.length === 0 || filters.archive.includes(doc.archive);
-      // ▲▲▲ INI BAGIAN LOGIKA PENTINGNYA ▲▲▲
 
       const docDateStartMatch =
         filters.docDateStart === "" || doc.documentDate >= filters.docDateStart;
       const docDateEndMatch =
         filters.docDateEnd === "" || doc.documentDate <= filters.docDateEnd;
 
+      const fileTypeMatch =
+        !filters.fileType ||
+        (doc.fileType &&
+          doc.fileType.toLowerCase().includes(filters.fileType.toLowerCase()));
+
       let finalExpireMatch = true;
       if (expireFilterMethod === "range") {
         const expireDateStartMatch =
           filters.expireDateStart === "" ||
-          doc.expireDate >= filters.expireDateStart;
+          !!(doc.expireDate && doc.expireDate >= filters.expireDateStart);
+
         const expireDateEndMatch =
           filters.expireDateEnd === "" ||
-          doc.expireDate <= filters.expireDateEnd;
+          !!(doc.expireDate && doc.expireDate <= filters.expireDateEnd);
+
         finalExpireMatch = expireDateStartMatch && expireDateEndMatch;
       } else {
         const activeExpireInPeriods = Object.keys(filters.expireIn);
@@ -130,6 +136,7 @@ export const useDocumentFilters = (
         archiveMatch &&
         docDateStartMatch &&
         docDateEndMatch &&
+        fileTypeMatch &&
         finalExpireMatch
       );
     });

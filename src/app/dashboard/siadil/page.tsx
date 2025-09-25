@@ -32,8 +32,16 @@ import CreateArchiveModal from "./components/modals/CreateArchiveModal";
 import { AddDocumentModal } from "./components/modals/AddDocumentModal";
 import { SearchPopup } from "./components/modals/SearchPopup";
 import { MoveToModal } from "./components/modals/MoveToModal";
+
 import { AllRemindersModal } from "./components/modals/AllRemindersModal";
 import { reminders } from "./data";
+import { toast } from "sonner";
+import { ConfirmationModal } from "./components/modals/ConfirmationModal";
+
+
+import ManageContributorsModal from "./components/modals/ManageContributorsModal";
+
+
 import { toast } from "sonner";
 import { ConfirmationModal } from "./components/modals/ConfirmationModal";
 
@@ -89,6 +97,12 @@ export default function SiadilPage() {
       return newSet;
     });
   };
+
+  const [confirmationAction, setConfirmationAction] = useState<{
+    action: "trash" | "delete" | "restore";
+    docId: string;
+    docTitle: string;
+  } | null>(null);
 
   const [confirmationAction, setConfirmationAction] = useState<{
     action: "trash" | "delete" | "restore";
@@ -199,7 +213,14 @@ export default function SiadilPage() {
   const handleDeleteDocument = (docId: string) => {
     const docToTrash = documents.find((doc) => doc.id === docId);
     if (docToTrash) {
+
       setConfirmationAction({ action: "trash", docId, docTitle: docToTrash.title });
+
+      setConfirmationAction({
+        action: "trash",
+        docId,
+        docTitle: docToTrash.title,
+      });
     }
   };
 
@@ -210,10 +231,16 @@ export default function SiadilPage() {
         doc.id === docId ? { ...doc, status: "Active" } : doc
       )
     );
+
      toast.success("Documents Successfully Recovered", {
     description: `Document "${
       docToRestore?.title || `ID: ${docId}`
     }" Successfully Recovered.`,
+
+    toast.success("Dokumen Berhasil Dipulihkan", {
+      description: `Dokumen "${
+        docToRestore?.title || `ID: ${docId}`
+      }" Dukumen berhasil dipulihkan.`,
     });
   };
 
@@ -228,7 +255,8 @@ export default function SiadilPage() {
     }
   };
 
-    const handleConfirmAction = () => {
+
+  const handleConfirmAction = () => {
     if (!confirmationAction) return;
 
     const { action, docId, docTitle } = confirmationAction;
@@ -241,8 +269,13 @@ export default function SiadilPage() {
       );
       if (infoPanelDocument?.id === docId) setInfoPanelDocument(null);
       setSelectedDocumentIds(new Set());
+
       toast.success("Document Moved to Trash", {
         description: `Document "${docTitle}" has been successfully transferred.`,
+
+      toast.success("Dokumen Dipindahkan ke Sampah", {
+        description: `Dokumen "${docTitle}" telah berhasil dipindahkan.`,
+
       });
     } else if (action === "restore") {
       setDocuments((currentDocs) =>
@@ -250,15 +283,24 @@ export default function SiadilPage() {
           doc.id === docId ? { ...doc, status: "Active" } : doc
         )
       );
+
       toast.success("Documents Successfully Recovered", {
         description: `Document "${docTitle}" has been returned from the trash.`,
+
+      toast.success("Dokumen Berhasil Dipulihkan", {
+        description: `Dokumen "${docTitle}" telah dikembalikan dari sampah.`,
+
       });
     } else if (action === "delete") {
       setDocuments((currentDocs) =>
         currentDocs.filter((doc) => doc.id !== docId)
       );
+
       toast.error("Document Permanently Deleted", {
         description: `Document "${docTitle}" has been successfully deleted permanently.`,
+
+      toast.error("Dokumen Dihapus Permanen", {
+        description: `Dokumen "${docTitle}" telah berhasil dihapus secara permanen.`,
       });
     }
     setConfirmationAction(null); // Tutup modal
@@ -294,12 +336,13 @@ export default function SiadilPage() {
             : doc
         )
       );
+
        toast.success("Document Updated Successfully", {
         description: `Changes to ID documents: ${editingDocId} has been saved.`,
+
       });
     } else {
       if (!newDocument.file) {
-        // ▼▼▼ GANTI DENGAN TOAST ERROR ▼▼▼
         toast.error("File Belum Dipilih", {
           description: "Silakan pilih file yang akan diunggah.",
         });
@@ -313,10 +356,17 @@ export default function SiadilPage() {
         const maxId = Math.max(...numericIds);
         return (maxId + 1).toString();
       };
+
+      const fileName = newDocument.file.name;
+      const fileExtension = fileName.split(".").pop()?.toLowerCase();
+
       const newDoc: Document = {
         id: getNextId(),
         parentId: currentFolderId,
         title: newDocument.title || newDocument.file.name,
+
+        fileType: fileExtension,
+
         number: newDocument.number,
         description: newDocument.description,
         documentDate:
@@ -331,7 +381,7 @@ export default function SiadilPage() {
         updatedDate: new Date().toISOString(),
       };
       setDocuments((docs) => [...docs, newDoc]);
-      // ▼▼▼ GANTI DENGAN TOAST SUKSES ▼▼▼
+
       toast.success("Document Uploaded Successfully", {
         description: `Document "${newDoc.title}" has been added with ID: ${newDoc.id}.`,
       });
@@ -440,6 +490,30 @@ export default function SiadilPage() {
   setIsMoveModalOpen(false);
   setDocumentToMove(null);
  };
+    if (!documentToMove) return;
+
+    // Mendapatkan detail dokumen dan arsip tujuan (hanya sekali)
+    const docDetails = documents.find((doc) => doc.id === documentToMove);
+    const targetArchive = archives.find((a) => a.id === targetArchiveId);
+
+    // Memperbarui state dokumen
+    setDocuments((currentDocs) =>
+      currentDocs.map((doc) =>
+        doc.id === documentToMove ? { ...doc, parentId: targetArchiveId } : doc
+      )
+    );
+
+    // Menampilkan notifikasi toast
+    toast.success("Dokumen Berhasil Dipindahkan", {
+      description: `Dokumen "${
+        docDetails?.title || `ID: ${documentToMove}`
+      }" berhasil dipindahkan ke arsip "${targetArchive?.name || "tujuan"}".`,
+    });
+
+    // Menutup modal dan mereset state
+    setIsMoveModalOpen(false);
+    setDocumentToMove(null);
+  };
 
   const handleQuickAccessClick = (doc: Document) => {
     const docsInTargetFolder = documents.filter(
@@ -506,8 +580,10 @@ export default function SiadilPage() {
         };
       case "restore":
         return {
+
           title: "Recover Documents?",
           body: `Are you sure you want to recover the "${confirmationAction.docTitle}" document from the trash?`,
+
           confirmText: "Ya, Pulihkan",
           variant: "default" as const,
         };
@@ -780,6 +856,7 @@ export default function SiadilPage() {
           confirmText={confirmationModalData.confirmText}
           variant={confirmationModalData.variant}
         >
+          variant={confirmationModalData.variant}>
           <p>{confirmationModalData.body}</p>
         </ConfirmationModal>
       )}
