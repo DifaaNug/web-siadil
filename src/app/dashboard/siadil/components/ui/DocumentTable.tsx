@@ -86,8 +86,7 @@ export const DocumentTable = ({
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
-            strokeWidth={2}
-          >
+            strokeWidth={2}>
             <path
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -102,8 +101,7 @@ export const DocumentTable = ({
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
-          strokeWidth={2}
-        >
+          strokeWidth={2}>
           <path
             strokeLinecap="round"
             strokeLinejoin="round"
@@ -117,8 +115,7 @@ export const DocumentTable = ({
         className="w-4 h-4 text-gray-400"
         fill="none"
         viewBox="0 0 24 24"
-        stroke="currentColor"
-      >
+        stroke="currentColor">
         <path
           strokeLinecap="round"
           strokeLinejoin="round"
@@ -143,8 +140,7 @@ export const DocumentTable = ({
         onClick={(e) =>
           setActiveHeaderMenu({ columnId, buttonEl: e.currentTarget })
         }
-        className="flex items-center gap-2 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider hover:text-gray-800 dark:hover:text-white transition-colors"
-      >
+        className="flex items-center gap-2 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider hover:text-gray-800 dark:hover:text-white transition-colors">
         {label}
         <SortIndicator columnId={columnId} />
       </button>
@@ -193,15 +189,14 @@ export const DocumentTable = ({
           {documents.map((doc) => (
             <tr
               key={doc.id}
-              id={`doc-table-${doc.id}`} // <-- PERBAIKAN: Tambahkan ID unik di sini
+              id={`doc-table-${doc.id}`}
               onContextMenu={(e) => handleContextMenu(e, doc.id)}
               onClick={(e) => onDocumentSelect(doc.id, e)}
               className={`transition-colors cursor-pointer ${
                 selectedDocumentIds.has(doc.id)
                   ? "bg-green-50 dark:bg-green-900/50"
                   : "hover:bg-gray-50 dark:hover:bg-gray-700"
-              }`}
-            >
+              }`}>
               {visibleColumns.has("actions") && (
                 <td className="px-4 py-4 whitespace-nowrap pl-7 text-sm font-medium relative">
                   <button
@@ -209,14 +204,12 @@ export const DocumentTable = ({
                       e.stopPropagation();
                       handleMenuToggle(doc.id, e.currentTarget);
                     }}
-                    className="text-gray-500 hover:text-gray-900 dark:hover:text-white p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-600"
-                  >
+                    className="text-gray-500 hover:text-gray-900 dark:hover:text-white p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-600">
                     <svg
                       className="w-5 h-5"
                       fill="none"
                       viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
+                      stroke="currentColor">
                       <path
                         strokeLinecap="round"
                         strokeLinejoin="round"
@@ -252,8 +245,7 @@ export const DocumentTable = ({
               {visibleColumns.has("description") && (
                 <td
                   className="px-4 py-4 text-sm text-gray-500 dark:text-gray-400 max-w-xs "
-                  title={doc.description}
-                >
+                  title={doc.description}>
                   {doc.description}
                 </td>
               )}
@@ -269,8 +261,7 @@ export const DocumentTable = ({
                       <div
                         key={i}
                         title={c.name}
-                        className="w-7 h-7 bg-gray-200 dark:bg-gray-600 rounded-full flex items-center justify-center text-xs font-medium text-gray-600 dark:text-gray-300 ring-2 ring-white dark:ring-gray-800"
-                      >
+                        className="w-7 h-7 bg-gray-200 dark:bg-gray-600 rounded-full flex items-center justify-center text-xs font-medium text-gray-600 dark:text-gray-300 ring-2 ring-white dark:ring-gray-800">
                         {c.name
                           .split(" ")
                           .map((n) => n[0])
