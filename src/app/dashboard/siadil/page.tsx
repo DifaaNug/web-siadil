@@ -570,7 +570,6 @@ export default function SiadilPage() {
           onClose={() => setIsRemindersModalOpen(false)}
           reminders={reminders}
         />
-
         {currentFolderId === "root" && (
           <QuickAccessSection
             documents={quickAccessDocuments}
@@ -579,14 +578,15 @@ export default function SiadilPage() {
         )}
 
         {currentFolderId === "root" && (
+          // GANTI BAGIAN INI (dari <div className="mb-6"> sampai penutup </nav></div>)
           <div className="mb-6 border-b border-gray-200 dark:border-gray-700">
             <nav className="-mb-px flex space-x-6" aria-label="Tabs">
               <button
                 onClick={() => setPageView("archives")}
-                className={`flex items-center gap-2 whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm ${
+                className={`flex items-center gap-2 whitespace-nowrap py-3 px-1 border-b-2 text-sm font-semibold transition-colors ${
                   pageView === "archives"
                     ? "border-demplon text-demplon"
-                    : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                    : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300 dark:hover:border-gray-500"
                 }`}>
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -605,10 +605,10 @@ export default function SiadilPage() {
 
               <button
                 onClick={() => setPageView("starred")}
-                className={`flex items-center gap-2 whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm ${
+                className={`flex items-center gap-2 whitespace-nowrap py-3 px-1 border-b-2 text-sm font-semibold transition-colors ${
                   pageView === "starred"
                     ? "border-demplon text-demplon"
-                    : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                    : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300 dark:hover:border-gray-500"
                 }`}>
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -627,10 +627,10 @@ export default function SiadilPage() {
 
               <button
                 onClick={() => setPageView("trash")}
-                className={`flex items-center gap-2 whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm ${
+                className={`flex items-center gap-2 whitespace-nowrap py-3 px-1 border-b-2 text-sm font-semibold transition-colors ${
                   pageView === "trash"
                     ? "border-demplon text-demplon"
-                    : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                    : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300 dark:hover:border-gray-500"
                 }`}>
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -650,7 +650,6 @@ export default function SiadilPage() {
             </nav>
           </div>
         )}
-
         {currentFolderId === "root" ? (
           (() => {
             switch (pageView) {
