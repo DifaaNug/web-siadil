@@ -9,33 +9,25 @@ const PersonalArchiveCard = ({
 }) => (
   <div
     onClick={onClick}
-    className="relative overflow-hidden rounded-lg border dark:border-gray-700 p-5 transition-all duration-200 ease-in-out hover:bg-gray-50 cursor-pointer flex items-center min-h-[110px] bg-gradient-to-br dark:from-gray-800 dark:to-gray-800 border-l-4 border-demplon">
-    <div className="flex items-center space-x-3 min-w-0">
-      <div className="w-10 h-10 bg-red-500 rounded-full flex items-center justify-center flex-shrink-0">
-        <span className="text-white font-semibold text-sm">DF</span>
+    className="group relative flex cursor-pointer items-center overflow-hidden rounded-lg border border-green-600 bg-gradient-to-br  backdrop-blur-lg p-4 shadow-md transition-all duration-300 hover:shadow-lg dark:bg-gray-700/60 dark:hover:bg-gray-700">
+    <div className="flex w-full items-center gap-4">
+      <div className="w-12 h-12 bg-red-500 rounded-full flex items-center justify-center flex-shrink-0 shadow-lg">
+        <span className="text-white font-bold text-lg tracking-wide">DF</span>
       </div>
-      <div className="min-w-0">
-        <h3 className="flex items-center gap-1.5 font-semibold text-gray-900 dark:text-white text-sm truncate">
-          <svg
-            className="h-3.5 w-3.5 text-gray-900 dark:text-gray-400 flex-shrink-0"
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor">
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
-            />
-          </svg>
-          <span>{archive.name}</span>
+      <div className="min-w-0 flex-grow">
+        <h3
+          className="font-bold text-base text-green-900 dark:text-white"
+          title={archive.name}>
+          {archive.name}
         </h3>
-        <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+        <p className="text-sm text-green-700 dark:text-green-300 font-semibold mt-1">
           10122059
         </p>
       </div>
     </div>
+    <span className="absolute top-2 right-2 px-2.5 py-0.5 text-xs font-semibold rounded-md bg-white text-gray-800 shadow">
+      Personal
+    </span>
   </div>
 );
 
@@ -50,32 +42,42 @@ const ArchiveCard = ({
 }) => (
   <div
     onClick={onClick}
-    className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-5 transition-all duration-200 ease-in-out hover:bg-gray-50 cursor-pointer flex items-center min-h-[110px] overflow-hidden
-    ">
-    <div className="flex items-center space-x-4 min-w-0">
-      <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-demplon flex-shrink-0">
+    className="group relative flex flex-col cursor-pointer overflow-hidden rounded-lg border bg-gradient-to-br  backdrop-blur-lg p-4 transition-all duration-300 hover:shadow-md hover:border-green-500 dark:bg-gray-800 dark:from-gray-800 dark:to-gray-700/50 dark:hover:border-green-500">
+    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-green-700 shadow-md">
+      <svg
+        className="h-6 w-6 text-white"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round">
+        <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+      </svg>
+    </div>
+    <div className="mt-3 flex-grow">
+      <h3
+        className="text-sm font-bold text-gray-800 dark:text-white"
+        title={archive.name}>
+        {archive.name}
+      </h3>
+    </div>
+    <div className="mt-2">
+      <span className="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400 border dark:border-gray-600 dark:bg-gray-700 px-2 py-0.5 rounded-lg">
         <svg
-          className="w-5 h-5 text-white"
-          width="24"
-          height="24"
+          className="w-3 h-3 text-green-700"
+          fill="none"
           viewBox="0 0 24 24"
-          fill="none">
+          stroke="currentColor">
           <path
-            d="M3 7V17C3 18.1046 3.89543 19 5 19H19C20.1046 19 21 18.1046 21 17V9C21 7.89543 20.1046 7 19 7H9L7 5H5C3.89543 5 3 5.89543 3 7Z"
-            stroke="currentColor"
-            strokeWidth="2"
+            strokeLinecap="round"
             strokeLinejoin="round"
+            strokeWidth="2"
+            d="M8 17l4-4 4 4m0 0V7m0 10l-4-4-4 4"
           />
         </svg>
-      </div>
-      <div className="min-w-0">
-        <h3 className="font-semibold text-gray-900 dark:text-white text-sm">
-          {archive.name}
-        </h3>
-        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-          {docCount} items
-        </p>
-      </div>
+        {docCount} items
+      </span>
     </div>
   </div>
 );
