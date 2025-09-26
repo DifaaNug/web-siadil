@@ -1,8 +1,7 @@
 import React from "react";
-import Breadcrumb from "../ui/Breadcrumb";
 import { reminders } from "../../data";
 import { FolderIcon } from "../ui/FolderIcon";
-import { UserInfoCard } from "../ui/UserInforCard";
+// import { UserInfoCard } from "../ui/UserInforCard";
 
 interface BreadcrumbItem {
   label: string;
@@ -21,7 +20,6 @@ const HeaderSection: React.FC<HeaderSectionProps> = ({
   breadcrumbItems,
   totalDocuments,
   onBreadcrumbClick,
-  onCreateNewArchive,
   onViewAllReminders,
 }) => {
   const breadcrumbProps = breadcrumbItems.map((item) => ({
@@ -70,21 +68,11 @@ const HeaderSection: React.FC<HeaderSectionProps> = ({
   };
 
   return (
-    <div className="mb-6">
+    <div className="mb-3 mt-0">
       <div className="flex items-start justify-between">
         {/* === KOLOM KIRI === */}
-        <div className="flex flex-1 flex-col">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-              SIADIL
-            </h1>
-            <p className="mb-4 text-gray-600 dark:text-gray-300">
-              Sistem Arsip Digital
-            </p>
-            <Breadcrumb items={breadcrumbProps} />
-          </div>
-
-          <div className="mt-10 flex gap-6">
+        <div className="flex mt-7 flex-1 flex-col">
+          <div className="mt-4 flex gap-6">
             <div className="w-[240px] rounded-lg bg-demplon p-5 text-white">
               <div className="flex items-center space-x-4">
                 <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-lg bg-white/20">
@@ -92,7 +80,8 @@ const HeaderSection: React.FC<HeaderSectionProps> = ({
                     className="h-6 w-6 text-white"
                     fill="none"
                     viewBox="0 0 24 24"
-                    stroke="currentColor">
+                    stroke="currentColor"
+                  >
                     <path
                       strokeLinecap="round"
                       strokeLinejoin="round"
@@ -108,40 +97,20 @@ const HeaderSection: React.FC<HeaderSectionProps> = ({
               </div>
               <p className="mt-2 text-xs opacity-80">Per 24 September 2025</p>
             </div>
-
-            <div
-              onClick={onCreateNewArchive}
-              className="flex w-[240px] cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-300 bg-white p-5 text-center text-gray-600 transition hover:border-gray-400 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-400 dark:hover:border-gray-500 dark:hover:bg-gray-700">
-              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-200 dark:bg-gray-700">
-                <svg
-                  className="h-5 w-5"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor">
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-                  />
-                </svg>
-              </div>
-              <p className="mt-2 text-sm font-semibold">Create New Archives</p>
-              <p className="text-xs">Folder Baru</p>
-            </div>
           </div>
         </div>
 
         {/* === KOLOM KANAN === */}
         <div className="ml-8 flex w-80 flex-shrink-0 flex-col">
-          <UserInfoCard />
+          {/* <UserInfoCard /> */}
           <div className="flex w-full items-center justify-between mt-6 mb-3">
             <h3 className="text-base font-semibold text-gray-900 dark:text-white">
               Reminders
             </h3>
             <button
               onClick={onViewAllReminders}
-              className="text-xs font-semibold text-demplon hover:underline">
+              className="text-xs font-semibold text-demplon hover:underline"
+            >
               View All
             </button>
           </div>
@@ -151,15 +120,18 @@ const HeaderSection: React.FC<HeaderSectionProps> = ({
               return (
                 <div
                   key={reminder.id}
-                  className={`flex items-center justify-between rounded-lg border p-4 shadow-sm ${styles.bgColor} ${styles.borderColor}`}>
+                  className={`flex items-center justify-between rounded-lg border p-4 shadow-sm ${styles.bgColor} ${styles.borderColor}`}
+                >
                   <div className="flex items-center">
                     <div
-                      className={`flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full ${styles.iconBg} ${styles.iconColor}`}>
+                      className={`flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full ${styles.iconBg} ${styles.iconColor}`}
+                    >
                       {styles.icon}
                     </div>
                     <div className="ml-4">
                       <p
-                        className={`text-sm font-semibold ${styles.titleColor}`}>
+                        className={`text-sm font-semibold ${styles.titleColor}`}
+                      >
                         {reminder.title}
                       </p>
                       <p className="text-xs text-gray-600 dark:text-gray-400">
@@ -175,7 +147,8 @@ const HeaderSection: React.FC<HeaderSectionProps> = ({
                       className="h-5 w-5 text-gray-400"
                       fill="none"
                       viewBox="0 0 24 24"
-                      stroke="currentColor">
+                      stroke="currentColor"
+                    >
                       <path
                         strokeLinecap="round"
                         strokeLinejoin="round"

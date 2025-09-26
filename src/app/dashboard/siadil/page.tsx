@@ -37,6 +37,7 @@ import { AllRemindersModal } from "./components/modals/AllRemindersModal";
 import { reminders } from "./data";
 import { toast } from "sonner";
 import { ConfirmationModal } from "./components/modals/ConfirmationModal";
+import DashboardHeader from "./components/container/DashboardHeader";
 
 const allTableColumns: TableColumn[] = [
   { id: "numberAndTitle", label: "Number & Title" },
@@ -64,6 +65,10 @@ export default function SiadilPage() {
   const [pageView, setPageView] = useState<"archives" | "starred" | "trash">(
     "archives"
   );
+  const userData = {
+    name: "Riza Ilhamsyah",
+    id: "1990123",
+  };
   const [isAddNewMenuOpen, setIsAddNewMenuOpen] = useState(false);
   const addNewButtonRef = useRef<HTMLButtonElement>(null);
   const [isExporting, setIsExporting] = useState(false);
@@ -529,6 +534,12 @@ export default function SiadilPage() {
         className={`transition-all duration-300 ease-in-out ${
           isInfoPanelOpen ? "mr-80" : "mr-0"
         }`}>
+        <DashboardHeader
+          userName={userData.name}
+          breadcrumbItems={breadcrumbItems}
+          onBreadcrumbClick={setCurrentFolderId}
+        />
+        {/* Komponen HeaderSection yang lama digantikan oleh WelcomeBanner */}
         <HeaderSection
           breadcrumbItems={breadcrumbItems}
           totalDocuments={documents.length}
@@ -586,7 +597,7 @@ export default function SiadilPage() {
                 className={`flex items-center gap-2 whitespace-nowrap py-3 px-1 border-b-2 text-sm font-semibold transition-colors ${
                   pageView === "archives"
                     ? "border-demplon text-demplon"
-                    : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300 dark:hover:border-gray-500"
+                    : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
                 }`}>
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -608,7 +619,7 @@ export default function SiadilPage() {
                 className={`flex items-center gap-2 whitespace-nowrap py-3 px-1 border-b-2 text-sm font-semibold transition-colors ${
                   pageView === "starred"
                     ? "border-demplon text-demplon"
-                    : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300 dark:hover:border-gray-500"
+                    : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
                 }`}>
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -630,7 +641,7 @@ export default function SiadilPage() {
                 className={`flex items-center gap-2 whitespace-nowrap py-3 px-1 border-b-2 text-sm font-semibold transition-colors ${
                   pageView === "trash"
                     ? "border-demplon text-demplon"
-                    : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300 dark:hover:border-gray-500"
+                    : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
                 }`}>
                 <svg
                   xmlns="http://www.w3.org/2000/svg"

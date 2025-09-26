@@ -49,7 +49,8 @@ export default function DashboardLayout({
       <div
         className={`sticky top-0 h-full transition-all duration-300 shrink-0 ${
           isSidebarCollapsed ? "w-20" : "w-60"
-        }`}>
+        }`}
+      >
         <Sidebar onCollapseChange={setIsSidebarCollapsed} />
       </div>
       <main className="flex-1 flex flex-col min-w-0">
@@ -59,7 +60,8 @@ export default function DashboardLayout({
           ref={contentRef}
           className={`p-6 flex-1 overflow-y-auto custom-scrollbar ${
             isScrolling ? "scrolling" : ""
-          }`}>
+          }`}
+        >
           {children}
         </div>
       </main>
