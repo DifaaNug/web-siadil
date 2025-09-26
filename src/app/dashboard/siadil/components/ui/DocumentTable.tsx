@@ -133,9 +133,9 @@ export const DocumentTable = ({
   }: {
     columnId: keyof Document;
     label: string;
-    align?: "left" | "right";
+    align?: "left" | "center" | "right";
   }) => (
-    <th className={`px-4 py-3 text-${align} sticky top-0 z-10 bg-emerald-50 dark:bg-emerald-900 last:rounded-tr-lg border-r-2 border-emerald-200 dark:border-emerald-700 last:border-r-0`}>
+    <th className={`px-4 py-3 text-${align} sticky top-0 z-10 bg-emerald-50 dark:bg-emerald-900 border-r-2 border-emerald-200 dark:border-emerald-700 last:border-r-0`}>
       <button
         onClick={(e) =>
           setActiveHeaderMenu({ columnId, buttonEl: e.currentTarget })
@@ -149,12 +149,12 @@ export const DocumentTable = ({
 
   return (
     <>
-      <div className="rounded-lg overflow-hidden border-2 border-emerald-200 dark:border-emerald-700">
+      <div className="overflow-hidden border-2 border-emerald-200 dark:border-emerald-700">
         <table className="w-full border-collapse">
           <thead className="bg-emerald-50 dark:bg-emerald-900 border-b-2 border-emerald-300 dark:border-emerald-600 sticky top-0 z-10 shadow-sm">
           <tr>
             {visibleColumns.has("actions") && (
-              <th className="px-4 py-3 text-left text-sm font-medium text-emerald-800 dark:text-emerald-100 tracking-wider sticky top-0 z-10 first:rounded-tl-lg bg-emerald-50 dark:bg-emerald-900 border-r-2 border-emerald-200 dark:border-emerald-700">
+              <th className="px-4 py-3 text-left text-sm font-medium text-emerald-800 dark:text-emerald-100 tracking-wider sticky top-0 z-10 bg-emerald-50 dark:bg-emerald-900 border-r-2 border-emerald-200 dark:border-emerald-700">
                 Actions
               </th>
             )}
@@ -168,7 +168,7 @@ export const DocumentTable = ({
               </th>
             )}
             {visibleColumns.has("documentDate") && (
-              <SortableHeader columnId="documentDate" label="Document Date" />
+              <SortableHeader columnId="documentDate" label="Document Date" align="center" />
             )}
             {visibleColumns.has("contributors") && (
               <th className="px-4 py-3 text-left text-sm font-medium text-emerald-800 dark:text-emerald-100 tracking-wider sticky top-0 z-10 bg-emerald-50 dark:bg-emerald-900 border-r-2 border-emerald-200 dark:border-emerald-700">
@@ -199,9 +199,16 @@ export const DocumentTable = ({
                   : "hover:bg-gray-50 dark:hover:bg-gray-700"
               }`}>
               {visibleColumns.has("actions") && (
-                <td className="px-4 py-4 whitespace-nowrap pl-7 text-sm font-medium relative border-r-2 border-gray-200 dark:border-gray-600">
+                <td 
+                  onClick={(e) => e.stopPropagation()}
+                  className="px-4 py-4 whitespace-nowrap pl-7 text-sm font-medium relative border-r-2 border-gray-200 dark:border-gray-600">
                   <button
                     onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                    }}
+                    onMouseDown={(e) => {
+                      e.preventDefault();
                       e.stopPropagation();
                       handleMenuToggle(doc.id, e.currentTarget);
                     }}
@@ -251,7 +258,7 @@ export const DocumentTable = ({
                 </td>
               )}
               {visibleColumns.has("documentDate") && (
-                <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white border-r-2 border-gray-200 dark:border-gray-600">
+                <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white border-r-2 border-gray-200 dark:border-gray-600 text-center">
                   {formatDate(doc.documentDate)}
                 </td>
               )}

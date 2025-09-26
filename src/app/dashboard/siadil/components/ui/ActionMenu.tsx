@@ -30,12 +30,18 @@ export const ActionMenu = ({
   onManageContributors, // Tambahkan ini
 }: ActionMenuProps) => {
   const menuRef = useRef<HTMLDivElement>(null);
+  const buttonRef = useRef<HTMLButtonElement>(buttonEl);
   const [style, setStyle] = useState<React.CSSProperties>({
     position: "fixed",
     visibility: "hidden",
   });
 
-  useOnClickOutside(menuRef, onClose);
+  // Update buttonRef when buttonEl changes
+  useEffect(() => {
+    buttonRef.current = buttonEl;
+  }, [buttonEl]);
+
+  useOnClickOutside(menuRef, onClose, buttonRef);
 
   useEffect(() => {
     if (menuRef.current && buttonEl) {
@@ -97,6 +103,7 @@ export const ActionMenu = ({
   return (
     <div
       ref={menuRef}
+      onClick={(e) => e.stopPropagation()}
       className="w-56 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg z-50"
       style={style}>
       <div className="p-2">
