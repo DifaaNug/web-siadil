@@ -589,7 +589,6 @@ export default function SiadilPage() {
         )}
 
         {currentFolderId === "root" && (
-          // GANTI BAGIAN INI (dari <div className="mb-6"> sampai penutup </nav></div>)
           <div className="mb-6 border-b border-gray-200 dark:border-gray-700">
             <nav className="-mb-px flex space-x-6" aria-label="Tabs">
               <button
