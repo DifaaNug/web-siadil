@@ -39,14 +39,14 @@ const ArchiveView: React.FC<ArchiveViewProps> = ({
 
   return (
     <div className="mb-10">
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-          Archives
+      <div className="flex justify-between items-center mb-6 gap-4">
+        <h2 className="text-2xl font-bold text-gray-800 dark:text-white shrink-0">
+          My Archives
         </h2>
-        <div className="relative max-w-xs">
+        <div className="relative w-full max-w-xs">
           <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
             <svg
-              className="h-5 w-5 text-gray-400"
+              className="h-5 w-5 text-demplon/70"
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
               viewBox="0 0 24 24"
@@ -61,19 +61,19 @@ const ArchiveView: React.FC<ArchiveViewProps> = ({
           </div>
           <input
             type="text"
-            placeholder="Search Archive"
+            placeholder="Search Archive..."
             value={searchQuery}
             onChange={(e) => {
               setSearchQuery(e.target.value);
               setCurrentPage(1);
             }}
-            className="w-full rounded-md border border-gray-300 bg-white py-1.5 pl-10 pr-4 text-sm text-gray-900 placeholder-gray-500 focus:border-green-500 focus:ring-green-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:placeholder-gray-400"
+            className="w-full rounded-lg border border-gray-200 bg-white py-2 pl-12 pr-4 text-base text-gray-900 placeholder-gray-400 shadow-sm focus:border-demplon focus:ring-2 focus:ring-demplon/40 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:placeholder-gray-400 transition-all duration-200"
           />
         </div>
       </div>
 
-      {paginatedArchives.length > 0 && (
-        <div className="grid grid-cols-[repeat(auto-fill,minmax(200px,1fr))] gap-6">
+      {paginatedArchives.length > 0 ? (
+        <div className="grid grid-cols-[repeat(auto-fill,minmax(220px,1fr))] gap-6">
           {paginatedArchives.map((archive) =>
             archive.code === "PERSONAL" ? (
               <PersonalArchiveCard
@@ -91,6 +91,10 @@ const ArchiveView: React.FC<ArchiveViewProps> = ({
             )
           )}
         </div>
+      ) : (
+        <div className="text-center py-16 border-2 border-dashed rounded-lg">
+          <p className="text-gray-500">No archives found.</p>
+        </div>
       )}
 
       {totalPages > 1 && (
@@ -99,7 +103,22 @@ const ArchiveView: React.FC<ArchiveViewProps> = ({
             onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
             disabled={currentPage === 1}
             className="px-3 py-1 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md disabled:opacity-50 hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700">
-            Previous
+            Previous{" "}
+            <button
+              onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+              disabled={currentPage === 1}
+              className="px-3 py-1 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md disabled:opacity-50 hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700">
+              Previous
+            </button>
+            <span className="text-sm text-gray-700 dark:text-gray-300">
+              Page {currentPage} of {totalPages}
+            </span>
+            <button
+              onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+              disabled={currentPage === totalPages}
+              className="px-3 py-1 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md disabled:opacity-50 hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700">
+              Next
+            </button>
           </button>
           <span className="text-sm text-gray-700 dark:text-gray-300">
             Page {currentPage} of {totalPages}
