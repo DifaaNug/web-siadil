@@ -64,7 +64,7 @@ export const DocumentGrid = ({
             id={`doc-grid-${doc.id}`}
             onContextMenu={(e) => handleContextMenu(e, doc.id)}
             onClick={(e) => onDocumentSelect(doc.id, e)}
-            className={`group relative flex flex-col cursor-pointer overflow-hidden rounded-xl border bg-gradient-to-br from-gray-50 to-white p-4 shadow-sm transition-all duration-300 ease-in-out hover:-translate-y-1 dark:border-gray-700 dark:from-gray-800 dark:to-gray-700/50 ${
+            className={`group relative flex flex-col cursor-pointer overflow-hidden rounded-xl border bg-gradient-to-br from-gray-50 to-white p-4 shadow-sm transition-all duration-300 ease-in-out  dark:border-gray-700 dark:from-gray-800 dark:to-gray-700/50 ${
               selectedDocumentIds.has(doc.id)
                 ? "border-green-400 ring-2 ring-green-500/30 dark:border-green-600"
                 : "border-gray-200 hover:border-green-400 hover:shadow-lg dark:hover:border-green-600"
