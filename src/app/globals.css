@@ -111,8 +111,6 @@ body {
   font-family: "Poppins", Arial, Helvetica, sans-serif;
 }
 
-
-
 @layer base {
   :root {
     --background: 0 0% 100%;
@@ -169,8 +167,6 @@ body {
   }
 }
 
-
-
 @layer base {
   * {
     @apply border-border;
@@ -178,4 +174,35 @@ body {
   body {
     @apply bg-background text-foreground;
   }
+}
+
+.with-glow {
+  position: relative;
+}
+
+.with-glow::after {
+  content: "";
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  border-radius: 0.8rem; /* cocokan dengan rounded-xl */
+  background: conic-gradient(
+    from 180deg at 50% 50%,
+    #e92a67 0deg,
+    #a855f7 55deg,
+    #2563eb 115deg,
+    #3b82f6 180deg,
+    #14b8a6 230deg,
+    #f59e0b 285deg,
+    #e92a67 360deg
+  );
+  filter: blur(18px);
+  z-index: -1;
+  opacity: 0.15;
+}
+
+.dark .with-glow::after {
+  opacity: 0.25;
 }

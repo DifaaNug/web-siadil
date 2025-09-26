@@ -37,6 +37,7 @@ import { AllRemindersModal } from "./components/modals/AllRemindersModal";
 import { reminders } from "./data";
 import { toast } from "sonner";
 import { ConfirmationModal } from "./components/modals/ConfirmationModal";
+import DashboardHeader from "./components/container/DashboardHeader";
 
 const allTableColumns: TableColumn[] = [
   { id: "numberAndTitle", label: "Number & Title" },
@@ -64,6 +65,10 @@ export default function SiadilPage() {
   const [pageView, setPageView] = useState<"archives" | "starred" | "trash">(
     "archives"
   );
+  const userData = {
+    name: "Riza Ilhamsyah",
+    id: "1990123",
+  };
   const [isAddNewMenuOpen, setIsAddNewMenuOpen] = useState(false);
   const addNewButtonRef = useRef<HTMLButtonElement>(null);
   const [isExporting, setIsExporting] = useState(false);
@@ -528,7 +533,14 @@ export default function SiadilPage() {
       <div
         className={`transition-all duration-300 ease-in-out ${
           isInfoPanelOpen ? "mr-80" : "mr-0"
-        }`}>
+        }`}
+      >
+        <DashboardHeader
+          userName={userData.name}
+          breadcrumbItems={breadcrumbItems}
+          onBreadcrumbClick={setCurrentFolderId}
+        />
+        {/* Komponen HeaderSection yang lama digantikan oleh WelcomeBanner */}
         <HeaderSection
           breadcrumbItems={breadcrumbItems}
           totalDocuments={documents.length}
@@ -540,12 +552,14 @@ export default function SiadilPage() {
           <button
             ref={addNewButtonRef}
             onClick={() => setIsAddNewMenuOpen(!isAddNewMenuOpen)}
-            className="bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 font-semibold px-5 py-2.5 rounded-lg shadow hover:shadow-lg transition-all duration-200 ease-in-out flex items-center border border-gray-200 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+            className="bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 font-semibold px-5 py-2.5 rounded-lg shadow hover:shadow-lg transition-all duration-200 ease-in-out flex items-center border border-gray-200 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+          >
             <svg
               className="w-5 h-5 mr-2 -ml-1"
               fill="none"
               viewBox="0 0 24 24"
-              stroke="currentColor">
+              stroke="currentColor"
+            >
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -587,7 +601,8 @@ export default function SiadilPage() {
                   pageView === "archives"
                     ? "border-demplon text-demplon"
                     : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-                }`}>
+                }`}
+              >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="16"
@@ -597,7 +612,8 @@ export default function SiadilPage() {
                   stroke="currentColor"
                   strokeWidth="2"
                   strokeLinecap="round"
-                  strokeLinejoin="round">
+                  strokeLinejoin="round"
+                >
                   <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
                 </svg>
                 <span>My Archives</span>
@@ -609,7 +625,8 @@ export default function SiadilPage() {
                   pageView === "starred"
                     ? "border-demplon text-demplon"
                     : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-                }`}>
+                }`}
+              >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="16"
@@ -619,7 +636,8 @@ export default function SiadilPage() {
                   stroke="currentColor"
                   strokeWidth="2"
                   strokeLinecap="round"
-                  strokeLinejoin="round">
+                  strokeLinejoin="round"
+                >
                   <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
                 </svg>
                 <span>Starred</span>
@@ -631,7 +649,8 @@ export default function SiadilPage() {
                   pageView === "trash"
                     ? "border-demplon text-demplon"
                     : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-                }`}>
+                }`}
+              >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="16"
@@ -641,7 +660,8 @@ export default function SiadilPage() {
                   stroke="currentColor"
                   strokeWidth="2"
                   strokeLinecap="round"
-                  strokeLinejoin="round">
+                  strokeLinejoin="round"
+                >
                   <polyline points="3 6 5 6 21 6"></polyline>
                   <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
                 </svg>
@@ -783,7 +803,8 @@ export default function SiadilPage() {
           onConfirm={handleConfirmAction}
           title={confirmationModalData.title}
           confirmText={confirmationModalData.confirmText}
-          variant={confirmationModalData.variant}>
+          variant={confirmationModalData.variant}
+        >
           <p>{confirmationModalData.body}</p>
         </ConfirmationModal>
       )}
