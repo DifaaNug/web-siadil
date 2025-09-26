@@ -82,7 +82,7 @@ export const DocumentTable = ({
       if (sortOrder === "asc") {
         return (
           <svg
-            className="w-4 h-4 text-gray-900 dark:text-white"
+            className="w-4 h-4 text-emerald-700 dark:text-emerald-200"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -97,7 +97,7 @@ export const DocumentTable = ({
       }
       return (
         <svg
-          className="w-4 h-4 text-gray-900 dark:text-white"
+          className="w-4 h-4 text-emerald-700 dark:text-emerald-200"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
@@ -112,7 +112,7 @@ export const DocumentTable = ({
     }
     return (
       <svg
-        className="w-4 h-4 text-gray-400"
+        className="w-4 h-4 text-emerald-400 dark:text-emerald-300"
         fill="none"
         viewBox="0 0 24 24"
         stroke="currentColor">
@@ -133,14 +133,14 @@ export const DocumentTable = ({
   }: {
     columnId: keyof Document;
     label: string;
-    align?: "left" | "right";
+    align?: "left" | "center" | "right";
   }) => (
-    <th className={`px-4 py-3 text-${align}`}>
+    <th className={`px-4 py-3 text-${align} sticky top-0 z-10 bg-emerald-50 dark:bg-emerald-900 border-r-2 border-emerald-200 dark:border-emerald-700 last:border-r-0`}>
       <button
         onClick={(e) =>
           setActiveHeaderMenu({ columnId, buttonEl: e.currentTarget })
         }
-        className="flex items-center gap-2 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider hover:text-gray-800 dark:hover:text-white transition-colors">
+        className="flex items-center gap-2 text-sm font-bold text-emerald-800 dark:text-emerald-100 tracking-wider hover:text-emerald-900 dark:hover:text-white transition-colors">
         {label}
         <SortIndicator columnId={columnId} />
       </button>
@@ -149,11 +149,12 @@ export const DocumentTable = ({
 
   return (
     <>
-      <table className="w-full">
-        <thead className="bg-gray-50 dark:bg-gray-700">
+      <div className="overflow-hidden border-2 border-emerald-200 dark:border-emerald-700">
+        <table className="w-full border-collapse">
+          <thead className="bg-emerald-50 dark:bg-emerald-900 border-b-2 border-emerald-300 dark:border-emerald-600 sticky top-0 z-10 shadow-sm">
           <tr>
             {visibleColumns.has("actions") && (
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+              <th className="px-4 py-3 text-left text-sm font-medium text-emerald-800 dark:text-emerald-100 tracking-wider sticky top-0 z-10 bg-emerald-50 dark:bg-emerald-900 border-r-2 border-emerald-200 dark:border-emerald-700">
                 Actions
               </th>
             )}
@@ -162,15 +163,15 @@ export const DocumentTable = ({
               <SortableHeader columnId="number" label="Number & Title" />
             )}
             {visibleColumns.has("description") && (
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+              <th className="px-4 py-3 text-left text-sm font-medium text-emerald-800 dark:text-emerald-100 tracking-wider sticky top-0 z-10 bg-emerald-50 dark:bg-emerald-900 border-r-2 border-emerald-200 dark:border-emerald-700">
                 Description
               </th>
             )}
             {visibleColumns.has("documentDate") && (
-              <SortableHeader columnId="documentDate" label="Document Date" />
+              <SortableHeader columnId="documentDate" label="Document Date" align="center" />
             )}
             {visibleColumns.has("contributors") && (
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+              <th className="px-4 py-3 text-left text-sm font-medium text-emerald-800 dark:text-emerald-100 tracking-wider sticky top-0 z-10 bg-emerald-50 dark:bg-emerald-900 border-r-2 border-emerald-200 dark:border-emerald-700">
                 Contributors
               </th>
             )}
@@ -180,43 +181,69 @@ export const DocumentTable = ({
             {visibleColumns.has("updatedAndCreatedBy") && (
               <SortableHeader
                 columnId="updatedDate"
-                label="Update & Create By"
+                label="Update & Create by"
               />
             )}
           </tr>
-        </thead>
-        <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+          </thead>
+          <tbody className="bg-white dark:bg-gray-800 divide-y-2 divide-gray-200 dark:divide-gray-600">
           {documents.map((doc) => (
             <tr
               key={doc.id}
               id={`doc-table-${doc.id}`}
               onContextMenu={(e) => handleContextMenu(e, doc.id)}
               onClick={(e) => onDocumentSelect(doc.id, e)}
-              className={`transition-colors cursor-pointer ${
+              className={`transition-colors cursor-pointer border-b border-gray-200 dark:border-gray-600 ${
                 selectedDocumentIds.has(doc.id)
                   ? "bg-green-50 dark:bg-green-900/50"
                   : "hover:bg-gray-50 dark:hover:bg-gray-700"
               }`}>
               {visibleColumns.has("actions") && (
-                <td className="px-4 py-4 whitespace-nowrap pl-7 text-sm font-medium relative">
+                <td 
+                  onClick={(e) => e.stopPropagation()}
+                  className="px-4 py-4 whitespace-nowrap pl-7 text-sm font-medium relative border-r-2 border-gray-200 dark:border-gray-600">
                   <button
                     onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                    }}
+                    onMouseDown={(e) => {
+                      e.preventDefault();
                       e.stopPropagation();
                       handleMenuToggle(doc.id, e.currentTarget);
                     }}
-                    className="text-gray-500 hover:text-gray-900 dark:hover:text-white p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-600">
+                    className={`group relative transition-all duration-300 p-2 rounded-lg transform hover:scale-105 active:scale-95 ${
+                      activeActionMenu?.docId === doc.id
+                        ? 'text-emerald-600 dark:text-emerald-400 bg-gradient-to-br from-emerald-50 to-emerald-100 dark:from-emerald-900/40 dark:to-emerald-800/40 shadow-md ring-1 ring-emerald-200 dark:ring-emerald-700'
+                        : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gradient-to-br hover:from-gray-50 hover:to-gray-100 dark:hover:from-gray-700/50 dark:hover:to-gray-600/50 hover:shadow-sm'
+                    }`}>
+                    
+                    {/* Background glow effect */}
+                    <div className={`absolute inset-0 rounded-lg transition-opacity duration-300 ${
+                      activeActionMenu?.docId === doc.id 
+                        ? 'bg-emerald-200/30 opacity-100' 
+                        : 'bg-gray-200/20 opacity-0 group-hover:opacity-100'
+                    } blur-sm -z-10`}></div>
+                    
                     <svg
-                      className="w-5 h-5"
+                      className={`w-5 h-5 transition-all duration-300 ${
+                        activeActionMenu?.docId === doc.id 
+                          ? 'rotate-90 scale-110' 
+                          : 'group-active:rotate-90'
+                      }`}
                       fill="none"
                       viewBox="0 0 24 24"
-                      stroke="currentColor">
+                      stroke="currentColor"
+                      strokeWidth={activeActionMenu?.docId === doc.id ? 2.5 : 2}>
                       <path
                         strokeLinecap="round"
                         strokeLinejoin="round"
-                        strokeWidth={2}
                         d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"
                       />
                     </svg>
+
+                    {/* Ripple effect on click */}
+                    <div className="absolute inset-0 rounded-lg bg-emerald-300/40 opacity-0 group-active:opacity-60 group-active:animate-ping pointer-events-none"></div>
                   </button>
                   {activeActionMenu?.docId === doc.id && (
                     <ActionMenu
@@ -231,11 +258,11 @@ export const DocumentTable = ({
                   )}
                 </td>
               )}
-              <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+              <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white border-r-2 border-gray-200 dark:border-gray-600">
                 {doc.id}
               </td>
               {visibleColumns.has("numberAndTitle") && (
-                <td className="px-4 py-4 text-sm text-gray-900 dark:text-white">
+                <td className="px-4 py-4 text-sm text-gray-900 dark:text-white border-r-2 border-gray-200 dark:border-gray-600">
                   <div className="font-medium">{doc.number}</div>
                   <div className="text-gray-500 dark:text-gray-400">
                     {doc.title}
@@ -244,18 +271,18 @@ export const DocumentTable = ({
               )}
               {visibleColumns.has("description") && (
                 <td
-                  className="px-4 py-4 text-sm text-gray-500 dark:text-gray-400 max-w-xs "
+                  className="px-4 py-4 text-sm text-gray-500 dark:text-gray-400 max-w-xs border-r-2 border-gray-200 dark:border-gray-600"
                   title={doc.description}>
                   {doc.description}
                 </td>
               )}
               {visibleColumns.has("documentDate") && (
-                <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+                <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white border-r-2 border-gray-200 dark:border-gray-600 text-center">
                   {formatDate(doc.documentDate)}
                 </td>
               )}
               {visibleColumns.has("contributors") && (
-                <td className="px-4 py-4 text-sm text-gray-900 dark:text-white">
+                <td className="px-4 py-4 text-sm text-gray-900 dark:text-white border-r-2 border-gray-200 dark:border-gray-600">
                   <div className="flex -space-x-2">
                     {doc.contributors.slice(0, 3).map((c, i) => (
                       <div
@@ -277,7 +304,7 @@ export const DocumentTable = ({
                 </td>
               )}
               {visibleColumns.has("archive") && (
-                <td className="px-4 py-4 whitespace-nowrap text-sm">
+                <td className="px-4 py-4 whitespace-nowrap text-sm border-r-2 border-gray-200 dark:border-gray-600">
                   <span className="px-2 py-1 text-xs font-medium rounded-full bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300">
                     {doc.archive}
                   </span>
@@ -300,8 +327,9 @@ export const DocumentTable = ({
               )}
             </tr>
           ))}
-        </tbody>
-      </table>
+          </tbody>
+        </table>
+      </div>
       {activeHeaderMenu && (
         <HeaderSortMenu
           buttonEl={activeHeaderMenu.buttonEl}
