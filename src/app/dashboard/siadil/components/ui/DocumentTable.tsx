@@ -82,7 +82,7 @@ export const DocumentTable = ({
       if (sortOrder === "asc") {
         return (
           <svg
-            className="w-4 h-4 text-gray-900 dark:text-white"
+            className="w-4 h-4 text-emerald-700 dark:text-emerald-200"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -97,7 +97,7 @@ export const DocumentTable = ({
       }
       return (
         <svg
-          className="w-4 h-4 text-gray-900 dark:text-white"
+          className="w-4 h-4 text-emerald-700 dark:text-emerald-200"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
@@ -112,7 +112,7 @@ export const DocumentTable = ({
     }
     return (
       <svg
-        className="w-4 h-4 text-gray-400"
+        className="w-4 h-4 text-emerald-400 dark:text-emerald-300"
         fill="none"
         viewBox="0 0 24 24"
         stroke="currentColor">
@@ -135,12 +135,12 @@ export const DocumentTable = ({
     label: string;
     align?: "left" | "right";
   }) => (
-    <th className={`px-4 py-3 text-${align}`}>
+    <th className={`px-4 py-3 text-${align} sticky top-0 z-10 bg-emerald-50 dark:bg-emerald-900 last:rounded-tr-lg`}>
       <button
         onClick={(e) =>
           setActiveHeaderMenu({ columnId, buttonEl: e.currentTarget })
         }
-        className="flex items-center gap-2 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider hover:text-gray-800 dark:hover:text-white transition-colors">
+        className="flex items-center gap-2 text-sm font-bold text-emerald-800 dark:text-emerald-100 tracking-wider hover:text-emerald-900 dark:hover:text-white transition-colors">
         {label}
         <SortIndicator columnId={columnId} />
       </button>
@@ -149,11 +149,12 @@ export const DocumentTable = ({
 
   return (
     <>
-      <table className="w-full">
-        <thead className="bg-gray-50 dark:bg-gray-700">
+      <div className="rounded-lg overflow-hidden">
+        <table className="w-full">
+          <thead className="bg-emerald-50 dark:bg-emerald-900 border-b border-emerald-200 dark:border-emerald-700 sticky top-0 z-10 shadow-sm">
           <tr>
             {visibleColumns.has("actions") && (
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+              <th className="px-4 py-3 text-left text-sm font-medium text-emerald-800 dark:text-emerald-100 tracking-wider sticky top-0 z-10 first:rounded-tl-lg bg-emerald-50 dark:bg-emerald-900">
                 Actions
               </th>
             )}
@@ -162,7 +163,7 @@ export const DocumentTable = ({
               <SortableHeader columnId="number" label="Number & Title" />
             )}
             {visibleColumns.has("description") && (
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+              <th className="px-4 py-3 text-left text-sm font-medium text-emerald-800 dark:text-emerald-100 tracking-wider sticky top-0 z-10 bg-emerald-50 dark:bg-emerald-900">
                 Description
               </th>
             )}
@@ -170,7 +171,7 @@ export const DocumentTable = ({
               <SortableHeader columnId="documentDate" label="Document Date" />
             )}
             {visibleColumns.has("contributors") && (
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+              <th className="px-4 py-3 text-left text-sm font-medium text-emerald-800 dark:text-emerald-100 tracking-wider sticky top-0 z-10 bg-emerald-50 dark:bg-emerald-900">
                 Contributors
               </th>
             )}
@@ -180,12 +181,12 @@ export const DocumentTable = ({
             {visibleColumns.has("updatedAndCreatedBy") && (
               <SortableHeader
                 columnId="updatedDate"
-                label="Update & Create By"
+                label="Update & Create by"
               />
             )}
           </tr>
-        </thead>
-        <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+          </thead>
+          <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
           {documents.map((doc) => (
             <tr
               key={doc.id}
@@ -300,8 +301,9 @@ export const DocumentTable = ({
               )}
             </tr>
           ))}
-        </tbody>
-      </table>
+          </tbody>
+        </table>
+      </div>
       {activeHeaderMenu && (
         <HeaderSortMenu
           buttonEl={activeHeaderMenu.buttonEl}
