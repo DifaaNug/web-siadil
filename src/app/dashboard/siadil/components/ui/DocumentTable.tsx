@@ -212,19 +212,38 @@ export const DocumentTable = ({
                       e.stopPropagation();
                       handleMenuToggle(doc.id, e.currentTarget);
                     }}
-                    className="text-gray-500 hover:text-gray-900 dark:hover:text-white p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-600">
+                    className={`group relative transition-all duration-300 p-2 rounded-lg transform hover:scale-105 active:scale-95 ${
+                      activeActionMenu?.docId === doc.id
+                        ? 'text-emerald-600 dark:text-emerald-400 bg-gradient-to-br from-emerald-50 to-emerald-100 dark:from-emerald-900/40 dark:to-emerald-800/40 shadow-md ring-1 ring-emerald-200 dark:ring-emerald-700'
+                        : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gradient-to-br hover:from-gray-50 hover:to-gray-100 dark:hover:from-gray-700/50 dark:hover:to-gray-600/50 hover:shadow-sm'
+                    }`}>
+                    
+                    {/* Background glow effect */}
+                    <div className={`absolute inset-0 rounded-lg transition-opacity duration-300 ${
+                      activeActionMenu?.docId === doc.id 
+                        ? 'bg-emerald-200/30 opacity-100' 
+                        : 'bg-gray-200/20 opacity-0 group-hover:opacity-100'
+                    } blur-sm -z-10`}></div>
+                    
                     <svg
-                      className="w-5 h-5"
+                      className={`w-5 h-5 transition-all duration-300 ${
+                        activeActionMenu?.docId === doc.id 
+                          ? 'rotate-90 scale-110' 
+                          : 'group-active:rotate-90'
+                      }`}
                       fill="none"
                       viewBox="0 0 24 24"
-                      stroke="currentColor">
+                      stroke="currentColor"
+                      strokeWidth={activeActionMenu?.docId === doc.id ? 2.5 : 2}>
                       <path
                         strokeLinecap="round"
                         strokeLinejoin="round"
-                        strokeWidth={2}
                         d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"
                       />
                     </svg>
+
+                    {/* Ripple effect on click */}
+                    <div className="absolute inset-0 rounded-lg bg-emerald-300/40 opacity-0 group-active:opacity-60 group-active:animate-ping pointer-events-none"></div>
                   </button>
                   {activeActionMenu?.docId === doc.id && (
                     <ActionMenu
