@@ -600,7 +600,7 @@ export default function SiadilPage() {
                   strokeLinejoin="round">
                   <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
                 </svg>
-                <span>My Archives</span>
+                <span>Archives</span>
               </button>
 
               <button
@@ -657,6 +657,7 @@ export default function SiadilPage() {
                 return (
                   <StarredView
                     documents={starredDocuments}
+                    archives={archives}
                     selectedDocumentIds={selectedDocumentIds}
                     onDocumentSelect={handleDocumentSelect}
                     onEdit={handleOpenEditModal}
@@ -670,6 +671,7 @@ export default function SiadilPage() {
                 return (
                   <TrashView
                     documents={trashedDocuments}
+                    archives={archives}
                     onRestore={handleRestoreDocument}
                     onDeletePermanently={handleDeletePermanently}
                   />

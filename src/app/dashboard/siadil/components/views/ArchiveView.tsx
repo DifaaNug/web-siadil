@@ -41,12 +41,12 @@ const ArchiveView: React.FC<ArchiveViewProps> = ({
     <div className="mb-10">
       <div className="flex justify-between items-center mb-6 gap-4">
         <h2 className="text-xl font-bold text-gray-800 dark:text-white shrink-0">
-          My Archives
+          Archives
         </h2>
-        <div className="relative w-full max-w-xs">
+        <div className="relative  max-w-xs">
           <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
             <svg
-              className="h-4 w-4 text-demplon/70"
+              className="h-4 w-4 text-demplon"
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
               viewBox="0 0 24 24"
@@ -67,7 +67,7 @@ const ArchiveView: React.FC<ArchiveViewProps> = ({
               setSearchQuery(e.target.value);
               setCurrentPage(1);
             }}
-            className="w-full rounded-lg border border-gray-200 bg-white py-1.5 pl-10 pr-4 text-sm text-gray-900 placeholder-gray-400 shadow-sm focus:border-demplon focus:ring-2 focus:ring-demplon/40 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:placeholder-gray-400 transition-all duration-200"
+            className="w-full rounded-lg border bg-white  py-2 pl-10 pr-4 text-sm  text-gray-900 placeholder-gray-400 focus:border-demplon focus:ring-2 focus:ring-demplon/40 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:placeholder-gray-400 transition-all duration-200"
           />
         </div>
       </div>
