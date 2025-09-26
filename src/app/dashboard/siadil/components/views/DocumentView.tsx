@@ -209,6 +209,7 @@ const DocumentView: React.FC<DocumentViewProps> = (props) => {
             <DocumentGrid
               documents={paginatedDocuments}
               selectedDocumentIds={selectedDocumentIds}
+              archives={archives}
               onDocumentSelect={onDocumentSelect}
               onMove={onMove}
               onEdit={onEdit}
