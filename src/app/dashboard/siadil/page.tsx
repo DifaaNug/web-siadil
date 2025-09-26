@@ -533,8 +533,7 @@ export default function SiadilPage() {
       <div
         className={`transition-all duration-300 ease-in-out ${
           isInfoPanelOpen ? "mr-80" : "mr-0"
-        }`}
-      >
+        }`}>
         <DashboardHeader
           userName={userData.name}
           breadcrumbItems={breadcrumbItems}
@@ -552,14 +551,12 @@ export default function SiadilPage() {
           <button
             ref={addNewButtonRef}
             onClick={() => setIsAddNewMenuOpen(!isAddNewMenuOpen)}
-            className="bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 font-semibold px-5 py-2.5 rounded-lg shadow hover:shadow-lg transition-all duration-200 ease-in-out flex items-center border border-gray-200 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
-          >
+            className="bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 font-semibold px-5 py-2.5 rounded-lg shadow hover:shadow-lg transition-all duration-200 ease-in-out flex items-center border border-gray-200 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
             <svg
               className="w-5 h-5 mr-2 -ml-1"
               fill="none"
               viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
+              stroke="currentColor">
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -584,7 +581,6 @@ export default function SiadilPage() {
           onClose={() => setIsRemindersModalOpen(false)}
           reminders={reminders}
         />
-
         {currentFolderId === "root" && (
           <QuickAccessSection
             documents={quickAccessDocuments}
@@ -593,16 +589,16 @@ export default function SiadilPage() {
         )}
 
         {currentFolderId === "root" && (
+          // GANTI BAGIAN INI (dari <div className="mb-6"> sampai penutup </nav></div>)
           <div className="mb-6 border-b border-gray-200 dark:border-gray-700">
             <nav className="-mb-px flex space-x-6" aria-label="Tabs">
               <button
                 onClick={() => setPageView("archives")}
-                className={`flex items-center gap-2 whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm ${
+                className={`flex items-center gap-2 whitespace-nowrap py-3 px-1 border-b-2 text-sm font-semibold transition-colors ${
                   pageView === "archives"
                     ? "border-demplon text-demplon"
                     : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-                }`}
-              >
+                }`}>
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="16"
@@ -612,21 +608,19 @@ export default function SiadilPage() {
                   stroke="currentColor"
                   strokeWidth="2"
                   strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
+                  strokeLinejoin="round">
                   <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
                 </svg>
-                <span>My Archives</span>
+                <span>Archives</span>
               </button>
 
               <button
                 onClick={() => setPageView("starred")}
-                className={`flex items-center gap-2 whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm ${
+                className={`flex items-center gap-2 whitespace-nowrap py-3 px-1 border-b-2 text-sm font-semibold transition-colors ${
                   pageView === "starred"
                     ? "border-demplon text-demplon"
                     : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-                }`}
-              >
+                }`}>
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="16"
@@ -636,8 +630,7 @@ export default function SiadilPage() {
                   stroke="currentColor"
                   strokeWidth="2"
                   strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
+                  strokeLinejoin="round">
                   <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
                 </svg>
                 <span>Starred</span>
@@ -645,12 +638,11 @@ export default function SiadilPage() {
 
               <button
                 onClick={() => setPageView("trash")}
-                className={`flex items-center gap-2 whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm ${
+                className={`flex items-center gap-2 whitespace-nowrap py-3 px-1 border-b-2 text-sm font-semibold transition-colors ${
                   pageView === "trash"
                     ? "border-demplon text-demplon"
                     : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-                }`}
-              >
+                }`}>
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="16"
@@ -660,8 +652,7 @@ export default function SiadilPage() {
                   stroke="currentColor"
                   strokeWidth="2"
                   strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
+                  strokeLinejoin="round">
                   <polyline points="3 6 5 6 21 6"></polyline>
                   <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
                 </svg>
@@ -670,7 +661,6 @@ export default function SiadilPage() {
             </nav>
           </div>
         )}
-
         {currentFolderId === "root" ? (
           (() => {
             switch (pageView) {
@@ -678,6 +668,7 @@ export default function SiadilPage() {
                 return (
                   <StarredView
                     documents={starredDocuments}
+                    archives={archives}
                     selectedDocumentIds={selectedDocumentIds}
                     onDocumentSelect={handleDocumentSelect}
                     onEdit={handleOpenEditModal}
@@ -691,6 +682,7 @@ export default function SiadilPage() {
                 return (
                   <TrashView
                     documents={trashedDocuments}
+                    archives={archives}
                     onRestore={handleRestoreDocument}
                     onDeletePermanently={handleDeletePermanently}
                   />
@@ -803,8 +795,7 @@ export default function SiadilPage() {
           onConfirm={handleConfirmAction}
           title={confirmationModalData.title}
           confirmText={confirmationModalData.confirmText}
-          variant={confirmationModalData.variant}
-        >
+          variant={confirmationModalData.variant}>
           <p>{confirmationModalData.body}</p>
         </ConfirmationModal>
       )}

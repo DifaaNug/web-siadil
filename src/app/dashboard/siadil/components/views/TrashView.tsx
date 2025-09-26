@@ -1,70 +1,121 @@
 import React from "react";
-import { Document } from "../../types";
+import { Document, Archive } from "../../types"; // Pastikan Archive di-import
 
 interface TrashViewProps {
   documents: Document[];
+  archives: Archive[]; // Tambahkan ini
   onRestore: (docId: string) => void;
   onDeletePermanently: (docId: string) => void;
 }
 
 const TrashView: React.FC<TrashViewProps> = ({
   documents,
+  archives, // Terima props
   onRestore,
   onDeletePermanently,
 }) => {
+  // Helper function untuk mendapatkan nama folder
+  const getParentArchiveName = (parentId: string) => {
+    const parent = archives.find((a) => a.id === parentId);
+    return parent ? parent.name : "Unknown Archive";
+  };
+
+  const handleEmptyTrash = () => {
+    // TODO: Sambungkan ke logic konfirmasi untuk menghapus semua item
+    // Anda bisa memanggil fungsi baru di page.tsx dari sini
+    alert("Fungsi 'Empty Trash' perlu diimplementasikan di halaman utama.");
+  };
+
   return (
     <div className="mb-10">
-      <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">
-        Trash
-      </h2>
-      <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
-        Items here will be automatically deleted after 30 days.
-      </p>
+      <div className="flex justify-between items-center mb-4">
+        <div>
+          <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+            Trash
+          </h2>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+            Items here will be automatically deleted after 30 days.
+          </p>
+        </div>
+        {documents.length > 0 && (
+          <button
+            onClick={handleEmptyTrash}
+            className="flex items-center gap-2 px-3 py-1.5 text-sm font-semibold text-red-600 bg-red-50 border border-red-200 rounded-lg hover:bg-red-100 dark:bg-red-900/50 dark:text-red-300 dark:border-red-800 dark:hover:bg-red-900">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round">
+              <path d="M3 6h18" />
+              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" />
+              <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+              <line x1="10" x2="10" y1="11" y2="17" />
+              <line x1="14" x2="14" y1="11" y2="17" />
+            </svg>
+            <span>Empty Trash</span>
+          </button>
+        )}
+      </div>
 
       {documents.length > 0 ? (
-        <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
-          <ul className="divide-y divide-gray-200 dark:divide-gray-700">
-            {documents.map((doc) => (
-              <li
-                key={doc.id}
-                className="p-4 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-700/50">
-                <div className="flex items-center gap-4">
+        <div className="space-y-3">
+          {documents.map((doc) => (
+            <div
+              key={doc.id}
+              className="flex items-center justify-between p-4 rounded-lg border bg-white hover:border-gray-300 dark:bg-gray-800 dark:border-gray-700 dark:hover:border-gray-600">
+              <div className="flex items-center gap-4">
+                <svg
+                  className="w-8 h-8 text-gray-400 flex-shrink-0"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor">
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="1.5"
+                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                </svg>
+                <div className="min-w-0">
+                  <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">
+                    {doc.title} ({getParentArchiveName(doc.parentId)})
+                  </p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                    ID: {doc.id} | Dihapus pada:{" "}
+                    {new Date().toLocaleDateString("id-ID")}
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2 flex-shrink-0">
+                <button
+                  onClick={() => onRestore(doc.id)}
+                  className="px-3 py-1.5 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600">
+                  Restore
+                </button>
+                <button
+                  onClick={() => onDeletePermanently(doc.id)}
+                  className="p-1.5 text-gray-500 rounded-md hover:bg-red-100 hover:text-red-600 dark:hover:bg-red-900/50 dark:hover:text-red-400">
                   <svg
-                    className="w-6 h-6 text-gray-400 flex-shrink-0"
-                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="18"
+                    height="18"
                     viewBox="0 0 24 24"
-                    stroke="currentColor">
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="1.5"
-                      d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round">
+                    <polyline points="3 6 5 6 21 6"></polyline>
+                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
                   </svg>
-                  <div>
-                    <p className="text-sm font-medium text-gray-900 dark:text-white">
-                      {doc.title}
-                    </p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">
-                      ID: {doc.id} | Dihapus pada:{" "}
-                      {new Date().toLocaleDateString("id-ID")}
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => onRestore(doc.id)}
-                    className="px-3 py-1 text-sm font-semibold text-blue-600 hover:text-blue-800">
-                    Restore
-                  </button>
-                  <button
-                    onClick={() => onDeletePermanently(doc.id)}
-                    className="px-3 py-1 text-sm font-semibold text-red-600 hover:text-red-800">
-                    Delete 
-                  </button>
-                </div>
-              </li>
-            ))}
-          </ul>
+                </button>
+              </div>
+            </div>
+          ))}
         </div>
       ) : (
         <div className="text-center py-16 border-2 border-dashed rounded-lg">
@@ -83,10 +134,10 @@ const TrashView: React.FC<TrashViewProps> = ({
             />
           </svg>
           <h3 className="mt-2 text-sm font-semibold text-gray-900 dark:text-white">
-            Empty Trash Can
+            Trash is Empty
           </h3>
           <p className="mt-1 text-sm text-gray-500">
-            The documents you deleted will appear here.
+            Deleted documents will appear here.
           </p>
         </div>
       )}
