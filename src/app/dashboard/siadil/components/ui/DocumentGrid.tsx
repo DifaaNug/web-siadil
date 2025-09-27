@@ -59,7 +59,7 @@ export const DocumentGrid = ({
 
   return (
     <>
-      <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-5">
+      <div className="p-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-5">
         {documents.map((doc) => (
           <div
             key={doc.id}
