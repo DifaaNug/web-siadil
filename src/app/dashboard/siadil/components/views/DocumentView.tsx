@@ -49,6 +49,7 @@ interface DocumentViewProps {
   onEdit: (docId: string) => void;
   onDelete: (docId: string) => void;
   onToggleStar: (docId: string, event: React.MouseEvent) => void;
+  isInfoPanelOpen: boolean;
   currentFolderName: string | undefined;
   onArchiveClick: (id: string) => void;
 }
@@ -89,6 +90,7 @@ const DocumentView: React.FC<DocumentViewProps> = (props) => {
     archiveDocCounts,
     onArchiveClick,
     onManageContributors,
+    isInfoPanelOpen,
   } = props;
 
   const hasDocuments = paginatedDocuments.length > 0;
@@ -218,6 +220,7 @@ const DocumentView: React.FC<DocumentViewProps> = (props) => {
               onEdit={onEdit}
               onDelete={onDelete}
               onToggleStar={onToggleStar}
+              isInfoPanelOpen={isInfoPanelOpen}
               onManageContributors={onManageContributors}
             />
           )
