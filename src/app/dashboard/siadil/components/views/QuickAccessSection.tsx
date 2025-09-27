@@ -1,23 +1,32 @@
+// src/app/dashboard/siadil/components/views/QuickAccessSection.tsx
+
 import React from "react";
 import { Document } from "../../types";
 
 interface QuickAccessSectionProps {
   documents: Document[];
   onDocumentClick: (doc: Document) => void;
+  isInfoPanelOpen: boolean;
 }
 
 const QuickAccessSection: React.FC<QuickAccessSectionProps> = ({
   documents,
   onDocumentClick,
+  isInfoPanelOpen,
 }) => {
   if (documents.length === 0) return null;
+
+  // Logika dinamis untuk kelas grid
+  const gridClasses = isInfoPanelOpen
+    ? "grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4" // Saat panel terbuka, maksimal 4 kolom
+    : "grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-5"; // Saat panel tertutup, bisa sampai 5 kolom
 
   return (
     <div className="mb-10">
       <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">
         Quick Access
       </h2>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3  lg:grid-cols-5 gap-5">
+      <div className={`grid ${gridClasses} gap-5`}>
         {documents.map((doc) => (
           <div
             key={doc.id}
