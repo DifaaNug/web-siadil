@@ -17,6 +17,7 @@ type DocumentGridProps = {
   onEdit: (docId: string) => void;
   onDelete: (docId: string) => void;
   onManageContributors: (docId: string) => void;
+  isInfoPanelOpen: boolean; // <-- TAMBAHKAN PROP INI
 };
 
 export const DocumentGrid = ({
@@ -29,6 +30,7 @@ export const DocumentGrid = ({
   onEdit,
   onDelete,
   onManageContributors,
+  isInfoPanelOpen, // <-- Terima prop ini
 }: DocumentGridProps) => {
   const [activeActionMenu, setActiveActionMenu] = useState<null | {
     docId: string;
@@ -59,7 +61,14 @@ export const DocumentGrid = ({
 
   return (
     <>
-      <div className="p-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-5">
+      {/* ===== START PERUBAHAN UTAMA ===== */}
+      <div
+        className={`p-6 grid grid-cols-1 sm:grid-cols-2 gap-5 ${
+          isInfoPanelOpen
+            ? "md:grid-cols-2 lg:grid-cols-3" // Saat panel terbuka: 3 kolom di layar besar
+            : "md:grid-cols-3 lg:grid-cols-4" // Saat panel tertutup: 4 kolom di layar besar
+        }`}>
+        {/* ===== AKHIR PERUBAHAN UTAMA ===== */}
         {documents.map((doc) => (
           <div
             key={doc.id}
