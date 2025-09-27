@@ -585,6 +585,7 @@ export default function SiadilPage() {
           <QuickAccessSection
             documents={quickAccessDocuments}
             onDocumentClick={handleQuickAccessClick}
+            isInfoPanelOpen={isInfoPanelOpen}
           />
         )}
 
@@ -675,6 +676,7 @@ export default function SiadilPage() {
                     onDelete={handleDeleteDocument}
                     onToggleStar={handleToggleStar}
                     onManageContributors={handleOpenContributorsModal}
+                    isInfoPanelOpen={isInfoPanelOpen}
                   />
                 );
               case "trash":
@@ -722,6 +724,7 @@ export default function SiadilPage() {
             onRowsPerPageChange={handleRowsPerPageChange}
             setExpireFilterMethod={handleExpireMethodChange}
             onColumnToggle={handleColumnToggle}
+            isInfoPanelOpen={isInfoPanelOpen}
             onArchiveCheckboxChange={handleArchiveCheckboxChange}
             onExport={handleExport}
             onManageContributors={handleOpenContributorsModal}
