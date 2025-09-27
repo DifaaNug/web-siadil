@@ -1,3 +1,5 @@
+// src/app/dashboard/siadil/components/views/StarredView.tsx
+
 import React from "react";
 import { Document, Archive } from "../../types";
 import { DocumentGrid } from "../ui/DocumentGrid";
@@ -12,6 +14,7 @@ interface StarredViewProps {
   onDelete: (docId: string) => void;
   onToggleStar: (docId: string, event: React.MouseEvent) => void;
   onManageContributors: (docId: string) => void;
+  isInfoPanelOpen: boolean; // <-- 1. Tambahkan prop di sini
 }
 
 const StarredView: React.FC<StarredViewProps> = (props) => {
@@ -25,6 +28,7 @@ const StarredView: React.FC<StarredViewProps> = (props) => {
     onDelete,
     onToggleStar,
     onManageContributors,
+    isInfoPanelOpen, // <-- 2. Terima prop di sini
   } = props;
 
   return (
@@ -43,6 +47,7 @@ const StarredView: React.FC<StarredViewProps> = (props) => {
           onDelete={onDelete}
           onToggleStar={onToggleStar}
           onManageContributors={onManageContributors}
+          isInfoPanelOpen={isInfoPanelOpen} // <-- 3. Teruskan prop ke DocumentGrid
         />
       ) : (
         <div className="text-center py-16 border-2 border-dashed rounded-lg">
