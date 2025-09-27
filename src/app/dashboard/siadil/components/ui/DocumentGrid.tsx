@@ -1,3 +1,5 @@
+// src/app/dashboard/siadil/components/ui/DocumentGrid.tsx
+
 import { useState } from "react";
 import { Document, Archive } from "../../types";
 import { ActionMenu } from "./ActionMenu";
@@ -57,7 +59,7 @@ export const DocumentGrid = ({
 
   return (
     <>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-5">
+      <div className="p-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-5">
         {documents.map((doc) => (
           <div
             key={doc.id}
@@ -138,7 +140,6 @@ export const DocumentGrid = ({
               </p>
             </div>
 
-            {/* Bagian Footer Kartu */}
             <div className="mt-3 pt-3 border-t border-gray-100 dark:border-gray-700/50 text-xs text-gray-500 dark:text-gray-400">
               <div className="flex justify-between">
                 <span>{doc.number}</span>

@@ -1,3 +1,5 @@
+// src/app/dashboard/siadil/components/views/DocumentView.tsx
+
 import React from "react";
 import {
   Document,
@@ -27,7 +29,6 @@ interface DocumentViewProps {
   allTableColumns: TableColumn[];
   archiveDocCounts: Record<string, number>;
   onManageContributors: (docId: string) => void;
-
   onGoBack: () => void;
   onSearchClick: () => void;
   setViewMode: (mode: "list" | "grid") => void;
@@ -152,7 +153,7 @@ const DocumentView: React.FC<DocumentViewProps> = (props) => {
         <div className="flex items-center gap-3">
           <button
             onClick={onSearchClick}
-            className="px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-600 focus:ring-2 focus:ring-blue-500 focus:border-transparent text-left flex items-center gap-2">
+            className="px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-500 dark:text-gray-400 text-left flex items-center gap-2 transition-all duration-200 hover:border-green-400 dark:hover:border-green-500 hover:shadow-md">
             <svg
               className="text-gray-400 w-4 h-4"
               fill="none"
@@ -167,7 +168,9 @@ const DocumentView: React.FC<DocumentViewProps> = (props) => {
             </svg>
             <span>Search Document</span>
           </button>
-          <ViewModeToggle viewMode={viewMode} setViewMode={setViewMode} />
+          <div className="transition-all duration-200 hover:shadow-md rounded-lg">
+            <ViewModeToggle viewMode={viewMode} setViewMode={setViewMode} />
+          </div>
         </div>
       </div>
       <DocumentsContainer
