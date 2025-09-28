@@ -1,42 +1,35 @@
 import React from "react";
-import { Document, Archive } from "../../types"; // Pastikan Archive di-import
+import { Document, Archive } from "../../types";
 
 interface TrashViewProps {
   documents: Document[];
-  archives: Archive[]; // Tambahkan ini
+  archives: Archive[];
   onRestore: (docId: string) => void;
   onDeletePermanently: (docId: string) => void;
 }
 
 const TrashView: React.FC<TrashViewProps> = ({
   documents,
-  archives, // Terima props
+  archives,
   onRestore,
   onDeletePermanently,
 }) => {
-  // Helper function untuk mendapatkan nama folder
   const getParentArchiveName = (parentId: string) => {
     const parent = archives.find((a) => a.id === parentId);
     return parent ? parent.name : "Unknown Archive";
   };
 
   const handleEmptyTrash = () => {
-    // TODO: Sambungkan ke logic konfirmasi untuk menghapus semua item
-    // Anda bisa memanggil fungsi baru di page.tsx dari sini
     alert("Fungsi 'Empty Trash' perlu diimplementasikan di halaman utama.");
   };
 
   return (
     <div className="mb-10">
+      {/* Keterangan di bawah judul, bisa kita gabungkan atau modifikasi di page.tsx jika perlu */}
       <div className="flex justify-between items-center mb-4">
-        <div>
-          <h2 className="text-xl font-bold text-gray-900 dark:text-white">
-            Trash
-          </h2>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-            Items here will be automatically deleted after 30 days.
-          </p>
-        </div>
+        <p className="text-sm text-gray-500 dark:text-gray-400">
+          Items here will be automatically deleted after 30 days.
+        </p>
         {documents.length > 0 && (
           <button
             onClick={handleEmptyTrash}
@@ -54,8 +47,8 @@ const TrashView: React.FC<TrashViewProps> = ({
               <path d="M3 6h18" />
               <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" />
               <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
-              <line x1="10" x2="10" y1="11" y2="17" />
-              <line x1="14" x2="14" y1="11" y2="17" />
+              <line x1="10" y1="11" x2="10" y2="17" />
+              <line x1="14" y1="11" x2="14" y2="17" />
             </svg>
             <span>Empty Trash</span>
           </button>

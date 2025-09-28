@@ -55,6 +55,7 @@ export const DocumentsContainer = ({
   onExport,
   isExporting,
   onArchiveCheckboxChange,
+  viewMode,
 }: DocumentsContainerProps) => {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [isColumnToggleOpen, setIsColumnToggleOpen] = useState(false);
@@ -224,7 +225,6 @@ export const DocumentsContainer = ({
     <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
       <div className="bg-green-50 dark:bg-green-900/50 p-4 border-b border-green-200 dark:border-green-700 flex justify-between items-center gap-4">
         <div className="flex-1 max-w-md">
-          {" "}
           <div className="relative">
             <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
               <svg
@@ -509,7 +509,12 @@ export const DocumentsContainer = ({
             )}
         </div>
       </div>
-      <div className="overflow-x-auto">{children}</div>
+
+      {/* ===== PERUBAHAN FINAL ADA DI SINI ===== */}
+      <div className={`overflow-x-auto ${viewMode === "grid" ? "p-6" : ""}`}>
+        {children}
+      </div>
+
       <div className="px-4 py-3 bg-gray-50 dark:bg-gray-700 border-t border-gray-200 dark:border-gray-600 flex items-center justify-between flex-wrap gap-2">
         <div className="text-sm text-gray-700 dark:text-gray-300">
           Showing{" "}
