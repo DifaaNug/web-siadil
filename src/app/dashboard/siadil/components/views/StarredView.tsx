@@ -33,9 +33,6 @@ const StarredView: React.FC<StarredViewProps> = (props) => {
 
   return (
     <div className="mb-10">
-      <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-6">
-        Starred Documents
-      </h2>
       {documents.length > 0 ? (
         <DocumentGrid
           documents={documents}
