@@ -3,42 +3,85 @@
 import { useState, useRef, useMemo } from "react";
 import { useOnClickOutside } from "../../hooks/useOnClickOutside";
 
+// Tipe data untuk sebuah pengingat
 type Reminder = {
   id: string;
   title: string;
   description: string;
   message: string;
   type: "error" | "warning";
+  // Properti baru untuk aksi dan tanggal
+  documentId?: string;
+  expireDate?: string;
 };
 
+// Tipe data untuk props komponen
 type Props = {
   isOpen: boolean;
   onClose: () => void;
   reminders: Reminder[];
+  // Prop baru untuk menangani aksi klik pada dokumen
+  onDocumentClick?: (documentId: string) => void;
 };
 
-export const AllRemindersModal = ({ isOpen, onClose, reminders }: Props) => {
+type SortOption = "default" | "title-asc" | "expiry-asc";
+type ActiveTab = "all" | "error" | "warning";
+
+export const AllRemindersModal = ({
+  isOpen,
+  onClose,
+  reminders,
+  onDocumentClick,
+}: Props) => {
   const modalRef = useRef<HTMLDivElement>(null);
   useOnClickOutside(modalRef, onClose);
 
   const [searchTerm, setSearchTerm] = useState("");
+  const [sortOption, setSortOption] = useState<SortOption>("default");
+  const [activeTab, setActiveTab] = useState<ActiveTab>("all");
 
-  const filteredReminders = useMemo(() => {
-    if (!searchTerm) {
-      return reminders;
+  const processedReminders = useMemo(() => {
+    let filtered = reminders;
+
+    // 1. Filter berdasarkan Tab
+    if (activeTab !== "all") {
+      filtered = filtered.filter((r) => r.type === activeTab);
     }
-    const lowercasedTerm = searchTerm.toLowerCase();
-    return reminders.filter(
-      (r) =>
-        r.title.toLowerCase().includes(lowercasedTerm) ||
-        r.description.toLowerCase().includes(lowercasedTerm) ||
-        r.message.toLowerCase().includes(lowercasedTerm)
-    );
-  }, [searchTerm, reminders]);
+
+    // 2. Filter berdasarkan Pencarian
+    if (searchTerm) {
+      const lowercasedTerm = searchTerm.toLowerCase();
+      filtered = filtered.filter(
+        (r) =>
+          r.title.toLowerCase().includes(lowercasedTerm) ||
+          r.description.toLowerCase().includes(lowercasedTerm) ||
+          r.message.toLowerCase().includes(lowercasedTerm)
+      );
+    }
+
+    // 3. Lakukan Pengurutan
+    switch (sortOption) {
+      case "title-asc":
+        return [...filtered].sort((a, b) => a.title.localeCompare(b.title));
+      case "expiry-asc":
+        return [...filtered].sort((a, b) => {
+          if (!a.expireDate || !b.expireDate) return 0;
+          return (
+            new Date(a.expireDate).getTime() - new Date(b.expireDate).getTime()
+          );
+        });
+      default:
+        // Urutan default: error dulu, baru warning
+        return [...filtered].sort((a, b) => {
+          if (a.type === "error" && b.type === "warning") return -1;
+          if (a.type === "warning" && b.type === "error") return 1;
+          return 0;
+        });
+    }
+  }, [searchTerm, reminders, sortOption, activeTab]);
 
   if (!isOpen) return null;
 
-  // FUNGSI INI SEBELUMNYA KOSONG, SEKARANG SUDAH DIISI KEMBALI
   const getReminderStyles = (type: "error" | "warning") => {
     switch (type) {
       case "error":
@@ -79,23 +122,27 @@ export const AllRemindersModal = ({ isOpen, onClose, reminders }: Props) => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
       <div
         ref={modalRef}
-        className="flex w-full max-w-lg flex-col rounded-lg bg-white shadow-xl dark:bg-gray-800 max-h-[90vh]">
-        <div className="border-b p-4 dark:border-gray-700">
+        className="flex w-full max-w-2xl flex-col rounded-xl bg-white shadow-2xl dark:bg-gray-800 max-h-[90vh]"
+      >
+        {/* Header */}
+        <div className="border-b p-5 dark:border-gray-700">
           <div className="flex items-center justify-between">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+            <h3 className="text-xl font-bold text-gray-900 dark:text-white">
               All Reminders
             </h3>
             <button
               onClick={onClose}
-              className="p-1 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600">
+              className="p-1 rounded-full text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600"
+            >
               <svg
-                className="h-6 w-6 text-gray-500 dark:text-gray-400"
+                className="h-6 w-6"
                 fill="none"
                 viewBox="0 0 24 24"
-                stroke="currentColor">
+                stroke="currentColor"
+              >
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -105,46 +152,90 @@ export const AllRemindersModal = ({ isOpen, onClose, reminders }: Props) => {
               </svg>
             </button>
           </div>
-          <div className="relative mt-4">
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+            Tinjau semua pengingat kedaluwarsa dokumen Anda di sini.
+          </p>
+        </div>
+
+        {/* Kontrol (Tab, Search, Sort) */}
+        <div className="p-5 flex flex-col md:flex-row gap-4 items-center border-b dark:border-gray-700 bg-gray-50/50 dark:bg-gray-900/20">
+          {/* Tabs */}
+          <div className="flex-shrink-0 bg-gray-200 dark:bg-gray-700 p-1 rounded-lg flex items-center">
+            <TabButton
+              isActive={activeTab === "all"}
+              onClick={() => setActiveTab("all")}
+            >
+              Semua
+            </TabButton>
+            <TabButton
+              isActive={activeTab === "error"}
+              onClick={() => setActiveTab("error")}
+            >
+              Kedaluwarsa
+            </TabButton>
+            <TabButton
+              isActive={activeTab === "warning"}
+              onClick={() => setActiveTab("warning")}
+            >
+              Akan Datang
+            </TabButton>
+          </div>
+          {/* Search and Sort */}
+          <div className="flex-grow w-full flex items-center gap-4">
             <input
               type="text"
-              placeholder="Search reminders..."
+              placeholder="Cari pengingat..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full rounded-md border border-gray-300 bg-white py-2 pl-10 pr-4 text-sm text-gray-900 focus:border-demplon focus:ring-demplon dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200"
+              className="w-full rounded-md border border-gray-300 bg-white py-2 px-4 text-sm text-gray-900 focus:border-demplon focus:ring-demplon dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200"
             />
-            <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-              <svg
-                className="h-5 w-5 text-gray-400"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                />
-              </svg>
-            </div>
+            <select
+              value={sortOption}
+              onChange={(e) => setSortOption(e.target.value as SortOption)}
+              className="rounded-md border-gray-300 bg-white py-2 px-3 text-sm focus:border-demplon focus:ring-demplon dark:bg-gray-700 dark:border-gray-600"
+            >
+              <option value="default">Urutkan</option>
+              <option value="expiry-asc">Tanggal Terdekat</option>
+              <option value="title-asc">Judul (A-Z)</option>
+            </select>
           </div>
         </div>
-        <div className="space-y-4 overflow-y-auto p-6">
-          {filteredReminders.length > 0 ? (
-            filteredReminders.map((reminder) => {
+
+        {/* Daftar Konten */}
+        <div className="flex-1 space-y-4 overflow-y-auto p-6">
+          {processedReminders.length > 0 ? (
+            processedReminders.map((reminder) => {
               const styles = getReminderStyles(reminder.type);
+              const isClickable = onDocumentClick && reminder.documentId;
+              const Component = isClickable ? "button" : "div";
+
               return (
-                <div
+                <Component
                   key={reminder.id}
-                  className={`flex items-center justify-between rounded-lg border p-4 shadow-sm ${styles.bgColor} ${styles.borderColor}`}>
+                  onClick={
+                    isClickable
+                      ? () => {
+                          onDocumentClick(reminder.documentId!);
+                          onClose();
+                        }
+                      : undefined
+                  }
+                  className={`w-full flex items-center justify-between rounded-lg border p-4 shadow-sm transition-all ${
+                    isClickable
+                      ? "cursor-pointer hover:shadow-md hover:border-gray-300 dark:hover:border-gray-500"
+                      : ""
+                  } ${styles.bgColor} ${styles.borderColor}`}
+                >
                   <div className="flex items-center">
                     <div
-                      className={`flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full ${styles.iconBg} ${styles.iconColor}`}>
+                      className={`flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full ${styles.iconBg} ${styles.iconColor}`}
+                    >
                       {styles.icon}
                     </div>
-                    <div className="ml-4">
+                    <div className="ml-4 text-left">
                       <p
-                        className={`text-sm font-semibold ${styles.titleColor}`}>
+                        className={`text-sm font-semibold ${styles.titleColor}`}
+                      >
                         {reminder.title}
                       </p>
                       <p className="text-xs text-gray-600 dark:text-gray-400">
@@ -160,7 +251,8 @@ export const AllRemindersModal = ({ isOpen, onClose, reminders }: Props) => {
                       className="h-5 w-5 text-gray-400"
                       fill="none"
                       viewBox="0 0 24 24"
-                      stroke="currentColor">
+                      stroke="currentColor"
+                    >
                       <path
                         strokeLinecap="round"
                         strokeLinejoin="round"
@@ -169,23 +261,38 @@ export const AllRemindersModal = ({ isOpen, onClose, reminders }: Props) => {
                       />
                     </svg>
                   </div>
-                </div>
+                </Component>
               );
             })
           ) : (
-            <p className="py-8 text-center text-sm text-gray-500">
-              No reminders found matching your search.
+            <p className="py-12 text-center text-sm text-gray-500">
+              Tidak ada pengingat yang cocok dengan filter Anda.
             </p>
           )}
-        </div>
-        <div className="flex justify-end rounded-b-lg border-t bg-gray-50 p-4 dark:border-gray-600 dark:bg-gray-800/50">
-          <button
-            onClick={onClose}
-            className="rounded-md border bg-white px-4 py-2 text-sm font-semibold text-gray-800 hover:bg-gray-100 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600">
-            Close
-          </button>
         </div>
       </div>
     </div>
   );
 };
+
+// Komponen helper untuk Tab
+const TabButton = ({
+  isActive,
+  onClick,
+  children,
+}: {
+  isActive: boolean;
+  onClick: () => void;
+  children: React.ReactNode;
+}) => (
+  <button
+    onClick={onClick}
+    className={`px-4 py-1.5 text-sm font-semibold rounded-md transition-colors ${
+      isActive
+        ? "bg-white dark:bg-gray-800 text-demplon shadow-sm"
+        : "text-gray-600 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50"
+    }`}
+  >
+    {children}
+  </button>
+);

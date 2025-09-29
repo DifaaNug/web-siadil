@@ -86,6 +86,7 @@ const HeaderSection: React.FC<HeaderSectionProps> = ({
         return {
           bgColor: "bg-red-50 dark:bg-red-900/50",
           borderColor: "border-red-200 dark:border-red-700",
+          accentColor: "bg-red-500",
           iconBg: "bg-red-100 dark:bg-red-900",
           iconColor: "text-red-600 dark:text-red-400",
           titleColor: "text-red-800 dark:text-red-200",
@@ -103,6 +104,7 @@ const HeaderSection: React.FC<HeaderSectionProps> = ({
         return {
           bgColor: "bg-yellow-50 dark:bg-yellow-900/50",
           borderColor: "border-yellow-200 dark:border-yellow-700",
+          accentColor: "bg-yellow-500",
           iconBg: "bg-yellow-100 dark:bg-yellow-900",
           iconColor: "text-yellow-600 dark:text-yellow-400",
           titleColor: "text-yellow-800 dark:text-yellow-200",
@@ -191,7 +193,7 @@ const HeaderSection: React.FC<HeaderSectionProps> = ({
           </div>
         </div>
 
-        {/* === KOLOM KANAN === */}
+        {/* === KOLOM KANAN (REMINDERS) === */}
         <div className="ml-8 flex w-80 flex-shrink-0 flex-col">
           <div className="flex w-full items-center justify-between mt-6 mb-3">
             <h3 className="text-base font-semibold text-gray-900 dark:text-white">
@@ -204,37 +206,48 @@ const HeaderSection: React.FC<HeaderSectionProps> = ({
               View All
             </button>
           </div>
-          <div className="space-y-3 max-h-[7rem] overflow-y-auto pr-2">
+          {/* Container untuk kartu pengingat dengan scroll */}
+          {/* ===== PERUBAHAN DI SINI: max-h-[7rem] menjadi max-h-[12rem] ===== */}
+          <div className="space-y-3 max-h-[7rem] overflow-y-auto pr-2 custom-scrollbar">
             {reminders.map((reminder) => {
               const styles = getReminderStyles(reminder.type);
               return (
+                // Setiap pengingat adalah sebuah kartu
                 <div
                   key={reminder.id}
-                  className={`flex items-center justify-between rounded-lg border p-4 shadow-sm ${styles.bgColor} ${styles.borderColor}`}
+                  className={`relative flex items-center gap-4 overflow-hidden rounded-lg border p-3 shadow-sm transition-all duration-200 hover:shadow-md cursor-pointer ${styles.bgColor} ${styles.borderColor}`}
                 >
-                  <div className="flex items-center">
-                    <div
-                      className={`flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full ${styles.iconBg} ${styles.iconColor}`}
-                    >
-                      {styles.icon}
-                    </div>
-                    <div className="ml-4">
-                      <p
-                        className={`text-sm font-semibold ${styles.titleColor}`}
-                      >
-                        {reminder.title}
-                      </p>
-                      <p className="text-xs text-gray-600 dark:text-gray-400">
-                        {reminder.description}
-                      </p>
-                      <p className="mt-1 text-xs text-gray-500 dark:text-gray-500">
-                        {reminder.message}
-                      </p>
-                    </div>
+                  {/* Garis aksen warna */}
+                  <div
+                    className={`absolute left-0 top-0 h-full w-1.5 ${styles.accentColor}`}
+                  ></div>
+
+                  {/* Ikon */}
+                  <div
+                    className={`ml-2 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full ${styles.iconBg} ${styles.iconColor}`}
+                  >
+                    {styles.icon}
                   </div>
-                  <div className="flex h-6 w-6 items-center justify-center rounded-full hover:bg-black/5 dark:hover:bg-white/10">
+
+                  {/* Konten Teks */}
+                  <div className="flex-1 min-w-0">
+                    <p
+                      className={`text-sm font-semibold truncate ${styles.titleColor}`}
+                    >
+                      {reminder.title}
+                    </p>
+                    <p className="text-xs text-gray-600 dark:text-gray-400 truncate">
+                      {reminder.description}
+                    </p>
+                    <p className="mt-1 text-xs text-gray-500 dark:text-gray-500">
+                      {reminder.message}
+                    </p>
+                  </div>
+
+                  {/* Ikon panah ke kanan */}
+                  <div className="flex-shrink-0 text-gray-400 dark:text-gray-500">
                     <svg
-                      className="h-5 w-5 text-gray-400"
+                      className="h-4 w-4"
                       fill="none"
                       viewBox="0 0 24 24"
                       stroke="currentColor"
