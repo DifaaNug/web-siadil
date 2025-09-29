@@ -55,17 +55,22 @@ const ArchiveCard = ({
 }) => (
   <div
     onClick={onClick}
-    className="group relative flex cursor-pointer flex-col overflow-hidden rounded-xl border border-gray-300 bg-gradient-to-br p-5 shadow transition-all duration-300 ease-in-out hover:border-demplon hover:shadow-lg hover:-translate-y-1 dark:border-gray-700 dark:from-gray-800 dark:to-gray-700/50 dark:hover:border-demplon">
+    className="group relative flex cursor-pointer flex-col overflow-hidden rounded-xl border border-gray-200 bg-gradient-to-br from-gray-50 to-white p-5 shadow-sm transition-all duration-300 ease-in-out  hover:border-green-400 hover:shadow-lg dark:border-gray-700 dark:from-gray-800 dark:to-gray-700/50 dark:hover:border-green-600">
     <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-green-50 to-green-100  dark:from-green-900/50 dark:to-green-800/50 dark:ring-gray-800">
       <svg
-        className="h-7 w-7 text-demplon"
-        viewBox="0 0 24 24"
+        className="h-6 w-6"
+        width="24"
+        height="24"
         fill="none"
         stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round">
-        <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+        viewBox="0 0 24 24"
+        aria-hidden="true">
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth="1.6"
+          d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+        />
       </svg>
     </div>
 

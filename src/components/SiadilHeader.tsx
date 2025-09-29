@@ -53,8 +53,11 @@ const SiadilHeader = () => {
             <svg
               xmlns="http://www.w3.org/2000/svg"
               className="h-5 w-5 text-gray-900"
+              width="20"
+              height="20"
               fill="none"
               viewBox="0 0 24 24"
+              preserveAspectRatio="xMidYMid meet"
               stroke="currentColor"
               strokeWidth={1.7}>
               <path
@@ -79,8 +82,11 @@ const SiadilHeader = () => {
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 className="h-4 w-4 text-gray-900"
+                width="16"
+                height="16"
                 fill="none"
                 viewBox="0 0 24 24"
+                preserveAspectRatio="xMidYMid meet"
                 stroke="currentColor"
                 strokeWidth={1.7}>
                 <path
@@ -113,8 +119,11 @@ const SiadilHeader = () => {
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   className="h-3.5 w-3.5 mr-2 text-gray-900"
+                  width="14"
+                  height="14"
                   fill="none"
                   viewBox="0 0 24 24"
+                  preserveAspectRatio="xMidYMid meet"
                   stroke="currentColor"
                   strokeWidth={1.7}>
                   <path
@@ -138,8 +147,11 @@ const SiadilHeader = () => {
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   className="h-3.5 w-3.5 mr-2 text-gray-900"
+                  width="14"
+                  height="14"
                   fill="none"
                   viewBox="0 0 24 24"
+                  preserveAspectRatio="xMidYMid meet"
                   stroke="currentColor"
                   strokeWidth={1.7}>
                   <path

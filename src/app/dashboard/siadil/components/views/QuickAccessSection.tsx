@@ -2,6 +2,15 @@
 
 import React from "react";
 import { Document } from "../../types";
+import { allArchives } from "../../data";
+
+// Peta bantuan (dibuat sekali di level modul)
+const ARCHIVE_BY_ID = new Map<string, string>(
+  allArchives.map((a) => [a.id, a.name])
+);
+const ARCHIVE_BY_CODE = new Map<string, string>(
+  allArchives.map((a) => [a.code, a.name])
+);
 
 interface QuickAccessSectionProps {
   documents: Document[];
@@ -123,82 +132,54 @@ const QuickAccessSection: React.FC<QuickAccessSectionProps> = ({
   isInfoPanelOpen,
   onViewAllClick,
 }) => {
+  if (documents.length === 0) return null;
+
+  // Logika dinamis untuk kelas grid
   const gridClasses = isInfoPanelOpen
-    ? "grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
-    : "grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-5";
+    ? "grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4" // Saat panel terbuka, maksimal 4 kolom
+    : "grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-5"; // Saat panel tertutup, bisa sampai 5 kolom
 
   return (
     <div className="mb-10">
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-          Quick Access
-        </h2>
-        {documents.length > 0 && (
-          <button
-            onClick={onViewAllClick}
-            className="text-sm font-medium text-demplon hover:underline">
-            View All
-          </button>
-        )}
-      </div>
-      {documents.length > 0 ? (
-        <div className={`grid ${gridClasses} gap-5`}>
-          {documents.slice(0, 5).map((doc) => (
-            <div
-              key={doc.id}
-              onClick={() => onDocumentClick(doc)}
-              className="group relative flex flex-col cursor-pointer overflow-hidden rounded-xl border bg-white p-4 shadow-sm transition-all duration-300 ease-in-out hover:border-demplon hover:shadow-lg hover:-translate-y-1 dark:border-gray-700 dark:bg-gray-800 dark:hover:border-green-600">
-              <div className="flex items-start justify-between mb-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gray-100 dark:bg-gray-700">
-                  {getFileIcon(doc.fileType)}
-                </div>
-                <div className="flex -space-x-2">
-                  <div
-                    title={doc.updatedBy}
-                    className="w-7 h-7 bg-gray-200 dark:bg-gray-600 rounded-full flex items-center justify-center text-xs font-medium text-gray-600 dark:text-gray-300 ring-2 ring-white dark:ring-gray-800">
-                    {getInitials(doc.updatedBy)}
-                  </div>
-                </div>
+      <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">
+        Quick Access
+      </h2>
+      <div className={`grid ${gridClasses} gap-5`}>
+        {documents.map((doc) => (
+          <div
+            key={doc.id}
+            onClick={() => onDocumentClick(doc)}
+            className="group relative rounded-lg border p-4 transition-all cursor-pointer border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800">
+            <div className="flex items-center">
+              <div className="flex-shrink-0">
+                <svg
+                  className="w-8 h-8 text-gray-400 dark:text-gray-500"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24">
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="1.5"
+                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                  />
+                </svg>
               </div>
-
-              <div className="flex-grow">
+              <div className="ml-3 min-w-0">
                 <h4
-                  className="font-bold text-sm text-gray-800 dark:text-white leading-tight"
+                  className="text-sm font-bold text-gray-900 dark:text-white truncate"
                   title={doc.title}>
                   {doc.title}
                 </h4>
-              </div>
-
-              <div className="mt-3 pt-3 border-t border-gray-100 dark:border-gray-700/50 text-xs text-gray-500 dark:text-gray-400">
-                Diubah: {new Date(doc.updatedDate).toLocaleDateString("id-ID")}
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                  Diubah:{" "}
+                  {new Date(doc.updatedDate).toLocaleDateString("id-ID")}
+                </p>
               </div>
             </div>
-          ))}
-        </div>
-      ) : (
-        <div className="text-center py-10 border-2 border-dashed rounded-lg">
-          <svg
-            className="mx-auto h-12 w-12 text-gray-400"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            aria-hidden="true">
-            <path
-              vectorEffect="non-scaling-stroke"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="1.5"
-              d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"
-            />
-          </svg>
-          <h3 className="mt-2 text-sm font-semibold text-gray-900 dark:text-white">
-            Quick Access is Empty
-          </h3>
-          <p className="mt-1 text-sm text-gray-500">
-            Documents you recently accessed will appear here.
-          </p>
-        </div>
-      )}
+          </div>
+        ))}
+      </div>
     </div>
   );
 };
