@@ -38,6 +38,7 @@ import { reminders } from "./data";
 import { toast } from "sonner";
 import { ConfirmationModal } from "./components/modals/ConfirmationModal";
 import DashboardHeader from "./components/container/DashboardHeader";
+import { AllHistoryModal } from "./components/modals/AllHistoryModal";
 
 const allTableColumns: TableColumn[] = [
   { id: "numberAndTitle", label: "Number & Title" },
@@ -85,6 +86,7 @@ export default function SiadilPage() {
   );
 
   const [archiveSearchQuery, setArchiveSearchQuery] = useState("");
+  const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false); // State untuk modal riwayat
 
   const handleColumnToggle = (columnId: string) => {
     setVisibleColumns((prev) => {
@@ -118,6 +120,17 @@ export default function SiadilPage() {
     subfolderArchives,
     handleToggleStar,
   } = useData(currentFolderId);
+
+  // Memo untuk semua dokumen riwayat
+  const allHistoryDocuments = useMemo(() => {
+    return [...documents]
+      .filter((doc) => doc.lastAccessed)
+      .sort(
+        (a, b) =>
+          new Date(b.lastAccessed!).getTime() -
+          new Date(a.lastAccessed!).getTime()
+      );
+  }, [documents]);
 
   const trashedDocuments = useMemo(() => {
     return documents.filter((doc) => doc.status === "Trashed");
@@ -603,6 +616,7 @@ export default function SiadilPage() {
             documents={quickAccessDocuments}
             onDocumentClick={handleQuickAccessClick}
             isInfoPanelOpen={isInfoPanelOpen}
+            onViewAllClick={() => setIsHistoryModalOpen(true)}
           />
         )}
 
@@ -613,7 +627,6 @@ export default function SiadilPage() {
                 {pageTitle}
               </h2>
 
-              {/* ===== SATU-SATUNYA PERUBAHAN ADA DI BARIS DI BAWAH INI ===== */}
               <div
                 className={`relative w-full sm:max-w-xs ${
                   pageView === "archives" ? "visible" : "invisible"
@@ -853,6 +866,15 @@ export default function SiadilPage() {
           <p>{confirmationModalData.body}</p>
         </ConfirmationModal>
       )}
+      <AllHistoryModal
+        isOpen={isHistoryModalOpen}
+        onClose={() => setIsHistoryModalOpen(false)}
+        documents={allHistoryDocuments}
+        onDocumentClick={(doc) => {
+          handleQuickAccessClick(doc);
+          setIsHistoryModalOpen(false);
+        }}
+      />
     </>
   );
 }

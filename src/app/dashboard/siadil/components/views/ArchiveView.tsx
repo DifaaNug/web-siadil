@@ -6,7 +6,7 @@ interface ArchiveViewProps {
   archives: Archive[];
   archiveDocCounts: Record<string, number>;
   onArchiveClick: (id: string) => void;
-  searchQuery: string; // <-- Prop baru untuk menerima query pencarian
+  searchQuery: string;
 }
 
 const ITEMS_PER_PAGE = 8;
@@ -15,12 +15,11 @@ const ArchiveView: React.FC<ArchiveViewProps> = ({
   archives,
   archiveDocCounts,
   onArchiveClick,
-  searchQuery, // <-- Gunakan prop ini
+  searchQuery,
 }) => {
   const [currentPage, setCurrentPage] = useState(1);
 
   const filteredArchives = useMemo(() => {
-    // Reset halaman ke 1 jika query berubah (dilakukan di parent)
     const archivesInCurrentFolder = archives.filter(
       (a) => a.parentId === "root"
     );
@@ -38,6 +37,25 @@ const ArchiveView: React.FC<ArchiveViewProps> = ({
   }, [filteredArchives, currentPage]);
 
   const totalPages = Math.ceil(filteredArchives.length / ITEMS_PER_PAGE);
+
+  const renderPageNumbers = () => {
+    const pageNumbers = [];
+    for (let i = 1; i <= totalPages; i++) {
+      pageNumbers.push(
+        <button
+          key={i}
+          onClick={() => setCurrentPage(i)}
+          className={`px-3 py-1 text-sm font-medium rounded-md transition-colors ${
+            currentPage === i
+              ? "bg-demplon text-white"
+              : "bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
+          }`}>
+          {i}
+        </button>
+      );
+    }
+    return pageNumbers;
+  };
 
   return (
     <div className="mb-10">
@@ -74,9 +92,9 @@ const ArchiveView: React.FC<ArchiveViewProps> = ({
             className="px-3 py-1 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md disabled:opacity-50 hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700">
             Previous
           </button>
-          <span className="text-sm text-gray-700 dark:text-gray-300">
-            Page {currentPage} of {totalPages}
-          </span>
+
+          {renderPageNumbers()}
+
           <button
             onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
             disabled={currentPage === totalPages}
