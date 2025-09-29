@@ -1,39 +1,92 @@
-import React from "react";
+"use client";
+
+import React, { useEffect, useRef } from "react";
 import { reminders } from "../../data";
-import { FolderIcon } from "../ui/FolderIcon";
-// import { UserInfoCard } from "../ui/UserInforCard";
 
-interface BreadcrumbItem {
-  label: string;
-  id: string;
-}
-
+// Interface props yang tidak digunakan dihapus
 interface HeaderSectionProps {
-  breadcrumbItems: BreadcrumbItem[];
   totalDocuments: number;
-  onBreadcrumbClick: (id: string) => void;
-  onCreateNewArchive: () => void;
+  expiredCount: number;
+  expiringSoonCount: number;
   onViewAllReminders: () => void;
 }
 
+// Komponen Card dengan efek hover border mengikuti kursor
+const InfoCard = ({
+  gradient,
+  icon,
+  value,
+  title,
+  subtitle,
+}: {
+  gradient: string;
+  icon: React.ReactNode;
+  value: number;
+  title: string;
+  subtitle: string;
+}) => {
+  const cardRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (cardRef.current) {
+        const rect = cardRef.current.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        cardRef.current.style.setProperty("--mouse-x", `${x}px`);
+        cardRef.current.style.setProperty("--mouse-y", `${y}px`);
+      }
+    };
+
+    const currentCard = cardRef.current;
+    currentCard?.addEventListener("mousemove", handleMouseMove);
+
+    return () => {
+      currentCard?.removeEventListener("mousemove", handleMouseMove);
+    };
+  }, []);
+
+  return (
+    <div ref={cardRef} className="group relative w-full">
+      {/* Efek border yang menyala mengikuti kursor */}
+      <div
+        className="pointer-events-none absolute -inset-0.5 rounded-xl opacity-0 transition-opacity duration-300 group-hover:opacity-75"
+        style={{
+          background:
+            "radial-gradient(400px at var(--mouse-x) var(--mouse-y), rgb(6, 217, 6), transparent 80%)",
+        }}
+      />
+      {/* Konten Kartu */}
+      <div
+        className={`relative z-10 rounded-xl p-3 text-white shadow-lg transition-all duration-300 ease-in-out ${gradient}`}
+      >
+        <div className="absolute top-4 right-4 flex h-10 w-10 items-center justify-center rounded-lg bg-white/30 backdrop-blur-sm">
+          {icon}
+        </div>
+        <div className="mt-7">
+          <p className="text-3xl font-bold">{value}</p>
+          <p className="text-base font-semibold mt-1">{title}</p>
+          <p className="text-xs opacity-80">{subtitle}</p>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const HeaderSection: React.FC<HeaderSectionProps> = ({
-  breadcrumbItems,
   totalDocuments,
-  onBreadcrumbClick,
+  expiredCount,
+  expiringSoonCount,
   onViewAllReminders,
 }) => {
-  const breadcrumbProps = breadcrumbItems.map((item) => ({
-    label: item.label,
-    icon: <FolderIcon />,
-    onClick: () => onBreadcrumbClick(item.id),
-  }));
-
   const getReminderStyles = (type: "error" | "warning" | undefined) => {
+    // ... (kode style reminder tidak ada perubahan)
     switch (type) {
       case "error":
         return {
           bgColor: "bg-red-50 dark:bg-red-900/50",
           borderColor: "border-red-200 dark:border-red-700",
+          accentColor: "bg-red-500",
           iconBg: "bg-red-100 dark:bg-red-900",
           iconColor: "text-red-600 dark:text-red-400",
           titleColor: "text-red-800 dark:text-red-200",
@@ -51,6 +104,7 @@ const HeaderSection: React.FC<HeaderSectionProps> = ({
         return {
           bgColor: "bg-yellow-50 dark:bg-yellow-900/50",
           borderColor: "border-yellow-200 dark:border-yellow-700",
+          accentColor: "bg-yellow-500",
           iconBg: "bg-yellow-100 dark:bg-yellow-900",
           iconColor: "text-yellow-600 dark:text-yellow-400",
           titleColor: "text-yellow-800 dark:text-yellow-200",
@@ -68,41 +122,79 @@ const HeaderSection: React.FC<HeaderSectionProps> = ({
   };
 
   return (
-    <div className="mb-3 mt-0">
+    <div className="mb-6">
       <div className="flex items-start justify-between">
         {/* === KOLOM KIRI === */}
-        <div className="flex mt-7 flex-1 flex-col">
-          <div className="mt-4 flex gap-6">
-            <div className="w-[240px] rounded-lg bg-demplon p-5 text-white">
-              <div className="flex items-center space-x-4">
-                <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-lg bg-white/20">
-                  <svg
-                    className="h-6 w-6 text-white"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                    />
-                  </svg>
-                </div>
-                <div>
-                  <p className="text-2xl font-bold">{totalDocuments}</p>
-                  <p className="text-sm">Total Dokumen</p>
-                </div>
-              </div>
-              <p className="mt-2 text-xs opacity-80">Per 24 September 2025</p>
-            </div>
+        <div className="flex-1">
+          <div className="mt-9 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <InfoCard
+              gradient="bg-gradient-to-br from-demplon to-teal-600"
+              value={totalDocuments}
+              title="Dokumen"
+              subtitle="Total Arsip Aktif"
+              icon={
+                <svg
+                  className="h-6 w-6 text-white"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                  />
+                </svg>
+              }
+            />
+            <InfoCard
+              gradient="bg-gradient-to-br from-red-700 to-red-500"
+              value={expiredCount}
+              title="Kedaluwarsa"
+              subtitle="Butuh Perhatian Segera"
+              icon={
+                <svg
+                  className="h-6 w-6 text-white"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
+                </svg>
+              }
+            />
+            <InfoCard
+              gradient="bg-gradient-to-br from-yellow-600 to-yellow-500"
+              value={expiringSoonCount}
+              title="Akan Kedaluwarsa"
+              subtitle="Dalam 30 Hari Kedepan"
+              icon={
+                <svg
+                  className="h-6 w-6 text-white"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
+                </svg>
+              }
+            />
           </div>
         </div>
 
-        {/* === KOLOM KANAN === */}
+        {/* === KOLOM KANAN (REMINDERS) === */}
         <div className="ml-8 flex w-80 flex-shrink-0 flex-col">
-          {/* <UserInfoCard /> */}
           <div className="flex w-full items-center justify-between mt-6 mb-3">
             <h3 className="text-base font-semibold text-gray-900 dark:text-white">
               Reminders
@@ -114,37 +206,48 @@ const HeaderSection: React.FC<HeaderSectionProps> = ({
               View All
             </button>
           </div>
-          <div className="space-y-3 max-h-[7rem] overflow-y-auto pr-2">
+          {/* Container untuk kartu pengingat dengan scroll */}
+          {/* ===== PERUBAHAN DI SINI: max-h-[7rem] menjadi max-h-[12rem] ===== */}
+          <div className="space-y-3 max-h-[7rem] overflow-y-auto pr-2 custom-scrollbar">
             {reminders.map((reminder) => {
               const styles = getReminderStyles(reminder.type);
               return (
+                // Setiap pengingat adalah sebuah kartu
                 <div
                   key={reminder.id}
-                  className={`flex items-center justify-between rounded-lg border p-4 shadow-sm ${styles.bgColor} ${styles.borderColor}`}
+                  className={`relative flex items-center gap-4 overflow-hidden rounded-lg border p-3 shadow-sm transition-all duration-200 hover:shadow-md cursor-pointer ${styles.bgColor} ${styles.borderColor}`}
                 >
-                  <div className="flex items-center">
-                    <div
-                      className={`flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full ${styles.iconBg} ${styles.iconColor}`}
-                    >
-                      {styles.icon}
-                    </div>
-                    <div className="ml-4">
-                      <p
-                        className={`text-sm font-semibold ${styles.titleColor}`}
-                      >
-                        {reminder.title}
-                      </p>
-                      <p className="text-xs text-gray-600 dark:text-gray-400">
-                        {reminder.description}
-                      </p>
-                      <p className="mt-1 text-xs text-gray-500 dark:text-gray-500">
-                        {reminder.message}
-                      </p>
-                    </div>
+                  {/* Garis aksen warna */}
+                  <div
+                    className={`absolute left-0 top-0 h-full w-1.5 ${styles.accentColor}`}
+                  ></div>
+
+                  {/* Ikon */}
+                  <div
+                    className={`ml-2 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full ${styles.iconBg} ${styles.iconColor}`}
+                  >
+                    {styles.icon}
                   </div>
-                  <div className="flex h-6 w-6 items-center justify-center rounded-full hover:bg-black/5 dark:hover:bg-white/10">
+
+                  {/* Konten Teks */}
+                  <div className="flex-1 min-w-0">
+                    <p
+                      className={`text-sm font-semibold truncate ${styles.titleColor}`}
+                    >
+                      {reminder.title}
+                    </p>
+                    <p className="text-xs text-gray-600 dark:text-gray-400 truncate">
+                      {reminder.description}
+                    </p>
+                    <p className="mt-1 text-xs text-gray-500 dark:text-gray-500">
+                      {reminder.message}
+                    </p>
+                  </div>
+
+                  {/* Ikon panah ke kanan */}
+                  <div className="flex-shrink-0 text-gray-400 dark:text-gray-500">
                     <svg
-                      className="h-5 w-5 text-gray-400"
+                      className="h-4 w-4"
                       fill="none"
                       viewBox="0 0 24 24"
                       stroke="currentColor"

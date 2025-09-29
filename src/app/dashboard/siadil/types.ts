@@ -25,6 +25,7 @@ export type Document = {
   lastAccessed?: string;
   content?: string;
 };
+
 export type Filters = {
   keyword: string;
   archive: string[];
