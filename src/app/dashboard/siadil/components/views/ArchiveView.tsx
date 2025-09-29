@@ -41,7 +41,6 @@ const ArchiveView: React.FC<ArchiveViewProps> = ({
 
   return (
     <div className="mb-10">
-      {/* JUDUL DAN SEARCH BAR SUDAH DIHAPUS DARI SINI */}
       {paginatedArchives.length > 0 ? (
         <div className="grid grid-cols-[repeat(auto-fill,minmax(220px,1fr))] gap-6">
           {paginatedArchives.map((archive) =>
