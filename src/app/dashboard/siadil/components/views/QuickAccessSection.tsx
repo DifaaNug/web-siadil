@@ -50,7 +50,7 @@ const QuickAccessSection: React.FC<QuickAccessSectionProps> = ({
     ? documents.slice(0, Math.max(documents.length - 1, 0))
     : documents;
 
-  if (displayedDocs.length === 0) return null;
+  // Jangan sembunyikan seksi; tampilkan empty state saat belum ada dokumen
 
   const gridClasses = isInfoPanelOpen
     ? "grid-cols-2 sm:grid-cols-3 lg:grid-cols-4"
@@ -87,13 +87,13 @@ const QuickAccessSection: React.FC<QuickAccessSectionProps> = ({
       <p className="text-sm text-gray-500 dark:text-gray-400 mb-5">
         Akses cepat ke dokumen yang terakhir kamu lihat dan ubah.
       </p>
-      <div className={`grid ${gridClasses} gap-4 md:gap-5`}>
-        {displayedDocs.map((doc) => (
+          <div className={`grid ${gridClasses} gap-4 md:gap-5`}>
+            {displayedDocs.map((doc) => (
           <div
             key={doc.id}
             role="button"
             tabIndex={0}
-            aria-label={`Buka dokumen ${doc.title}`}
+            aria-label={`Open document ${doc.title}`}
             onKeyDown={(e) => handleKeyDown(e, doc)}
             onClick={() => onDocumentClick(doc)}
             className="group relative mx-auto cursor-pointer overflow-hidden rounded-xl bg-white/60 p-4 ring-1 ring-gray-200/70 transition-all hover:-translate-y-0.5 hover:shadow-lg hover:ring-[#01793B]/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#01793B]/45 dark:bg-gray-900/40 dark:ring-white/10 backdrop-blur-sm aspect-square w-full">
@@ -124,13 +124,14 @@ const QuickAccessSection: React.FC<QuickAccessSectionProps> = ({
                 <div className="mt-2 flex w-full flex-wrap items-center justify-center gap-2">
                   <span
                     className="inline-flex items-center rounded-lg bg-gray-100 px-2 py-0.5 text-[10px] sm:text-[11px] font-medium text-gray-600 dark:bg-gray-800 dark:text-gray-300 whitespace-nowrap"
-                    title={`Arsip: ${getArchiveName(doc)}`}>
+                    title={`Arsip: ${getArchiveName(doc)}`}
+                  >
                     {getArchiveLabel(doc)}
                   </span>
                 </div>
                 <div className="mt-auto flex w-full items-end justify-center pt-3">
                   <span className="inline-flex items-center rounded-lg bg-gray-100 px-2 py-0.5 text-[10px] sm:text-[11px] font-medium text-gray-600 dark:bg-gray-800 dark:text-gray-300 whitespace-nowrap">
-                    Diubah: {formatDate(doc.updatedDate)}
+                    Updated: {formatDate(doc.updatedDate)}
                   </span>
                 </div>
               </div>
@@ -151,8 +152,9 @@ const QuickAccessSection: React.FC<QuickAccessSectionProps> = ({
               </svg>
             </div>
           </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 };
