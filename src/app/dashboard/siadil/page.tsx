@@ -23,6 +23,7 @@ import ManageContributorsModal from "./components/modals/ManageContributorsModal
 import HeaderSection from "./components/container/HeaderSection";
 
 import QuickAccessSection from "./components/views/QuickAccessSection";
+import { ViewAllQuickAccessModal } from "./components/modals/ViewAllQuickAccessModal";
 import ArchiveView from "./components/views/ArchiveView";
 import DocumentView from "./components/views/DocumentView";
 import StarredView from "./components/views/StarredView";
@@ -114,6 +115,7 @@ export default function SiadilPage() {
     breadcrumbItems,
     archiveDocCounts,
     quickAccessDocuments,
+    quickAccessAllDocuments,
     starredDocuments,
     subfolderArchives,
     handleToggleStar,
@@ -145,6 +147,8 @@ export default function SiadilPage() {
       setIsContributorsModalOpen(true);
     }
   };
+
+  const [isViewAllQAOpen, setIsViewAllQAOpen] = useState(false);
 
   const handleSaveContributors = (
     docId: string,
@@ -603,6 +607,7 @@ export default function SiadilPage() {
             documents={quickAccessDocuments}
             onDocumentClick={handleQuickAccessClick}
             isInfoPanelOpen={isInfoPanelOpen}
+            onViewAll={() => setIsViewAllQAOpen(true)}
           />
         )}
 
@@ -653,16 +658,12 @@ export default function SiadilPage() {
                       : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
                   }`}>
                   <svg
-                    xmlns="http://www.w3.org/2000/svg"
                     width="16"
                     height="16"
                     viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round">
-                    <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+                    fill="currentColor"
+                    aria-hidden="true">
+                    <path d="M21.5,3h-6.382L11.118,1H5.5c-1.378,0-2.5,1.121-2.5,2.5V20H24V5.5c0-1.379-1.121-2.5-2.5-2.5ZM5.5,2h5.382l4,2h6.618c.827,0,1.5,.673,1.5,1.5v1.5H4V3.5c0-.827,.673-1.5,1.5-1.5Zm-1.5,17V8H23v11H4Zm-3,3H20v1H0V8c0-.885,.387-1.676,1-2.222V22Z" />
                   </svg>
                   <span>Archives</span>
                 </button>
@@ -825,6 +826,16 @@ export default function SiadilPage() {
           setSearchQuery={setSearchQuery}
           documents={searchableDocuments}
           onDocumentSelect={handleSearchSelect}
+        />
+      )}
+      {isViewAllQAOpen && (
+        <ViewAllQuickAccessModal
+          isOpen={isViewAllQAOpen}
+          onClose={() => setIsViewAllQAOpen(false)}
+          documents={quickAccessAllDocuments}
+          onOpenArchive={(doc) => {
+            handleQuickAccessClick(doc);
+          }}
         />
       )}
       {isMoveModalOpen && (

@@ -91,6 +91,18 @@ export const useData = (currentFolderId: string) => {
       .slice(0, 5);
   }, [documents]);
 
+  // Semua dokumen yang pernah dibuka (tanpa slice) untuk fitur "Lihat semua"
+  const quickAccessAllDocuments = useMemo(() => {
+    return [...documents]
+      .filter((doc) => doc.lastAccessed)
+      .sort(
+        (a, b) =>
+          new Date(b.lastAccessed!).getTime() -
+          new Date(a.lastAccessed!).getTime()
+      )
+      .slice(0, 10); // batasi View All ke 10 dokumen terbaru
+  }, [documents]);
+
   const starredDocuments = useMemo(() => {
     return documents.filter((doc) => doc.isStarred);
   }, [documents]);
@@ -118,6 +130,7 @@ export const useData = (currentFolderId: string) => {
     breadcrumbItems,
     archiveDocCounts,
     quickAccessDocuments,
+  quickAccessAllDocuments,
     starredDocuments,
     subfolderArchives,
     handleToggleStar,

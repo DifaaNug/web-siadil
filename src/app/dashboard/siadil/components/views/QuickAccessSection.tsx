@@ -16,12 +16,14 @@ interface QuickAccessSectionProps {
   documents: Document[];
   onDocumentClick: (doc: Document) => void;
   isInfoPanelOpen: boolean;
+  onViewAll?: () => void;
 }
 
 const QuickAccessSection: React.FC<QuickAccessSectionProps> = ({
   documents,
   onDocumentClick,
   isInfoPanelOpen,
+  onViewAll,
 }) => {
   const formatDate = (iso: string) =>
     new Intl.DateTimeFormat("id-ID", {
@@ -65,9 +67,29 @@ const QuickAccessSection: React.FC<QuickAccessSectionProps> = ({
 
   return (
     <div className="mb-10">
-      <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">
-        Quick Access
-      </h2>
+      <div className="mb-2 flex items-center justify-between gap-3">
+        <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+          Quick Access
+        </h2>
+        {onViewAll && (
+          <button
+            type="button"
+            onClick={onViewAll}
+            className="inline-flex items-center gap-1 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-semibold text-gray-700 shadow-sm hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#01793B]/40 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700"
+            aria-label="Lihat semua Quick Access"
+          >
+            View All
+            <svg
+              className="h-3.5 w-3.5"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+            >
+              <path d="M9 5l7 7-7 7" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </button>
+        )}
+      </div>
       <p className="text-sm text-gray-500 dark:text-gray-400 mb-5">
         Akses cepat ke dokumen yang terakhir kamu lihat dan ubah.
       </p>
@@ -80,9 +102,9 @@ const QuickAccessSection: React.FC<QuickAccessSectionProps> = ({
             aria-label={`Buka dokumen ${doc.title}`}
             onKeyDown={(e) => handleKeyDown(e, doc)}
             onClick={() => onDocumentClick(doc)}
-                className="group relative mx-auto cursor-pointer overflow-hidden rounded-2xl bg-white/60 p-4 ring-1 ring-gray-200/70 transition-all hover:-translate-y-0.5 hover:shadow-lg hover:ring-[#01793B]/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#01793B]/45 dark:bg-gray-900/40 dark:ring-white/10 backdrop-blur-sm aspect-square w-full">
+                className="group relative mx-auto cursor-pointer overflow-hidden rounded-xl bg-white/60 p-4 ring-1 ring-gray-200/70 transition-all hover:-translate-y-0.5 hover:shadow-lg hover:ring-[#01793B]/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#01793B]/45 dark:bg-gray-900/40 dark:ring-white/10 backdrop-blur-sm aspect-square w-full">
                 <div className="flex h-full w-full flex-col items-center">
-                  <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-[#01793B] to-emerald-500 text-white shadow-sm ring-1 ring-inset ring-white/20">
+                  <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-[#01793B] to-emerald-500 text-white shadow-sm ring-1 ring-inset ring-white/20">
                 <svg
                       className="h-6 w-6"
                       width="24"
@@ -108,7 +130,7 @@ const QuickAccessSection: React.FC<QuickAccessSectionProps> = ({
                 </h4>
                 <div className="mt-2 flex w-full flex-wrap items-center justify-center gap-2">
                   <span
-                    className="inline-flex items-center rounded-full bg-gray-100 px-2 py-0.5 text-[10px] sm:text-[11px] font-medium text-gray-600 dark:bg-gray-800 dark:text-gray-300 whitespace-nowrap"
+                    className="inline-flex items-center rounded-lg bg-gray-100 px-2 py-0.5 text-[10px] sm:text-[11px] font-medium text-gray-600 dark:bg-gray-800 dark:text-gray-300 whitespace-nowrap"
                     title={`Arsip: ${getArchiveName(doc)}`}
                   >
                     {getArchiveLabel(doc)}
@@ -116,7 +138,7 @@ const QuickAccessSection: React.FC<QuickAccessSectionProps> = ({
                   
                 </div>
                 <div className="mt-auto flex w-full items-end justify-center pt-3">
-                  <span className="inline-flex items-center rounded-full bg-gray-100 px-2 py-0.5 text-[10px] sm:text-[11px] font-medium text-gray-600 dark:bg-gray-800 dark:text-gray-300 whitespace-nowrap">
+                  <span className="inline-flex items-center rounded-lg bg-gray-100 px-2 py-0.5 text-[10px] sm:text-[11px] font-medium text-gray-600 dark:bg-gray-800 dark:text-gray-300 whitespace-nowrap">
                     Diubah: {formatDate(doc.updatedDate)}
                   </span>
                 </div>
