@@ -45,11 +45,11 @@ export const ViewAllQuickAccessModal = ({ isOpen, onClose, documents, onOpenArch
         ref={modalRef}
         className="flex w-full max-w-3xl flex-col rounded-lg bg-white shadow-xl dark:bg-gray-800 max-h-[90vh]">
         <div className="border-b p-4 dark:border-gray-700 flex items-center justify-between gap-3">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Semua Quick Access</h3>
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">All Quick Access</h3>
           <div className="flex-1 max-w-sm relative">
             <input
               className="w-full rounded-md border border-gray-300 bg-white py-2 pl-9 pr-3 text-sm text-gray-900 focus:border-demplon focus:ring-demplon dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200"
-              placeholder="Cari judul/nomor/arsip..."
+              placeholder="Search title/number/archive..."
               value={query}
               onChange={(e) => setQuery(e.target.value)}
             />
@@ -59,12 +59,12 @@ export const ViewAllQuickAccessModal = ({ isOpen, onClose, documents, onOpenArch
               </svg>
             </div>
           </div>
-          <button onClick={onClose} className="ml-2 rounded-md border bg-white px-3 py-2 text-sm font-medium text-gray-800 hover:bg-gray-100 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200">Tutup</button>
+          <button onClick={onClose} className="ml-2 rounded-md border bg-white px-3 py-2 text-sm font-medium text-gray-800 hover:bg-gray-100 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200">Close</button>
         </div>
 
         <div className="overflow-y-auto p-4 divide-y divide-gray-100 dark:divide-gray-700">
           {filtered.length === 0 ? (
-            <p className="py-14 text-center text-sm text-gray-500">Tidak ada dokumen ditemukan.</p>
+            <p className="py-14 text-center text-sm text-gray-500">No documents found.</p>
           ) : (
             <ul className="space-y-0">
               {filtered.map((doc) => (
@@ -101,7 +101,7 @@ export const ViewAllQuickAccessModal = ({ isOpen, onClose, documents, onOpenArch
                         </span>
                       )}
                       <span className="inline-flex items-center rounded-full bg-gray-100 px-2 py-0.5 text-[10px] font-medium text-gray-600 dark:bg-gray-800 dark:text-gray-300 whitespace-nowrap">
-                        Diubah: {formatDate(doc.updatedDate)}
+                        Updated: {formatDate(doc.updatedDate)}
                       </span>
                     </div>
                   </div>

@@ -55,7 +55,7 @@ const QuickAccessSection: React.FC<QuickAccessSectionProps> = ({
     ? documents.slice(0, Math.max(documents.length - 1, 0))
     : documents;
 
-  if (displayedDocs.length === 0) return null;
+  // Jangan sembunyikan seksi; tampilkan empty state saat belum ada dokumen
 
   // Grid rapat dengan auto-fill agar card lebih berdekatan
   // Tetapkan jumlah kolom agar baris pertama pas ke kanan:
@@ -91,15 +91,27 @@ const QuickAccessSection: React.FC<QuickAccessSectionProps> = ({
         )}
       </div>
       <p className="text-sm text-gray-500 dark:text-gray-400 mb-5">
-        Akses cepat ke dokumen yang terakhir kamu lihat dan ubah.
+        Quick access to the documents you recently viewed and edited.
       </p>
-          <div className={`grid ${gridClasses} gap-4 md:gap-5`}>
-            {displayedDocs.map((doc) => (
+      {displayedDocs.length === 0 ? (
+        <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900/40 p-8 text-center">
+          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-[#01793B] to-emerald-500 text-white ring-1 ring-white/20">
+            <svg className="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.6" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+          </div>
+          <h3 className="mt-4 text-base font-semibold text-gray-900 dark:text-white">No Quick Access yet</h3>
+          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">Documents you open will appear here automatically.</p>
+          <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">Tip: open a document from the Archives section below to get started.</p>
+        </div>
+      ) : (
+        <div className={`grid ${gridClasses} gap-4 md:gap-5`}>
+          {displayedDocs.map((doc) => (
           <div
             key={doc.id}
             role="button"
             tabIndex={0}
-            aria-label={`Buka dokumen ${doc.title}`}
+            aria-label={`Open document ${doc.title}`}
             onKeyDown={(e) => handleKeyDown(e, doc)}
             onClick={() => onDocumentClick(doc)}
                 className="group relative mx-auto cursor-pointer overflow-hidden rounded-xl bg-white/60 p-4 ring-1 ring-gray-200/70 transition-all hover:-translate-y-0.5 hover:shadow-lg hover:ring-[#01793B]/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#01793B]/45 dark:bg-gray-900/40 dark:ring-white/10 backdrop-blur-sm aspect-square w-full">
@@ -131,7 +143,7 @@ const QuickAccessSection: React.FC<QuickAccessSectionProps> = ({
                 <div className="mt-2 flex w-full flex-wrap items-center justify-center gap-2">
                   <span
                     className="inline-flex items-center rounded-lg bg-gray-100 px-2 py-0.5 text-[10px] sm:text-[11px] font-medium text-gray-600 dark:bg-gray-800 dark:text-gray-300 whitespace-nowrap"
-                    title={`Arsip: ${getArchiveName(doc)}`}
+                    title={`Archive: ${getArchiveName(doc)}`}
                   >
                     {getArchiveLabel(doc)}
                   </span>
@@ -139,7 +151,7 @@ const QuickAccessSection: React.FC<QuickAccessSectionProps> = ({
                 </div>
                 <div className="mt-auto flex w-full items-end justify-center pt-3">
                   <span className="inline-flex items-center rounded-lg bg-gray-100 px-2 py-0.5 text-[10px] sm:text-[11px] font-medium text-gray-600 dark:bg-gray-800 dark:text-gray-300 whitespace-nowrap">
-                    Diubah: {formatDate(doc.updatedDate)}
+                    Updated: {formatDate(doc.updatedDate)}
                   </span>
                 </div>
               </div>
@@ -161,8 +173,9 @@ const QuickAccessSection: React.FC<QuickAccessSectionProps> = ({
               </svg>
             </div>
           </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 };
