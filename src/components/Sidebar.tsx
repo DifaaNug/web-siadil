@@ -286,15 +286,18 @@ const Sidebar = ({ onCollapseChange }: SidebarProps) => {
       {showArrow && (
         <button
           onClick={handleCollapseToggle}
-          // Posisi diatur ulang sedikit agar pas
-          className={`absolute top-5 transition-all duration-300 z-30 bg-white border border-gray-200 rounded-md p-0.5 flex items-center justify-center
-            ${isCollapsed ? "left-[70px]" : "left-[230px]"}`}>
+          // Posisi: di atas, dan pusat tombol tepat di garis tepi sidebar
+          className={`absolute top-8 transition-all duration-300 z-30 bg-white ring-1 ring-gray-200 rounded-2xl h-8 w-8 flex items-center justify-center shadow-sm
+            ${isCollapsed ? "left-[64px]" : "left-[224px]"}`}>
           <svg
-            className={`w-4 h-4 text-gray-800 transition-transform duration-200 ${
+            className={`block text-gray-800 transition-transform duration-200 ${
               isCollapsed ? "rotate-180" : ""
             }`}
+            width="18"
+            height="18"
             fill="none"
             stroke="currentColor"
+            preserveAspectRatio="xMidYMid meet"
             viewBox="0 0 24 24">
             <path
               strokeLinecap="round"
@@ -389,8 +392,11 @@ const Icon = ({
     className={`${
       isCollapsed ? "w-6 h-6" : "w-5 h-5"
     } transition-all duration-300 shrink-0`}
+    width={isCollapsed ? 24 : 20}
+    height={isCollapsed ? 24 : 20}
     fill="none"
     viewBox="0 0 24 24"
+    preserveAspectRatio="xMidYMid meet"
     stroke="currentColor"
     strokeWidth={strokeWidth}
     strokeLinecap="round"

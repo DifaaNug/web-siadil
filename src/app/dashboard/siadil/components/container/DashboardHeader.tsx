@@ -1,8 +1,6 @@
-// src/app/dashboard/siadil/components/container/ModernHeader.tsx
-
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { FolderIcon } from "../ui/FolderIcon";
 
 interface BreadcrumbItem {
@@ -22,12 +20,30 @@ const ModernHeader: React.FC<ModernHeaderProps> = ({
   onBreadcrumbClick,
 }) => {
   const [currentTime, setCurrentTime] = useState(new Date());
+  const bannerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentTime(new Date());
     }, 1000);
-    return () => clearInterval(timer);
+
+    const handleMouseMove = (e: MouseEvent) => {
+      if (bannerRef.current) {
+        const rect = bannerRef.current.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        bannerRef.current.style.setProperty("--mouse-x", `${x}px`);
+        bannerRef.current.style.setProperty("--mouse-y", `${y}px`);
+      }
+    };
+
+    const currentBanner = bannerRef.current;
+    currentBanner?.addEventListener("mousemove", handleMouseMove);
+
+    return () => {
+      clearInterval(timer);
+      currentBanner?.removeEventListener("mousemove", handleMouseMove);
+    };
   }, []);
 
   const formattedTime = currentTime
@@ -44,59 +60,59 @@ const ModernHeader: React.FC<ModernHeaderProps> = ({
     year: "numeric",
   });
 
-  const currentFolder = breadcrumbItems[breadcrumbItems.length - 1];
-  const parentFolder =
-    breadcrumbItems.length > 1
-      ? breadcrumbItems[breadcrumbItems.length - 2]
-      : null;
-
   return (
-    // --- PERUBAHAN WARNA ADA DI BARIS INI ---
-    <div className="relative w-full overflow-hidden rounded-xl bg-gradient-to-br from-green-600 via-teal-600 to-yellow-300 p-8 text-white shadow-lg">
-      {/* Efek Garis Bergelombang (Wavy Lines) dengan SVG */}
-      <div className="absolute top-0 right-0 h-full w-full opacity-20">
-        <svg
-          className="absolute -right-20 -top-10 h-[150%] w-[150%]"
-          xmlns="http://www.w3.org/2000/svg"
-          width="100%"
-          height="100%"
-          viewBox="0 0 800 800"
-        >
-          <g fill="none" stroke="#FFF" strokeWidth="1">
-            <path d="M-200,300 Q-100,250 0,300 t200,0 t200,0 t200,0 t200,0 t200,0" />
-            <path d="M-200,350 Q-100,300 0,350 t200,0 t200,0 t200,0 t200,0 t200,0" />
-            <path d="M-200,400 Q-100,350 0,400 t200,0 t200,0 t200,0 t200,0 t200,0" />
-          </g>
-        </svg>
-      </div>
-
-      <div className="relative z-10 flex items-end justify-between">
-        <div>
-          <p className="text-lg font-medium text-green-100">Welcome,</p>
-          <h1 className="mt-1 text-4xl font-bold">Hi, {userName}</h1>
-          <p className="mt-2 max-w-lg text-sm text-green-50">
-            Kelola semua dokumen dan arsip digital Anda dengan mudah di satu
-            tempat.
-          </p>
-          <div className="mt-20 mb-0">
-            {currentFolder && (
-              <button
-                onClick={() =>
-                  parentFolder && onBreadcrumbClick(parentFolder.id)
-                }
-                disabled={!parentFolder}
-                className="flex items-center gap-2 rounded-lg border border-white/50 bg-white/10 px-3 py-2 text-sm font-medium transition hover:bg-white/20 disabled:cursor-not-allowed disabled:opacity-60"
-              >
-                <FolderIcon />
-                <span>{currentFolder.label}</span>
-              </button>
-            )}
+    // --- PERBAIKAN 1: Wrapper utama untuk event mouse dan efek ---
+    <div ref={bannerRef} className="group relative w-full">
+      {/* --- PERBAIKAN 2: Elemen untuk border yang akan menyala --- */}
+      <div
+        className="pointer-events-none absolute -inset-0.5 rounded-xl opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+        style={{
+          background:
+            "radial-gradient(400px at var(--mouse-x) var(--mouse-y), rgb(77, 238, 32), transparent 80%)",
+        }}
+      />
+      {/* --- Kartu Konten Utama --- */}
+      <div className="relative w-full overflow-hidden rounded-xl bg-gradient-to-r from-green-700 to-teal-600 p-11 text-white shadow-lg">
+        <div className="absolute inset-0 bg-black/10 mix-blend-multiply"></div>
+        <div className="relative z-10 flex flex-col justify-between h-full">
+          {/* Baris Atas */}
+          <div className="flex justify-between items-start">
+            <div>
+              <p className="text-base font-medium text-green-100">
+                Welcomeback, To SIADIL
+              </p>
+              <h1 className="mt-1 text-3xl font-bold">Hi, {userName}</h1>
+            </div>
+            <div className="text-right flex-shrink-0">
+              <p className="text-3xl font-bold tracking-wider">
+                {formattedTime}
+              </p>
+              <p className="text-sm opacity-90">{formattedDate}</p>
+            </div>
           </div>
-        </div>
 
-        <div className="text-right">
-          <p className="text-4xl font-bold tracking-wider">{formattedTime}</p>
-          <p className="opacity-90">{formattedDate}</p>
+          {/* Baris Bawah */}
+          <div className="mt-4 flex justify-between items-end">
+            <p className="max-w-lg text-sm text-green-50">
+              Kelola semua dokumen dan arsip digital Anda dengan mudah di satu
+              tempat.
+            </p>
+            <div className="flex items-center space-x-2">
+              {breadcrumbItems.map((item, index) => (
+                <React.Fragment key={item.id}>
+                  {index > 0 && <span className="text-white/50">/</span>}
+                  <button
+                    onClick={() => onBreadcrumbClick(item.id)}
+                    disabled={index === breadcrumbItems.length - 1}
+                    className="flex items-center gap-1.5 rounded-md bg-white/10 px-3 py-1.5 text-xs font-medium transition hover:bg-white/20 disabled:cursor-default disabled:bg-white/20"
+                  >
+                    <FolderIcon />
+                    <span>{item.label}</span>
+                  </button>
+                </React.Fragment>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     </div>
