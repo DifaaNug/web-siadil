@@ -1,3 +1,5 @@
+// src/app/dashboard/siadil/components/ui/ArchiveCards.tsx
+
 import { Archive } from "../../types";
 
 const PersonalArchiveCard = ({
@@ -9,7 +11,7 @@ const PersonalArchiveCard = ({
 }) => (
   <div
     onClick={onClick}
-    className="group relative flex cursor-pointer flex-col overflow-hidden rounded-xl bg-gradient-to-br from-demplon to-teal-600 p-5 text-white shadow-lg transition-all duration-300 ease-in-out  hover:shadow-xl">
+    className="group relative flex cursor-pointer flex-col overflow-hidden rounded-xl bg-gradient-to-br from-demplon to-teal-600 p-5 text-white shadow-lg transition-all duration-300 ease-in-out hover:shadow-xl hover:-translate-y-1">
     <div className="absolute top-0 left-0 h-full w-full opacity-10">
       <svg
         className="h-full w-full"
@@ -53,7 +55,7 @@ const ArchiveCard = ({
 }) => (
   <div
     onClick={onClick}
-    className="group relative flex cursor-pointer flex-col overflow-hidden rounded-xl border border-gray-200 bg-gradient-to-br from-gray-50 to-white p-5 shadow-sm transition-all duration-300 ease-in-out  hover:border-green-400 hover:shadow-lg dark:border-gray-700 dark:from-gray-800 dark:to-gray-700/50 dark:hover:border-green-600">
+    className="group relative flex cursor-pointer flex-col overflow-hidden rounded-xl border border-gray-300 bg-gradient-to-br p-5 shadow transition-all duration-300 ease-in-out hover:border-demplon hover:shadow-lg hover:-translate-y-1 dark:border-gray-700 dark:from-gray-800 dark:to-gray-700/50 dark:hover:border-demplon">
     <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-green-50 to-green-100  dark:from-green-900/50 dark:to-green-800/50 dark:ring-gray-800">
       <svg
         className="h-7 w-7 text-demplon"
