@@ -1,3 +1,5 @@
+// src/app/dashboard/siadil/components/ui/DocumentGrid.tsx
+
 import { useState } from "react";
 import { Document, Archive } from "../../types";
 import { ActionMenu } from "./ActionMenu";
@@ -15,6 +17,7 @@ type DocumentGridProps = {
   onEdit: (docId: string) => void;
   onDelete: (docId: string) => void;
   onManageContributors: (docId: string) => void;
+  isInfoPanelOpen: boolean;
 };
 
 export const DocumentGrid = ({
@@ -27,6 +30,7 @@ export const DocumentGrid = ({
   onEdit,
   onDelete,
   onManageContributors,
+  isInfoPanelOpen,
 }: DocumentGridProps) => {
   const [activeActionMenu, setActiveActionMenu] = useState<null | {
     docId: string;
@@ -57,20 +61,25 @@ export const DocumentGrid = ({
 
   return (
     <>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
+      {/* ===== PERUBAHAN ADA DI BARIS DI BAWAH INI (p-6 dihapus) ===== */}
+      <div
+        className={`grid grid-cols-1 sm:grid-cols-2 gap-5 ${
+          isInfoPanelOpen
+            ? "md:grid-cols-2 lg:grid-cols-3"
+            : "md:grid-cols-3 lg:grid-cols-4"
+        }`}>
         {documents.map((doc) => (
           <div
             key={doc.id}
             id={`doc-grid-${doc.id}`}
             onContextMenu={(e) => handleContextMenu(e, doc.id)}
             onClick={(e) => onDocumentSelect(doc.id, e)}
-            className={`group relative flex flex-col cursor-pointer overflow-hidden rounded-xl border bg-white p-4 transition-all duration-300 dark:bg-gray-800 ${
+            className={`group relative flex flex-col cursor-pointer overflow-hidden rounded-xl border bg-gradient-to-br from-gray-50 to-white p-4 shadow-sm transition-all duration-300 ease-in-out  dark:border-gray-700 dark:from-gray-800 dark:to-gray-700/50 ${
               selectedDocumentIds.has(doc.id)
-                ? "border-green-500 ring-2 ring-green-500/50 dark:border-green-700"
-                : "border-gray-200 hover:shadow-lg hover:border-green-500 dark:border-gray-700 dark:hover:border-green-500"
+                ? "border-green-400 ring-2 ring-green-500/30 dark:border-green-600"
+                : "border-gray-200 hover:border-green-400 hover:shadow-lg dark:hover:border-green-600"
             }`}>
-            {/* Bagian Atas: Ikon Dokumen dan Tombol Aksi */}
-            <div className="flex justify-between items-start mb-3">
+            <div className="flex items-start justify-between mb-3">
               <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gray-100 dark:bg-gray-700">
                 <svg
                   className="h-6 w-6 text-gray-500 dark:text-gray-400"
@@ -91,7 +100,7 @@ export const DocumentGrid = ({
                   className="relative z-10 p-2 text-gray-400 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700"
                   aria-label="Toggle Star">
                   <svg
-                    className={`w-4 h-4 transition-all ${
+                    className={`h-5 w-5 transition-all ${
                       doc.isStarred
                         ? "text-yellow-400 fill-current"
                         : "hover:text-yellow-400"
@@ -106,7 +115,7 @@ export const DocumentGrid = ({
                   </svg>
                 </button>
                 <button
-                  className="relative z-10 text-gray-400 hover:text-gray-700 dark:hover:text-white p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700"
+                  className="relative z-10 p-2 text-gray-400 rounded-full hover:bg-gray-100 hover:text-gray-700 dark:hover:bg-gray-700 dark:hover:text-white"
                   aria-label="Actions"
                   onClick={(e) => {
                     e.stopPropagation();
@@ -116,22 +125,21 @@ export const DocumentGrid = ({
                     });
                   }}>
                   <svg
-                    width="16"
-                    height="16"
+                    width="18"
+                    height="18"
                     viewBox="0 0 24 24"
                     fill="currentColor">
-                    <circle cx="5" cy="12" r="2" />{" "}
-                    <circle cx="12" cy="12" r="2" />{" "}
+                    <circle cx="5" cy="12" r="2" />
+                    <circle cx="12" cy="12" r="2" />
                     <circle cx="19" cy="12" r="2" />
                   </svg>
                 </button>
               </div>
             </div>
 
-            {/* Bagian Konten Utama */}
             <div className="flex-grow">
               <h4
-                className="font-bold text-gray-800 dark:text-white leading-tight"
+                className="font-bold text-sm text-gray-800 dark:text-white leading-tight"
                 title={doc.title}>
                 {doc.title}
               </h4>
@@ -140,7 +148,6 @@ export const DocumentGrid = ({
               </p>
             </div>
 
-            {/* Bagian Footer Kartu */}
             <div className="mt-3 pt-3 border-t border-gray-100 dark:border-gray-700/50 text-xs text-gray-500 dark:text-gray-400">
               <div className="flex justify-between">
                 <span>{doc.number}</span>

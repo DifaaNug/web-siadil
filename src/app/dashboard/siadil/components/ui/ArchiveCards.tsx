@@ -9,25 +9,36 @@ const PersonalArchiveCard = ({
 }) => (
   <div
     onClick={onClick}
-    className="group relative flex cursor-pointer items-center overflow-hidden rounded-lg border border-green-600 bg-gradient-to-br  backdrop-blur-lg p-4 shadow-md transition-all duration-300 hover:shadow-lg dark:bg-gray-700/60 dark:hover:bg-gray-700">
-    <div className="flex w-full items-center gap-4">
-      <div className="w-12 h-12 bg-red-500 rounded-full flex items-center justify-center flex-shrink-0 shadow-lg">
-        <span className="text-white font-bold text-lg tracking-wide">DF</span>
-      </div>
-      <div className="min-w-0 flex-grow">
-        <h3
-          className="font-bold text-base text-green-900 dark:text-white"
-          title={archive.name}>
-          {archive.name}
-        </h3>
-        <p className="text-sm text-green-700 dark:text-green-300 font-semibold mt-1">
-          10122059
-        </p>
-      </div>
+    className="group relative flex cursor-pointer flex-col overflow-hidden rounded-xl bg-gradient-to-br from-demplon to-teal-600 p-5 text-white shadow-lg transition-all duration-300 ease-in-out  hover:shadow-xl">
+    <div className="absolute top-0 left-0 h-full w-full opacity-10">
+      <svg
+        className="h-full w-full"
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 800 800">
+        <g fill="none" stroke="#FFF" strokeWidth="0.5">
+          <path d="M-200,300 Q-100,250 0,300 t200,0 t200,0 t200,0 t200,0 t200,0" />
+          <path d="M-200,350 Q-100,300 0,350 t200,0 t200,0 t200,0 t200,0 t200,0" />
+        </g>
+      </svg>
     </div>
-    <span className="absolute top-2 right-2 px-2.5 py-0.5 text-xs font-semibold rounded-md bg-white text-gray-800 shadow">
-      Personal
-    </span>
+
+    <div className="relative z-10 flex flex-grow flex-col">
+      <div className="flex items-center gap-4">
+        <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-white/20 backdrop-blur-sm ring-2 ring-white/50">
+          <span className="text-xl font-bold tracking-wide text-white">DF</span>
+        </div>
+        <div className="min-w-0">
+          <h3 className="text-base font-bold text-white" title={archive.name}>
+            {archive.name}
+          </h3>
+          <p className="mt-1 text-sm font-medium text-green-100">10122059</p>
+        </div>
+      </div>
+      <div className="mt-4 flex-grow"></div>
+      <span className="mt-2 self-start rounded-full bg-white/20 px-3 py-1 text-xs font-semibold">
+        Personal
+      </span>
+    </div>
   </div>
 );
 
@@ -42,10 +53,10 @@ const ArchiveCard = ({
 }) => (
   <div
     onClick={onClick}
-    className="group relative flex flex-col cursor-pointer overflow-hidden rounded-lg border bg-gradient-to-br  backdrop-blur-lg p-4 transition-all duration-300 hover:shadow-md hover:border-green-500 dark:bg-gray-800 dark:from-gray-800 dark:to-gray-700/50 dark:hover:border-green-500">
-    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-green-700 shadow-md">
+    className="group relative flex cursor-pointer flex-col overflow-hidden rounded-xl border border-gray-200 bg-gradient-to-br from-gray-50 to-white p-5 shadow-sm transition-all duration-300 ease-in-out  hover:border-green-400 hover:shadow-lg dark:border-gray-700 dark:from-gray-800 dark:to-gray-700/50 dark:hover:border-green-600">
+    <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-green-50 to-green-100  dark:from-green-900/50 dark:to-green-800/50 dark:ring-gray-800">
       <svg
-        className="h-6 w-6 text-white"
+        className="h-7 w-7 text-demplon"
         viewBox="0 0 24 24"
         fill="none"
         stroke="currentColor"
@@ -55,29 +66,34 @@ const ArchiveCard = ({
         <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
       </svg>
     </div>
-    <div className="mt-3 flex-grow">
+
+    <div className="flex-grow">
       <h3
-        className="text-sm font-bold text-gray-800 dark:text-white"
+        className="text-base font-bold text-gray-800 dark:text-white"
         title={archive.name}>
         {archive.name}
       </h3>
     </div>
-    <div className="mt-2">
-      <span className="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400 border dark:border-gray-600 dark:bg-gray-700 px-2 py-0.5 rounded-lg">
-        <svg
-          className="w-3 h-3 text-green-700"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor">
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="2"
-            d="M8 17l4-4 4 4m0 0V7m0 10l-4-4-4 4"
-          />
-        </svg>
-        {docCount} items
+
+    <div className="mt-4">
+      <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
+        {docCount} item{docCount !== 1 ? "s" : ""}
       </span>
+    </div>
+
+    <div className="absolute bottom-4 right-4 text-gray-300 opacity-0 transition-opacity duration-300 group-hover:opacity-100 dark:text-gray-600">
+      <svg
+        className="h-6 w-6"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor">
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M17 8l4 4m0 0l-4 4m4-4H3"
+        />
+      </svg>
     </div>
   </div>
 );

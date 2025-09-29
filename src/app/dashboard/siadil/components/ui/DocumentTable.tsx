@@ -136,7 +136,7 @@ export const DocumentTable = ({
     align?: "left" | "center" | "right";
   }) => (
     <th
-      className={`px-4 py-3 text-${align} sticky top-0 z-10 bg-green-50 dark:bg-green-900 border-r-2 border-green-200 dark:border-green-700 last:border-r-0`}>
+      className={`px-4 py-3 text-${align} sticky top-0 z-10 bg-green-50 dark:bg-green-900 border-r border-green-200 dark:border-green-700 last:border-r-0`}>
       <button
         onClick={(e) =>
           setActiveHeaderMenu({ columnId, buttonEl: e.currentTarget })
@@ -155,7 +155,7 @@ export const DocumentTable = ({
           <thead className="bg-green-50 dark:bg-green-900 border-green-300 dark:border-green-600 sticky top-0 z-10 shadow-sm">
             <tr>
               {visibleColumns.has("actions") && (
-                <th className="px-4 py-3 text-left text-sm font-medium text-green-800 dark:text-green-100 tracking-wider sticky top-0 z-10 bg-green-50 dark:bg-green-900 border-r-2 border-green-200 dark:border-green-700">
+                <th className="px-4 py-3 text-left text-sm font-medium text-green-800 dark:text-green-100 tracking-wider sticky top-0 z-10 bg-green-50 dark:bg-green-900 border-r border-green-200 dark:border-green-700">
                   Actions
                 </th>
               )}
@@ -164,7 +164,7 @@ export const DocumentTable = ({
                 <SortableHeader columnId="number" label="Number & Title" />
               )}
               {visibleColumns.has("description") && (
-                <th className="px-4 py-3 text-left text-sm font-medium text-green-800 dark:text-green-100 tracking-wider sticky top-0 z-10 bg-green-50 dark:bg-green-900 border-r-2 border-green-200 dark:border-green-700">
+                <th className="px-4 py-3 text-left text-sm font-medium text-green-800 dark:text-green-100 tracking-wider sticky top-0 z-10 bg-green-50 dark:bg-green-900 border-r border-green-200 dark:border-green-700">
                   Description
                 </th>
               )}
@@ -176,7 +176,7 @@ export const DocumentTable = ({
                 />
               )}
               {visibleColumns.has("contributors") && (
-                <th className="px-4 py-3 text-left text-sm font-medium text-green-800 dark:text-green-100 tracking-wider sticky top-0 z-10 bg-green-50 dark:bg-green-900 border-r-2 border-green-200 dark:border-green-700">
+                <th className="px-4 py-3 text-left text-sm font-medium text-green-800 dark:text-green-100 tracking-wider sticky top-0 z-10 bg-green-50 dark:bg-green-900 border-r border-green-200 dark:border-green-700">
                   Contributors
                 </th>
               )}
@@ -191,7 +191,7 @@ export const DocumentTable = ({
               )}
             </tr>
           </thead>
-          <tbody className="bg-white dark:bg-gray-800 divide-y-2 divide-gray-200 dark:divide-gray-600">
+          <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-600">
             {documents.map((doc) => (
               <tr
                 key={doc.id}
@@ -206,7 +206,7 @@ export const DocumentTable = ({
                 {visibleColumns.has("actions") && (
                   <td
                     onClick={(e) => e.stopPropagation()}
-                    className="px-4 py-4 whitespace-nowrap pl-7 text-sm font-medium relative border-r-2 border-gray-200 dark:border-gray-600">
+                    className="px-4 py-4 whitespace-nowrap pl-7 text-sm font-medium relative border-r border-gray-200 dark:border-gray-600">
                     <button
                       onClick={(e) => {
                         e.preventDefault();
@@ -265,11 +265,11 @@ export const DocumentTable = ({
                     )}
                   </td>
                 )}
-                <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white border-r-2 border-gray-200 dark:border-gray-600">
+                <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white border-r border-gray-200 dark:border-gray-600">
                   {doc.id}
                 </td>
                 {visibleColumns.has("numberAndTitle") && (
-                  <td className="px-4 py-4 text-sm text-gray-900 dark:text-white border-r-2 border-gray-200 dark:border-gray-600">
+                  <td className="px-4 py-4 text-sm text-gray-900 dark:text-white border-r border-gray-200 dark:border-gray-600">
                     <div className="font-medium">{doc.number}</div>
                     <div className="text-gray-500 dark:text-gray-400">
                       {doc.title}
@@ -278,18 +278,18 @@ export const DocumentTable = ({
                 )}
                 {visibleColumns.has("description") && (
                   <td
-                    className="px-4 py-4 text-sm text-gray-500 dark:text-gray-400 max-w-xs border-r-2 border-gray-200 dark:border-gray-600"
+                    className="px-4 py-4 text-sm text-gray-500 dark:text-gray-400 max-w-xs border-r border-gray-200 dark:border-gray-600"
                     title={doc.description}>
                     {doc.description}
                   </td>
                 )}
                 {visibleColumns.has("documentDate") && (
-                  <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white border-r-2 border-gray-200 dark:border-gray-600 text-center">
+                  <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white border-r border-gray-200 dark:border-gray-600 text-center">
                     {formatDate(doc.documentDate)}
                   </td>
                 )}
                 {visibleColumns.has("contributors") && (
-                  <td className="px-4 py-4 text-sm text-gray-900 dark:text-white border-r-2 border-gray-200 dark:border-gray-600">
+                  <td className="px-4 py-4 text-sm text-gray-900 dark:text-white border-r border-gray-200 dark:border-gray-600">
                     <div className="flex -space-x-2">
                       {doc.contributors.slice(0, 3).map((c, i) => (
                         <div
@@ -311,7 +311,7 @@ export const DocumentTable = ({
                   </td>
                 )}
                 {visibleColumns.has("archive") && (
-                  <td className="px-4 py-4 whitespace-nowrap text-sm border-r-2 border-gray-200 dark:border-gray-600">
+                  <td className="px-4 py-4 whitespace-nowrap text-sm border-r border-gray-200 dark:border-gray-600">
                     <span className="px-2 py-1 text-xs font-medium rounded-full bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300">
                       {doc.archive}
                     </span>

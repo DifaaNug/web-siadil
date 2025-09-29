@@ -1,3 +1,5 @@
+// src/app/dashboard/siadil/components/container/DocumentsContainer.tsx
+
 import { useState, useEffect, useRef, ReactNode, ChangeEvent } from "react";
 import ReactDOM from "react-dom";
 import { useOnClickOutside } from "../../hooks/useOnClickOutside";
@@ -11,7 +13,6 @@ type Column = {
   label: string;
 };
 
-// PERBAIKAN UTAMA ADA DI BLOK TIPE INI
 type DocumentsContainerProps = {
   children: ReactNode;
   archives: Archive[];
@@ -54,6 +55,7 @@ export const DocumentsContainer = ({
   onExport,
   isExporting,
   onArchiveCheckboxChange,
+  viewMode,
 }: DocumentsContainerProps) => {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [isColumnToggleOpen, setIsColumnToggleOpen] = useState(false);
@@ -220,12 +222,9 @@ export const DocumentsContainer = ({
   }, [isArchiveFilterOpen]);
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-md border border-gray-200 dark:border-gray-700">
-      <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center gap-4">
-        {/* 1. Wrapper untuk Search Bar dibuat lebih sederhana dan fleksibel */}
+    <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
+      <div className="bg-green-50 dark:bg-green-900/50 p-4 border-b border-green-200 dark:border-green-700 flex justify-between items-center gap-4">
         <div className="flex-1 max-w-md">
-          {" "}
-          {/* Menggunakan flex-1 dan max-w-md */}
           <div className="relative">
             <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
               <svg
@@ -378,7 +377,7 @@ export const DocumentsContainer = ({
           <button
             ref={archiveFilterButtonRef}
             onClick={() => setIsArchiveFilterOpen((v) => !v)}
-            className={`px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 flex items-center space-x-2`}>
+            className={`px-3 py-1.5 text-sm border rounded-md flex items-center space-x-2 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 transition-all duration-200 hover:border-green-400 dark:hover:border-green-500 hover:shadow-md`}>
             <svg
               width="14"
               height="14"
@@ -416,7 +415,7 @@ export const DocumentsContainer = ({
           <button
             ref={filterButtonRef}
             onClick={() => setIsFilterOpen((v) => !v)}
-            className="px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 flex items-center space-x-2">
+            className="px-3 py-1.5 text-sm border rounded-md flex items-center space-x-2 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 transition-all duration-200 hover:border-green-400 dark:hover:border-green-500 hover:shadow-md">
             <svg
               width="14"
               height="14"
@@ -457,7 +456,7 @@ export const DocumentsContainer = ({
           <button
             ref={exportMenuButtonRef}
             onClick={() => setIsExportMenuOpen((v) => !v)}
-            className="px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 flex items-center space-x-2">
+            className="px-3 py-1.5 text-sm border rounded-md flex items-center space-x-2 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 transition-all duration-200 hover:border-green-400 dark:hover:border-green-500 hover:shadow-md">
             <svg width="14" height="14" viewBox="0 0 22 22" fill="none">
               <path
                 d="M21 15V19C21 20.1046 20.1046 21 19 21H5C3.89543 21 3 20.1046 3 19V15M7 10L12 15L17 10M12 15V3"
@@ -472,7 +471,7 @@ export const DocumentsContainer = ({
           <button
             ref={columnToggleButtonRef}
             onClick={() => setIsColumnToggleOpen((v) => !v)}
-            className="px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 flex items-center space-x-2">
+            className="px-3 py-1.5 text-sm border rounded-md flex items-center space-x-2 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 transition-all duration-200 hover:border-green-400 dark:hover:border-green-500 hover:shadow-md">
             <svg width="14" height="14" viewBox="0 0 22 22" fill="none">
               <path
                 d="M3 12L5 10M5 10L3 8M5 10H11M13 12L15 10M15 10L13 8M15 10H21M7 20H17C18.1046 20 19 19.1046 19 18V6C19 4.89543 18.1046 4 17 4H7C5.89543 4 5 6V18C5 19.1046 5.89543 20 7 20Z"
@@ -510,7 +509,12 @@ export const DocumentsContainer = ({
             )}
         </div>
       </div>
-      <div className="overflow-x-auto">{children}</div>
+
+      {/* ===== PERUBAHAN FINAL ADA DI SINI ===== */}
+      <div className={`overflow-x-auto ${viewMode === "grid" ? "p-6" : ""}`}>
+        {children}
+      </div>
+
       <div className="px-4 py-3 bg-gray-50 dark:bg-gray-700 border-t border-gray-200 dark:border-gray-600 flex items-center justify-between flex-wrap gap-2">
         <div className="text-sm text-gray-700 dark:text-gray-300">
           Showing{" "}
