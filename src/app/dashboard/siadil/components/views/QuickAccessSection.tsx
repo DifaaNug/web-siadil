@@ -2,7 +2,6 @@ import React from "react";
 import { Document } from "../../types";
 import { allArchives } from "../../data";
 
-// Peta bantuan (dibuat sekali di level modul)
 const ARCHIVE_BY_ID = new Map<string, string>(
   allArchives.map((a) => [a.id, a.name])
 );
