@@ -61,7 +61,6 @@ export const DocumentGrid = ({
 
   return (
     <>
-      {/* ===== PERUBAHAN ADA DI BARIS DI BAWAH INI (p-6 dihapus) ===== */}
       <div
         className={`grid grid-cols-1 sm:grid-cols-2 gap-5 ${
           isInfoPanelOpen
@@ -74,10 +73,10 @@ export const DocumentGrid = ({
             id={`doc-grid-${doc.id}`}
             onContextMenu={(e) => handleContextMenu(e, doc.id)}
             onClick={(e) => onDocumentSelect(doc.id, e)}
-            className={`group relative flex flex-col cursor-pointer overflow-hidden rounded-xl border bg-gradient-to-br from-gray-50 to-white p-4 shadow-sm transition-all duration-300 ease-in-out  dark:border-gray-700 dark:from-gray-800 dark:to-gray-700/50 ${
+            className={`group relative flex flex-col cursor-pointer overflow-hidden rounded-xl border bg-gradient-to-br  p-4 shadow transition-all duration-300 ease-in-out dark:border-gray-700 dark:from-gray-800 dark:to-gray-700/50 ${
               selectedDocumentIds.has(doc.id)
                 ? "border-green-400 ring-2 ring-green-500/30 dark:border-green-600"
-                : "border-gray-200 hover:border-green-400 hover:shadow-lg dark:hover:border-green-600"
+                : "border-gray-300 hover:border-demplon hover:shadow-lg hover:-translate-y-1 dark:hover:border-demplon"
             }`}>
             <div className="flex items-start justify-between mb-3">
               <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gray-100 dark:bg-gray-700">

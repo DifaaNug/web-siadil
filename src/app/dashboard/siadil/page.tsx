@@ -39,6 +39,7 @@ import { reminders } from "./data";
 import { toast } from "sonner";
 import { ConfirmationModal } from "./components/modals/ConfirmationModal";
 import DashboardHeader from "./components/container/DashboardHeader";
+import { AllHistoryModal } from "./components/modals/AllHistoryModal";
 
 const allTableColumns: TableColumn[] = [
   { id: "numberAndTitle", label: "Number & Title" },
@@ -86,6 +87,7 @@ export default function SiadilPage() {
   );
 
   const [archiveSearchQuery, setArchiveSearchQuery] = useState("");
+  const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false); // State untuk modal riwayat
 
   const handleColumnToggle = (columnId: string) => {
     setVisibleColumns((prev) => {
@@ -120,6 +122,17 @@ export default function SiadilPage() {
     subfolderArchives,
     handleToggleStar,
   } = useData(currentFolderId);
+
+  // Memo untuk semua dokumen riwayat
+  const allHistoryDocuments = useMemo(() => {
+    return [...documents]
+      .filter((doc) => doc.lastAccessed)
+      .sort(
+        (a, b) =>
+          new Date(b.lastAccessed!).getTime() -
+          new Date(a.lastAccessed!).getTime()
+      );
+  }, [documents]);
 
   const trashedDocuments = useMemo(() => {
     return documents.filter((doc) => doc.status === "Trashed");
@@ -575,8 +588,7 @@ export default function SiadilPage() {
       <div
         className={`transition-all duration-300 ease-in-out ${
           isInfoPanelOpen ? "mr-80" : "mr-0"
-        }`}
-      >
+        }`}>
         <DashboardHeader
           userName={userData.name}
           breadcrumbItems={breadcrumbItems}
@@ -592,14 +604,12 @@ export default function SiadilPage() {
           <button
             ref={addNewButtonRef}
             onClick={() => setIsAddNewMenuOpen(!isAddNewMenuOpen)}
-            className="bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 font-semibold px-5 py-2.5 rounded-lg shadow hover:shadow-lg transition-all duration-200 ease-in-out flex items-center border border-gray-200 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
-          >
+            className="bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 font-semibold px-5 py-2.5 rounded-lg shadow hover:shadow-lg transition-all duration-200 ease-in-out flex items-center border border-gray-200 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
             <svg
               className="w-5 h-5 mr-2 -ml-1"
               fill="none"
               viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
+              stroke="currentColor">
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -631,6 +641,44 @@ export default function SiadilPage() {
             isInfoPanelOpen={isInfoPanelOpen}
             onViewAll={() => setIsViewAllQAOpen(true)}
           />
+        )}
+
+        {currentFolderId === "root" && (
+          <>
+            <div className="flex items-center justify-between gap-4 mb-4">
+              <h2 className="text-2xl font-bold text-gray-800 dark:text-white shrink-0">
+                {pageTitle}
+              </h2>
+
+              <div
+                className={`relative w-full sm:max-w-xs ${
+                  pageView === "archives" ? "visible" : "invisible"
+                }`}>
+                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5">
+                  <svg
+                    className="h-4 w-4 text-gray-400"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                    />
+                  </svg>
+                </div>
+                <input
+                  type="text"
+                  placeholder="Search Archive..."
+                  value={archiveSearchQuery}
+                  onChange={(e) => setArchiveSearchQuery(e.target.value)}
+                  className="w-full rounded-lg border border-gray-200  py-2 pl-10 pr-4 text-sm text-gray-900 placeholder-gray-500 transition-colors duration-200 focus:border-demplon focus:bg-white focus:ring-2 focus:ring-demplon/30 dark:border-gray-700 dark:bg-gray-900/50 dark:text-gray-200 dark:placeholder-gray-400 dark:focus:bg-gray-800"
+                />
+              </div>
+            </div>
+          </>
         )}
 
         {currentFolderId === "root" && (
@@ -851,11 +899,19 @@ export default function SiadilPage() {
           onConfirm={handleConfirmAction}
           title={confirmationModalData.title}
           confirmText={confirmationModalData.confirmText}
-          variant={confirmationModalData.variant}
-        >
+          variant={confirmationModalData.variant}>
           <p>{confirmationModalData.body}</p>
         </ConfirmationModal>
       )}
+      <AllHistoryModal
+        isOpen={isHistoryModalOpen}
+        onClose={() => setIsHistoryModalOpen(false)}
+        documents={allHistoryDocuments}
+        onDocumentClick={(doc) => {
+          handleQuickAccessClick(doc);
+          setIsHistoryModalOpen(false);
+        }}
+      />
     </>
   );
 }

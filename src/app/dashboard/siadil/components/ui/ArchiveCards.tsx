@@ -1,3 +1,5 @@
+// src/app/dashboard/siadil/components/ui/ArchiveCards.tsx
+
 import { Archive } from "../../types";
 import Image from "next/image";
 
@@ -10,7 +12,7 @@ const PersonalArchiveCard = ({
 }) => (
   <div
     onClick={onClick}
-    className="group relative flex cursor-pointer flex-col overflow-hidden rounded-xl bg-gradient-to-br from-demplon to-teal-600 p-5 text-white shadow-lg transition-all duration-300 ease-in-out  hover:shadow-xl">
+    className="group relative flex cursor-pointer flex-col overflow-hidden rounded-xl bg-gradient-to-br from-demplon to-teal-600 p-5 text-white shadow-lg transition-all duration-300 ease-in-out hover:shadow-xl hover:-translate-y-1">
     <div className="absolute top-0 left-0 h-full w-full opacity-10">
       <svg
         className="h-full w-full"
