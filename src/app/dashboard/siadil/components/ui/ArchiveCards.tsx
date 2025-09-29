@@ -1,6 +1,7 @@
 // src/app/dashboard/siadil/components/ui/ArchiveCards.tsx
 
 import { Archive } from "../../types";
+import Image from "next/image";
 
 const PersonalArchiveCard = ({
   archive,
@@ -56,22 +57,15 @@ const ArchiveCard = ({
   <div
     onClick={onClick}
     className="group relative flex cursor-pointer flex-col overflow-hidden rounded-xl border border-gray-200 bg-gradient-to-br from-gray-50 to-white p-5 shadow-sm transition-all duration-300 ease-in-out  hover:border-green-400 hover:shadow-lg dark:border-gray-700 dark:from-gray-800 dark:to-gray-700/50 dark:hover:border-green-600">
-    <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-green-50 to-green-100  dark:from-green-900/50 dark:to-green-800/50 dark:ring-gray-800">
-      <svg
-        className="h-6 w-6"
-        width="24"
-        height="24"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-        aria-hidden="true">
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth="1.6"
-          d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-        />
-      </svg>
+    <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-lg bg-gradient-to-br from-[#01793B] to-emerald-500 text-white shadow-sm ring-1 ring-inset ring-white/20">
+      <Image
+        src="/archive.svg"
+        alt="Archive icon"
+        width={24}
+        height={24}
+        className="h-6 w-6 invert"
+        priority
+      />
     </div>
 
     <div className="flex-grow">

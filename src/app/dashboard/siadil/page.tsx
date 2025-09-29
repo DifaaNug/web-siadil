@@ -23,6 +23,7 @@ import ManageContributorsModal from "./components/modals/ManageContributorsModal
 import HeaderSection from "./components/container/HeaderSection";
 
 import QuickAccessSection from "./components/views/QuickAccessSection";
+import { ViewAllQuickAccessModal } from "./components/modals/ViewAllQuickAccessModal";
 import ArchiveView from "./components/views/ArchiveView";
 import DocumentView from "./components/views/DocumentView";
 import StarredView from "./components/views/StarredView";
@@ -116,6 +117,7 @@ export default function SiadilPage() {
     breadcrumbItems,
     archiveDocCounts,
     quickAccessDocuments,
+    quickAccessAllDocuments,
     starredDocuments,
     subfolderArchives,
     handleToggleStar,
@@ -158,6 +160,8 @@ export default function SiadilPage() {
       setIsContributorsModalOpen(true);
     }
   };
+
+  const [isViewAllQAOpen, setIsViewAllQAOpen] = useState(false);
 
   const handleSaveContributors = (
     docId: string,
@@ -635,7 +639,7 @@ export default function SiadilPage() {
             documents={quickAccessDocuments}
             onDocumentClick={handleQuickAccessClick}
             isInfoPanelOpen={isInfoPanelOpen}
-            onViewAllClick={() => setIsHistoryModalOpen(true)}
+            onViewAll={() => setIsViewAllQAOpen(true)}
           />
         )}
 
@@ -823,6 +827,16 @@ export default function SiadilPage() {
           setSearchQuery={setSearchQuery}
           documents={searchableDocuments}
           onDocumentSelect={handleSearchSelect}
+        />
+      )}
+      {isViewAllQAOpen && (
+        <ViewAllQuickAccessModal
+          isOpen={isViewAllQAOpen}
+          onClose={() => setIsViewAllQAOpen(false)}
+          documents={quickAccessAllDocuments}
+          onOpenArchive={(doc) => {
+            handleQuickAccessClick(doc);
+          }}
         />
       )}
       {isMoveModalOpen && (
