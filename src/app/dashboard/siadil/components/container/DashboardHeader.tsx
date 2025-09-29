@@ -79,7 +79,7 @@ const ModernHeader: React.FC<ModernHeaderProps> = ({
           <div className="flex justify-between items-start">
             <div>
               <p className="text-base font-medium text-green-100">
-                Welcomeback, To SIADIL
+                Welcome back to SIADIL
               </p>
               <h1 className="mt-1 text-3xl font-bold">Hi, {userName}</h1>
             </div>
@@ -94,8 +94,7 @@ const ModernHeader: React.FC<ModernHeaderProps> = ({
           {/* Baris Bawah */}
           <div className="mt-4 flex justify-between items-end">
             <p className="max-w-lg text-sm text-green-50">
-              Kelola semua dokumen dan arsip digital Anda dengan mudah di satu
-              tempat.
+              Manage all your digital documents and archives easily in one place.
             </p>
             <div className="flex items-center space-x-2">
               {breadcrumbItems.map((item, index) => (
