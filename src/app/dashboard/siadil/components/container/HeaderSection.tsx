@@ -1,9 +1,9 @@
 "use client";
 
-import React, { useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { reminders } from "../../data";
 
-// Interface props yang tidak digunakan dihapus
+// Interface props yang sudah diperbaiki
 interface HeaderSectionProps {
   totalDocuments: number;
   expiredCount: number;
@@ -28,14 +28,14 @@ const InfoCard = ({
   const cardRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      if (cardRef.current) {
-        const rect = cardRef.current.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
-        cardRef.current.style.setProperty("--mouse-x", `${x}px`);
-        cardRef.current.style.setProperty("--mouse-y", `${y}px`);
-      }
+    const handleMouseMove = (event: MouseEvent) => {
+      const currentCard = cardRef.current;
+      if (!currentCard) return;
+      const rect = currentCard.getBoundingClientRect();
+      const x = event.clientX - rect.left;
+      const y = event.clientY - rect.top;
+      currentCard.style.setProperty("--mouse-x", `${x}px`);
+      currentCard.style.setProperty("--mouse-y", `${y}px`);
     };
 
     const currentCard = cardRef.current;
@@ -53,7 +53,7 @@ const InfoCard = ({
         className="pointer-events-none absolute -inset-0.5 rounded-xl opacity-0 transition-opacity duration-300 group-hover:opacity-75"
         style={{
           background:
-            "radial-gradient(400px at var(--mouse-x) var(--mouse-y), rgb(6, 217, 6), transparent 80%)",
+            "radial-gradient(400px at var(--mouse-x) var(--mouse-y), rgba(1, 121, 59, 0.5), transparent 80%)",
         }}
       />
       {/* Konten Kartu */}
@@ -79,14 +79,42 @@ const HeaderSection: React.FC<HeaderSectionProps> = ({
   expiringSoonCount,
   onViewAllReminders,
 }) => {
+  const [currentReminderIndex, setCurrentReminderIndex] = useState(0);
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+
+  const startInterval = () => {
+    // Hentikan interval yang sudah ada sebelum memulai yang baru
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+    }
+    intervalRef.current = setInterval(() => {
+      setCurrentReminderIndex((prevIndex) =>
+        prevIndex === reminders.length - 1 ? 0 : prevIndex + 1
+      );
+    }, 5000); // Ganti setiap 5 detik
+  };
+
+  const stopInterval = () => {
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+    }
+  };
+
+  useEffect(() => {
+    if (reminders.length > 1) {
+      startInterval();
+    }
+    // Cleanup function untuk membersihkan interval saat komponen di-unmount
+    return () => stopInterval();
+  }, []);
+
   const getReminderStyles = (type: "error" | "warning" | undefined) => {
-    // ... (kode style reminder tidak ada perubahan)
     switch (type) {
       case "error":
         return {
           bgColor: "bg-red-50 dark:bg-red-900/50",
           borderColor: "border-red-200 dark:border-red-700",
-          accentColor: "bg-red-500",
+          accentColor: "bg-red-500", // Ditambahkan
           iconBg: "bg-red-100 dark:bg-red-900",
           iconColor: "text-red-600 dark:text-red-400",
           titleColor: "text-red-800 dark:text-red-200",
@@ -104,7 +132,7 @@ const HeaderSection: React.FC<HeaderSectionProps> = ({
         return {
           bgColor: "bg-yellow-50 dark:bg-yellow-900/50",
           borderColor: "border-yellow-200 dark:border-yellow-700",
-          accentColor: "bg-yellow-500",
+          accentColor: "bg-yellow-500", // Ditambahkan
           iconBg: "bg-yellow-100 dark:bg-yellow-900",
           iconColor: "text-yellow-600 dark:text-yellow-400",
           titleColor: "text-yellow-800 dark:text-yellow-200",
@@ -120,13 +148,12 @@ const HeaderSection: React.FC<HeaderSectionProps> = ({
         };
     }
   };
-
   return (
-    <div className="mb-6">
-      <div className="flex items-start justify-between">
+    <div className="mb-4">
+      <div className="flex flex-col lg:flex-row items-start justify-between">
         {/* === KOLOM KIRI === */}
-        <div className="flex-1">
-          <div className="mt-9 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="flex-1 w-full lg:mt-8">
+          <div className="mt-0 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             <InfoCard
               gradient="bg-gradient-to-br from-demplon to-teal-600"
               value={totalDocuments}
@@ -194,71 +221,74 @@ const HeaderSection: React.FC<HeaderSectionProps> = ({
         </div>
 
         {/* === KOLOM KANAN (REMINDERS) === */}
-        <div className="ml-8 flex w-80 flex-shrink-0 flex-col">
+        <div className="w-full lg:w-80 lg:ml-8 mt-6 lg:mt-0 flex-shrink-0">
           <div className="flex w-full items-center justify-between mt-6 mb-3">
             <h3 className="text-base font-semibold text-gray-900 dark:text-white">
               Reminders
             </h3>
             <button
+              type="button"
               onClick={onViewAllReminders}
-              className="text-xs font-semibold text-demplon hover:underline"
+              className="inline-flex items-center gap-1 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-semibold text-gray-700 shadow-sm hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#01793B]/40 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700"
+              aria-label="View all Reminders"
             >
               View All
+              <svg
+                className="h-3.5 w-3.5"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+              >
+                <path
+                  d="M9 5l7 7-7 7"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
             </button>
           </div>
-          {/* Container untuk kartu pengingat dengan scroll */}
-          {/* ===== PERUBAHAN DI SINI: max-h-[7rem] menjadi max-h-[12rem] ===== */}
-          <div className="space-y-3 max-h-[7rem] overflow-y-auto pr-2 custom-scrollbar">
-            {reminders.map((reminder) => {
+          {/* --- Reminder Container --- */}
+          <div
+            className="relative h-28 overflow-hidden"
+            onMouseEnter={stopInterval}
+            onMouseLeave={startInterval}
+          >
+            {reminders.map((reminder, index) => {
               const styles = getReminderStyles(reminder.type);
               return (
-                // Setiap pengingat adalah sebuah kartu
                 <div
                   key={reminder.id}
-                  className={`relative flex items-center gap-4 overflow-hidden rounded-lg border p-3 shadow-sm transition-all duration-200 hover:shadow-md cursor-pointer ${styles.bgColor} ${styles.borderColor}`}
+                  className={`absolute top-0 left-0 w-full transition-all duration-500 ease-in-out ${
+                    index === currentReminderIndex
+                      ? "opacity-100 translate-y-0"
+                      : "opacity-0 -translate-y-4"
+                  }`}
                 >
-                  {/* Garis aksen warna */}
                   <div
-                    className={`absolute left-0 top-0 h-full w-1.5 ${styles.accentColor}`}
-                  ></div>
-
-                  {/* Ikon */}
-                  <div
-                    className={`ml-2 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full ${styles.iconBg} ${styles.iconColor}`}
+                    className={`relative flex items-center gap-4 overflow-hidden rounded-lg border p-3 shadow-sm cursor-pointer ${styles.bgColor} ${styles.borderColor} w-full flex-shrink-0`}
                   >
-                    {styles.icon}
-                  </div>
-
-                  {/* Konten Teks */}
-                  <div className="flex-1 min-w-0">
-                    <p
-                      className={`text-sm font-semibold truncate ${styles.titleColor}`}
+                    <div
+                      className={`absolute left-0 top-0 h-full w-1.5 ${styles.accentColor}`}
+                    ></div>
+                    <div
+                      className={`ml-2 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full ${styles.iconBg} ${styles.iconColor}`}
                     >
-                      {reminder.title}
-                    </p>
-                    <p className="text-xs text-gray-600 dark:text-gray-400 truncate">
-                      {reminder.description}
-                    </p>
-                    <p className="mt-1 text-xs text-gray-500 dark:text-gray-500">
-                      {reminder.message}
-                    </p>
-                  </div>
-
-                  {/* Ikon panah ke kanan */}
-                  <div className="flex-shrink-0 text-gray-400 dark:text-gray-500">
-                    <svg
-                      className="h-4 w-4"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M9 5l7 7-7 7"
-                      />
-                    </svg>
+                      {styles.icon}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p
+                        className={`text-sm font-semibold truncate ${styles.titleColor}`}
+                      >
+                        {reminder.title}
+                      </p>
+                      <p className="text-xs text-gray-600 dark:text-gray-400 truncate">
+                        {reminder.description}
+                      </p>
+                      <p className="mt-1 text-xs text-gray-500 dark:text-gray-500">
+                        {reminder.message}
+                      </p>
+                    </div>
                   </div>
                 </div>
               );

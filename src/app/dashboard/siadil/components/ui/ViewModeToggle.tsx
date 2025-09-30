@@ -7,7 +7,7 @@ const ViewModeToggle = ({
 }) => {
   const CheckmarkIcon = () => (
     <svg
-      className="w-4 h-4 mr-1 flex-shrink-0"
+      className="w-5 h-5 mr-1.5 flex-shrink-0"
       fill="none"
       viewBox="0 0 24 24"
       stroke="currentColor"
@@ -17,17 +17,20 @@ const ViewModeToggle = ({
   );
 
   return (
-    <div className="flex items-center bg-gray-100 dark:bg-gray-700 rounded-lg p-0.5">
+    <div
+      className="group flex items-center rounded-xl p-1 bg-gray-100/90 dark:bg-gray-700/90 transition-all duration-200 shadow-sm hover:shadow-md hover:ring-1 hover:ring-gray-300 dark:hover:ring-gray-600 cursor-pointer"
+      role="group"
+      aria-label="Toggle view mode">
       <button
         onClick={() => setViewMode("list")}
-        className={`flex items-center justify-center px-3 py-1 text-sm rounded-md transition-colors ${
+        className={`flex items-center justify-center px-3.5 py-2 text-[13px] rounded-md transition-colors ${
           viewMode === "list"
-            ? "bg-white dark:bg-gray-900 shadow-sm text-gray-800 dark:text-white font-semibold"
+            ? "bg-white dark:bg-gray-900 shadow text-gray-800 dark:text-white font-semibold"
             : "text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-white"
         }`}>
         {viewMode === "list" && <CheckmarkIcon />}
         <svg
-          className="w-5 h-5 flex-shrink-0"
+          className="w-6 h-6 flex-shrink-0"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor">
@@ -41,14 +44,14 @@ const ViewModeToggle = ({
       </button>
       <button
         onClick={() => setViewMode("grid")}
-        className={`flex items-center justify-center px-3 py-1 text-sm rounded-md transition-colors ${
+        className={`flex items-center justify-center px-3.5 py-2 text-[13px] rounded-md transition-colors ${
           viewMode === "grid"
-            ? "bg-white dark:bg-gray-900 shadow-sm text-gray-800 dark:text-white font-semibold"
+            ? "bg-white dark:bg-gray-900 shadow text-gray-800 dark:text-white font-semibold"
             : "text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-white"
         }`}>
         {viewMode === "grid" && <CheckmarkIcon />}
         <svg
-          className="w-5 h-5 flex-shrink-0"
+          className="w-6 h-6 flex-shrink-0"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor">

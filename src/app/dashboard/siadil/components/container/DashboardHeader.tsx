@@ -94,7 +94,8 @@ const ModernHeader: React.FC<ModernHeaderProps> = ({
           {/* Baris Bawah */}
           <div className="mt-4 flex justify-between items-end">
             <p className="max-w-lg text-sm text-green-50">
-              Manage all your digital documents and archives easily in one place.
+              Manage all your digital documents and archives easily in one
+              place.
             </p>
             <div className="flex items-center space-x-2">
               {breadcrumbItems.map((item, index) => (

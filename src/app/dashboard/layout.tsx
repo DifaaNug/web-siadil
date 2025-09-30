@@ -14,7 +14,7 @@ export default function DashboardLayout({
   // logika pendeteksi scroll
   const [isScrolling, setIsScrolling] = useState(false);
   const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const contentRef = useRef<HTMLDivElement>(null); // Ref untuk div konten
+  const contentRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const contentElement = contentRef.current;
@@ -26,14 +26,13 @@ export default function DashboardLayout({
       }
       scrollTimeoutRef.current = setTimeout(() => {
         setIsScrolling(false);
-      }, 1000); // Scrollbar akan hilang setelah 1 detik tidak scroll
+      }, 1000);
     };
 
     if (contentElement) {
       contentElement.addEventListener("scroll", handleScroll);
     }
 
-    // Cleanup function
     return () => {
       if (contentElement) {
         contentElement.removeEventListener("scroll", handleScroll);
@@ -42,10 +41,10 @@ export default function DashboardLayout({
         clearTimeout(scrollTimeoutRef.current);
       }
     };
-  }, []); // [] berarti efek ini hanya berjalan sekali
+  }, []);
 
   return (
-    <div className="flex h-screen bg-white overflow-hidden">
+    <div className="flex h-screen bg-gray-50 dark:bg-gray-900 overflow-hidden">
       <div
         className={`sticky top-0 h-full transition-all duration-300 shrink-0 ${
           isSidebarCollapsed ? "w-20" : "w-60"
@@ -53,9 +52,9 @@ export default function DashboardLayout({
       >
         <Sidebar onCollapseChange={setIsSidebarCollapsed} />
       </div>
-      <main className="flex-1 flex flex-col min-w-0">
+      {/* --- PERUBAHAN ADA DI BARIS INI --- */}
+      <main className="flex-1 flex flex-col min-w-0 bg-gradient-to-br via-white dark:to-teal-900/30">
         <SiadilHeader />
-        {/* 3. Terapkan 'ref' dan kelas-kelasnya di sini */}
         <div
           ref={contentRef}
           className={`p-6 flex-1 overflow-y-auto custom-scrollbar ${
