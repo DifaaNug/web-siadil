@@ -88,7 +88,7 @@ export const useData = (currentFolderId: string) => {
           new Date(b.lastAccessed!).getTime() -
           new Date(a.lastAccessed!).getTime()
       )
-      .slice(0, 5);
+  .slice(0, 6);
   }, [documents]);
 
   // Semua dokumen yang pernah dibuka (tanpa slice) untuk fitur "Lihat semua"
