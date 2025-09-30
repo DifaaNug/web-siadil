@@ -3,7 +3,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { reminders } from "../../data";
 
-// Interface props yang sudah diperbaiki
 interface HeaderSectionProps {
   totalDocuments: number;
   expiredCount: number;
@@ -11,7 +10,6 @@ interface HeaderSectionProps {
   onViewAllReminders: () => void;
 }
 
-// Komponen Card dengan efek hover border mengikuti kursor
 const InfoCard = ({
   gradient,
   icon,
@@ -48,7 +46,6 @@ const InfoCard = ({
 
   return (
     <div ref={cardRef} className="group relative w-full">
-      {/* Efek border yang menyala mengikuti kursor */}
       <div
         className="pointer-events-none absolute -inset-0.5 rounded-xl opacity-0 transition-opacity duration-300 group-hover:opacity-75"
         style={{
@@ -56,10 +53,8 @@ const InfoCard = ({
             "radial-gradient(400px at var(--mouse-x) var(--mouse-y), rgba(1, 121, 59, 0.5), transparent 80%)",
         }}
       />
-      {/* Konten Kartu */}
       <div
-        className={`relative z-10 rounded-xl p-3 text-white shadow-lg transition-all duration-300 ease-in-out ${gradient}`}
-      >
+        className={`relative z-10 rounded-xl p-3 text-white shadow-lg transition-all duration-300 ease-in-out ${gradient}`}>
         <div className="absolute top-4 right-4 flex h-10 w-10 items-center justify-center rounded-lg bg-white/30 backdrop-blur-sm">
           {icon}
         </div>
@@ -83,7 +78,6 @@ const HeaderSection: React.FC<HeaderSectionProps> = ({
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
   const startInterval = () => {
-    // Hentikan interval yang sudah ada sebelum memulai yang baru
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
     }
@@ -91,7 +85,7 @@ const HeaderSection: React.FC<HeaderSectionProps> = ({
       setCurrentReminderIndex((prevIndex) =>
         prevIndex === reminders.length - 1 ? 0 : prevIndex + 1
       );
-    }, 5000); // Ganti setiap 5 detik
+    }, 5000);
   };
 
   const stopInterval = () => {
@@ -104,7 +98,6 @@ const HeaderSection: React.FC<HeaderSectionProps> = ({
     if (reminders.length > 1) {
       startInterval();
     }
-    // Cleanup function untuk membersihkan interval saat komponen di-unmount
     return () => stopInterval();
   }, []);
 
@@ -114,7 +107,7 @@ const HeaderSection: React.FC<HeaderSectionProps> = ({
         return {
           bgColor: "bg-red-50 dark:bg-red-900/50",
           borderColor: "border-red-200 dark:border-red-700",
-          accentColor: "bg-red-500", // Ditambahkan
+          accentColor: "bg-red-500",
           iconBg: "bg-red-100 dark:bg-red-900",
           iconColor: "text-red-600 dark:text-red-400",
           titleColor: "text-red-800 dark:text-red-200",
@@ -128,11 +121,11 @@ const HeaderSection: React.FC<HeaderSectionProps> = ({
             </svg>
           ),
         };
-      default: // 'warning'
+      default:
         return {
           bgColor: "bg-yellow-50 dark:bg-yellow-900/50",
           borderColor: "border-yellow-200 dark:border-yellow-700",
-          accentColor: "bg-yellow-500", // Ditambahkan
+          accentColor: "bg-yellow-500",
           iconBg: "bg-yellow-100 dark:bg-yellow-900",
           iconColor: "text-yellow-600 dark:text-yellow-400",
           titleColor: "text-yellow-800 dark:text-yellow-200",
@@ -164,8 +157,7 @@ const HeaderSection: React.FC<HeaderSectionProps> = ({
                   className="h-6 w-6 text-white"
                   fill="none"
                   viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
+                  stroke="currentColor">
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -185,8 +177,7 @@ const HeaderSection: React.FC<HeaderSectionProps> = ({
                   className="h-6 w-6 text-white"
                   fill="none"
                   viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
+                  stroke="currentColor">
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -206,8 +197,7 @@ const HeaderSection: React.FC<HeaderSectionProps> = ({
                   className="h-6 w-6 text-white"
                   fill="none"
                   viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
+                  stroke="currentColor">
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -230,15 +220,13 @@ const HeaderSection: React.FC<HeaderSectionProps> = ({
               type="button"
               onClick={onViewAllReminders}
               className="inline-flex items-center gap-1 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-semibold text-gray-700 shadow-sm hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#01793B]/40 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700"
-              aria-label="View all Reminders"
-            >
+              aria-label="View all Reminders">
               View All
               <svg
                 className="h-3.5 w-3.5"
                 viewBox="0 0 24 24"
                 fill="none"
-                stroke="currentColor"
-              >
+                stroke="currentColor">
                 <path
                   d="M9 5l7 7-7 7"
                   strokeWidth="2"
@@ -252,8 +240,7 @@ const HeaderSection: React.FC<HeaderSectionProps> = ({
           <div
             className="relative h-28 overflow-hidden"
             onMouseEnter={stopInterval}
-            onMouseLeave={startInterval}
-          >
+            onMouseLeave={startInterval}>
             {reminders.map((reminder, index) => {
               const styles = getReminderStyles(reminder.type);
               return (
@@ -263,23 +250,18 @@ const HeaderSection: React.FC<HeaderSectionProps> = ({
                     index === currentReminderIndex
                       ? "opacity-100 translate-y-0"
                       : "opacity-0 -translate-y-4"
-                  }`}
-                >
+                  }`}>
                   <div
-                    className={`relative flex items-center gap-4 overflow-hidden rounded-lg border p-3 shadow-sm cursor-pointer ${styles.bgColor} ${styles.borderColor} w-full flex-shrink-0`}
-                  >
+                    className={`relative flex items-center gap-4 overflow-hidden rounded-lg border p-3 shadow-sm cursor-pointer ${styles.bgColor} ${styles.borderColor} w-full flex-shrink-0`}>
                     <div
-                      className={`absolute left-0 top-0 h-full w-1.5 ${styles.accentColor}`}
-                    ></div>
+                      className={`absolute left-0 top-0 h-full w-1.5 ${styles.accentColor}`}></div>
                     <div
-                      className={`ml-2 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full ${styles.iconBg} ${styles.iconColor}`}
-                    >
+                      className={`ml-2 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full ${styles.iconBg} ${styles.iconColor}`}>
                       {styles.icon}
                     </div>
                     <div className="flex-1 min-w-0">
                       <p
-                        className={`text-sm font-semibold truncate ${styles.titleColor}`}
-                      >
+                        className={`text-sm font-semibold truncate ${styles.titleColor}`}>
                         {reminder.title}
                       </p>
                       <p className="text-xs text-gray-600 dark:text-gray-400 truncate">
