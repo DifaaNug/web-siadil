@@ -173,14 +173,6 @@ export const allDocuments: Document[] = generateDummyData();
 
 export const reminders = [
   {
-    id: "ssl-1",
-    title: "SSL",
-    description: "ssl.kampus-kujang.co.id (Non GCP)",
-    message: "This document is expired 2 months 1 days",
-    type: "error" as const,
-    expireDate: "2025-07-28", // Tambahkan ini
-  },
-  {
     id: "ssl-2",
     title: "SSL",
     description: "pupuk-kujang.co.id (Non GCP)",
