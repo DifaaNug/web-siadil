@@ -1,5 +1,3 @@
-// src/app/dashboard/siadil/components/ui/ArchiveCards.tsx
-
 import { Archive } from "../../types";
 import Image from "next/image";
 

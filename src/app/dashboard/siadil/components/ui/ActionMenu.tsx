@@ -3,7 +3,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useOnClickOutside } from "../../hooks/useOnClickOutside";
 
-// Enhanced fade-in animation with scale
 const fadeInKeyframes = `
   @keyframes fadeIn {
     from { 
@@ -41,7 +40,7 @@ export const ActionMenu = ({
   onMove,
   onEdit,
   onDelete,
-  onManageContributors, // Tambahkan ini
+  onManageContributors,
 }: ActionMenuProps) => {
   const menuRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(buttonEl);
@@ -50,7 +49,6 @@ export const ActionMenu = ({
     visibility: "hidden",
   });
 
-  // Update buttonRef when buttonEl changes
   useEffect(() => {
     buttonRef.current = buttonEl;
   }, [buttonEl]);
@@ -104,7 +102,7 @@ export const ActionMenu = ({
     {
       label: "Manage Contributors",
       icon: <IconManageContributors />,
-      onClick: () => onManageContributors(documentId), // Ganti ini
+      onClick: () => onManageContributors(documentId),
     },
     { isSeparator: true },
     {

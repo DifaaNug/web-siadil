@@ -1,4 +1,3 @@
-// src/app/dashboard/siadil/components/AddNewMenu.tsx
 "use client";
 
 import { useRef, useEffect, useState } from "react";
@@ -16,8 +15,6 @@ type MenuSeparator = {
 };
 
 type MenuAction = MenuItem | MenuSeparator;
-
-// --- Batas Perbaikan ---
 
 type AddNewMenuProps = {
   onClose: () => void;

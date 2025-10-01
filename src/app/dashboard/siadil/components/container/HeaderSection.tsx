@@ -4,7 +4,6 @@ import React, { useState, useEffect, useRef, useCallback } from "react";
 import { Reminder } from "../../types";
 import { AddNewMenu } from "../ui/AddNewMenu";
 
-// Interface props yang sudah diperbaiki
 interface HeaderSectionProps {
   totalDocuments: number;
   expiredCount: number;
@@ -22,7 +21,6 @@ interface HeaderSectionProps {
   reminders: Reminder[];
 }
 
-// Komponen Card dengan efek hover border mengikuti kursor
 const InfoCard = ({
   gradient,
   icon,
@@ -60,11 +58,7 @@ const InfoCard = ({
   }, []);
 
   return (
-    <div
-      ref={cardRef}
-      className={`group relative w-full ${onClick ? "cursor-pointer" : ""}`}
-      onClick={onClick}
-    >
+    <div ref={cardRef} className="group relative w-full">
       {/* Efek border yang menyala mengikuti kursor */}
       <div
         className="pointer-events-none absolute -inset-0.5 rounded-xl opacity-0 transition-opacity duration-300 group-hover:opacity-75"
@@ -73,7 +67,6 @@ const InfoCard = ({
             "radial-gradient(400px at var(--mouse-x) var(--mouse-y), rgb(4, 207, 18), transparent 80%)",
         }}
       />
-      {/* Konten Kartu */}
       <div
         className={`relative z-10 rounded-xl p-3 pb-1 pt-1 text-white shadow-lg transition-all duration-300 ease-in-out ${gradient}`}
       >
@@ -109,18 +102,18 @@ const HeaderSection: React.FC<HeaderSectionProps> = ({
   const [currentReminderIndex, setCurrentReminderIndex] = useState(0);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  const stopInterval = useCallback(() => {
+  const startInterval = () => {
     if (intervalRef.current) clearInterval(intervalRef.current);
-  }, []);
+    intervalRef.current = setInterval(() => {
+      setCurrentReminderIndex((prev) =>
+        prev === reminders.length - 1 ? 0 : prev + 1
+      );
+    }, 3000); // Ganti setiap 5 detik
+  };
 
-  const startInterval = useCallback(() => {
-    stopInterval(); // Hentikan interval sebelumnya untuk menghindari duplikasi
-    if (reminders.length > 0) {
-      intervalRef.current = setInterval(() => {
-        setCurrentReminderIndex((prev) => (prev + 1) % reminders.length);
-      }, 3000);
-    }
-  }, [reminders.length, stopInterval]);
+  const stopInterval = () => {
+    if (intervalRef.current) clearInterval(intervalRef.current);
+  };
 
   useEffect(() => {
     if (reminders.length > 1) {
@@ -134,7 +127,7 @@ const HeaderSection: React.FC<HeaderSectionProps> = ({
         return {
           bgColor: "bg-red-50 dark:bg-red-900/50",
           borderColor: "border-red-200 dark:border-red-700",
-          accentColor: "bg-red-500", // Ditambahkan
+          accentColor: "bg-red-500",
           iconBg: "bg-red-100 dark:bg-red-900",
           iconColor: "text-red-600 dark:text-red-400",
           titleColor: "text-red-800 dark:text-red-200",
@@ -148,11 +141,11 @@ const HeaderSection: React.FC<HeaderSectionProps> = ({
             </svg>
           ),
         };
-      default: // 'warning'
+      default:
         return {
           bgColor: "bg-yellow-50 dark:bg-yellow-900/50",
           borderColor: "border-yellow-200 dark:border-yellow-700",
-          accentColor: "bg-yellow-500", // Ditambahkan
+          accentColor: "bg-yellow-500",
           iconBg: "bg-yellow-100 dark:bg-yellow-900",
           iconColor: "text-yellow-600 dark:text-yellow-400",
           titleColor: "text-yellow-800 dark:text-yellow-200",
@@ -275,7 +268,6 @@ const HeaderSection: React.FC<HeaderSectionProps> = ({
                 />
               )}
             </div>
-            {/* =================== AKHIR DARI KODE BARU =================== */}
           </div>
         </div>
       </div>
@@ -308,15 +300,12 @@ const HeaderSection: React.FC<HeaderSectionProps> = ({
             </svg>
           </button>
         </div>
-        {/* Kontainer Grid untuk 3 Kartu Reminder Animasi */}
         <div
           className="grid grid-cols-1 md:grid-cols-3 gap-4"
           onMouseEnter={stopInterval}
           onMouseLeave={startInterval}
         >
-          {/* Loop ini membuat 3 placeholder untuk kartu */}
           {[0, 1, 2].map((cardIndex) => {
-            // Menghitung data reminder yang akan tampil berdasarkan urutan animasi
             const reminderIndex =
               (currentReminderIndex + cardIndex) % reminders.length;
             const reminder = reminders[reminderIndex];

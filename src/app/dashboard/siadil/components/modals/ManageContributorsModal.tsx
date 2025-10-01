@@ -19,10 +19,8 @@ const ManageContributorsModal = ({
   const [newName, setNewName] = useState("");
   const [newRole, setNewRole] = useState("Penulis");
 
-  // <-- Ref untuk modal content
   const modalRef = useRef<HTMLDivElement>(null);
 
-  // <-- Panggil hook untuk deteksi klik di luar
   useOnClickOutside(modalRef, onClose);
 
   useEffect(() => {
@@ -54,7 +52,6 @@ const ManageContributorsModal = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
-      {/* <-- Hubungkan ref di sini */}
       <div
         ref={modalRef}
         className="w-full max-w-lg rounded-lg bg-white shadow-xl dark:bg-gray-800 flex flex-col max-h-[90vh]">

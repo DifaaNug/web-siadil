@@ -62,9 +62,7 @@ const ModernHeader: React.FC<ModernHeaderProps> = ({
   });
 
   return (
-    // --- PERBAIKAN 1: Wrapper utama untuk event mouse dan efek ---
     <div ref={bannerRef} className="group relative w-full">
-      {/* --- PERBAIKAN 2: Elemen untuk border yang akan menyala --- */}
       <div
         className="pointer-events-none absolute -inset-0.5 rounded-xl opacity-0 transition-opacity duration-300 group-hover:opacity-100"
         style={{
@@ -105,8 +103,7 @@ const ModernHeader: React.FC<ModernHeaderProps> = ({
                   <button
                     onClick={() => onBreadcrumbClick(item.id)}
                     disabled={index === breadcrumbItems.length - 1}
-                    className="flex items-center gap-1.5 rounded-md bg-white/10 px-3 py-1.5 text-xs font-medium transition hover:bg-white/20 disabled:cursor-default disabled:bg-white/20"
-                  >
+                    className="flex items-center gap-1.5 rounded-md bg-white/10 px-3 py-1.5 text-xs font-medium transition hover:bg-white/20 disabled:cursor-default disabled:bg-white/20">
                     <FolderIcon />
                     <span>{item.label}</span>
                   </button>
