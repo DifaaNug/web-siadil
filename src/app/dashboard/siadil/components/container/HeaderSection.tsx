@@ -106,18 +106,18 @@ const HeaderSection: React.FC<HeaderSectionProps> = ({
   const [currentReminderIndex, setCurrentReminderIndex] = useState(0);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  const startInterval = () => {
+  const startInterval = useCallback(() => {
     if (intervalRef.current) clearInterval(intervalRef.current);
     intervalRef.current = setInterval(() => {
       setCurrentReminderIndex((prev) =>
         prev === reminders.length - 1 ? 0 : prev + 1
       );
-    }, 3000); // Ganti setiap 5 detik
-  };
+    }, 3000); // Ganti setiap 3 detik
+  }, [reminders.length]);
 
-  const stopInterval = () => {
+  const stopInterval = useCallback(() => {
     if (intervalRef.current) clearInterval(intervalRef.current);
-  };
+  }, []);
 
   useEffect(() => {
     if (reminders.length > 1) {
