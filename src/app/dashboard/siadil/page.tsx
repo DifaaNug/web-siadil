@@ -691,18 +691,14 @@ export default function SiadilPage() {
                     ? "border-demplon text-demplon"
                     : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
                 }`}>
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round">
-                  <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
-                </svg>
+                <span
+                  aria-hidden
+                  className="inline-block w-4 h-4 bg-[currentColor]
+                  [mask-image:url('/archive.svg')] [-webkit-mask-image:url('/archive.svg')]
+                  [mask-size:contain] [-webkit-mask-size:contain]
+                  [mask-repeat:no-repeat] [-webkit-mask-repeat:no-repeat]
+                  [mask-position:center] [-webkit-mask-position:center]"
+                />
                 <span>Archives</span>
               </button>
 
@@ -809,7 +805,6 @@ export default function SiadilPage() {
             allTableColumns={allTableColumns}
             archiveDocCounts={archiveDocCounts}
             onGoBack={handleGoBack}
-            onSearchClick={() => setIsSearchPopupOpen(true)}
             setViewMode={setViewMode}
             onFilterChange={handleFilterChange}
             onCheckboxChange={handleCheckboxChange}
