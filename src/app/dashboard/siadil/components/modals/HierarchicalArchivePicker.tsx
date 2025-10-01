@@ -9,46 +9,21 @@ import React, {
 import { Archive } from "../../types";
 import { useOnClickOutside } from "../../hooks/useOnClickOutside";
 
-/**
- * Generic hierarchical archive picker with:
- * - subtree scoping based on baseArchiveId
- * - optional inclusion / exclusion of base node
- * - optional exposure of root level (when baseArchiveId === 'root')
- * - search filtering (name/code)
- * - confirm via Choose button (not instant)
- * - Clear button
- * - keyboard: Enter commit, Esc close
- * - dynamic drop-up if not enough space below
- * - indentation by depth
- */
 export type HierarchicalArchivePickerProps = {
   archives: Archive[];
-  /** current selected value (code or id depending on selectionKey) */
   value: string;
-  /** callback with committed value */
   onChange: (val: string) => void;
-  /** Which field is used for selection & value mapping: 'code' or 'id' */
   selectionKey: "code" | "id";
-  /** Current folder context id ("root" for top) */
   baseArchiveId: string;
-  /** Field label */
   label?: string;
-  /** When at root, include the synthetic Root option */
   showRootOptionAtRoot?: boolean;
-  /** Exclude the base archive itself from selectable list */
   excludeBase?: boolean;
-  /** Placeholder text */
   placeholder?: string;
-  /** Allow user to clear selection */
-  clearable?: boolean;
-  /** Allow expanding full subtree when at root */
   enableExpandAllToggle?: boolean;
-  /** Show child count badges */
   showChildCount?: boolean;
   className?: string;
 };
 
-// Helper type for internal node with depth
 interface DepthArchive extends Archive {
   depth: number;
   synthetic?: boolean;
@@ -66,8 +41,6 @@ export const HierarchicalArchivePicker: React.FC<
   showRootOptionAtRoot = true,
   excludeBase = false,
   placeholder = "Select Archive",
-  clearable = true,
-  // expand all toggle removed from UI
   showChildCount = true,
   className = "",
 }) => {
@@ -81,8 +54,7 @@ export const HierarchicalArchivePicker: React.FC<
 
   useOnClickOutside(containerRef, () => setOpen(false), buttonRef);
 
-  // removed global expandAll toggle (per-node only now)
-  const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set()); // per-node
+  const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
 
   const toggleNode = useCallback((id: string) => {
     setExpandedIds((prev) => {
@@ -93,7 +65,6 @@ export const HierarchicalArchivePicker: React.FC<
     });
   }, []);
 
-  // Precompute children map for faster lookups & counts
   const childrenMap = useMemo(() => {
     const map: Record<string, Archive[]> = {};
     archives.forEach((a) => {
@@ -104,7 +75,6 @@ export const HierarchicalArchivePicker: React.FC<
     return map;
   }, [archives]);
 
-  // Build two trees: visible (respects expandedIds) & full (for search)
   const { visibleArchives, fullArchives } = useMemo(() => {
     const build = (
       nodes: Archive[],
@@ -132,16 +102,16 @@ export const HierarchicalArchivePicker: React.FC<
           name: "Root",
           code: "root",
           parentId: "",
-          depth: -1, // use -1 so that its direct children appear visually unindented (depth 0)
+          depth: -1,
           synthetic: true,
         };
         visible.push(synthetic);
         full.push(synthetic);
       }
       const roots = childrenMap["root"] || [];
-      // pass depth 0 so they align flush with picker left edge
-      build(roots, 0, visible, true); // gated
-      build(roots, 0, full, false); // full
+
+      build(roots, 0, visible, true);
+      build(roots, 0, full, false);
     } else {
       const base = archives.find((a) => a.id === baseArchiveId);
       const children = childrenMap[baseArchiveId] || [];
@@ -153,9 +123,8 @@ export const HierarchicalArchivePicker: React.FC<
         if (expandedIds.has(base.id)) build(children, 1, visible, true);
         build(children, 1, full, false);
       } else {
-        // excludeBase==true -> show direct children as top-level, but keep their descendants gated by expansion
-        build(children, 0, visible, true); // gated so grandchildren are hidden until expand
-        build(children, 0, full, false); // full tree for search
+        build(children, 0, visible, true);
+        build(children, 0, full, false);
       }
     }
     return { visibleArchives: visible, fullArchives: full };
@@ -179,20 +148,17 @@ export const HierarchicalArchivePicker: React.FC<
     return counts;
   }, [archives, showChildCount]);
 
-  // Sync temp selection when external value changes
   useEffect(() => setTempSelection(value), [value]);
 
   const selectedArchive = useMemo(() => {
-    // If actual value matches an archive, use it
     const direct = archives.find((a) => a[selectionKey] === value);
     if (direct) return direct;
-    // If value cleared and we are inside a subtree (not root) and excludeBase=true,
-    // show the base archive as contextual label instead of placeholder.
-    if (!value && baseArchiveId !== "root" && excludeBase) {
+
+    if (!value && baseArchiveId !== "root") {
       const base = archives.find((a) => a.id === baseArchiveId);
       if (base) return base;
     }
-    // If at root and cleared (value empty) still show Root as contextual label
+
     if (!value && baseArchiveId === "root" && showRootOptionAtRoot) {
       return {
         id: "root",
@@ -201,7 +167,7 @@ export const HierarchicalArchivePicker: React.FC<
         parentId: "",
       } as Archive;
     }
-    // Special synthetic root selection
+
     if (value === "root") {
       return {
         id: "root",
@@ -211,19 +177,12 @@ export const HierarchicalArchivePicker: React.FC<
       } as Archive;
     }
     return undefined;
-  }, [
-    archives,
-    selectionKey,
-    value,
-    baseArchiveId,
-    excludeBase,
-    showRootOptionAtRoot,
-  ]);
+  }, [archives, selectionKey, value, baseArchiveId, showRootOptionAtRoot]);
 
   const filtered = useMemo(() => {
     if (!query.trim()) return visibleArchives;
     const q = query.toLowerCase();
-    // When searching: operate on full tree ignoring expansion, then filter & add ancestors
+
     const matches = fullArchives.filter(
       (a) =>
         a.name.toLowerCase().includes(q) || a.code.toLowerCase().includes(q)
@@ -234,7 +193,7 @@ export const HierarchicalArchivePicker: React.FC<
     fullArchives.forEach((a) => {
       byId[a.id] = a;
     });
-    // add ancestors
+
     matches.forEach((m) => {
       let currentParent = m.parentId;
       while (currentParent) {
@@ -252,13 +211,7 @@ export const HierarchicalArchivePicker: React.FC<
     setOpen(false);
   }, [onChange, tempSelection]);
 
-  const clearSelection = useCallback(() => {
-    if (!clearable) return;
-    setTempSelection("");
-    onChange("");
-    setQuery("");
-    setOpen(false);
-  }, [clearable, onChange]);
+  // (Reset removed) — no longer need fallback/reset logic
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && open) {
@@ -309,22 +262,22 @@ export const HierarchicalArchivePicker: React.FC<
       </button>
       {open && (
         <div
-          className={`absolute left-0 z-50 w-full rounded-md border border-gray-200 bg-white shadow-lg dark:border-gray-700 dark:bg-gray-800 ${
+          className={`absolute left-0 z-50 w-full rounded-md border border-gray-200 bg-white shadow-lg dark:border-gray-700 dark:bg-gray-800 text-sm ${
             dropUp ? "bottom-full mb-1" : "top-full mt-1"
           }`}
           onKeyDown={handleKeyDown}>
-          <div className="p-2 border-b border-gray-100 dark:border-gray-700">
+          <div className="p-2 pb-1 border-b border-gray-100 dark:border-gray-700">
             <input
               ref={inputRef}
               type="text"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Search..."
-              className="w-full rounded-md border border-gray-300 bg-white px-2 py-1 text-sm text-gray-900 focus:border-green-500 focus:ring-green-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200"
+              className="w-full rounded-md border border-gray-300 bg-white px-2 py-1 h-8 text-gray-900 focus:border-green-500 focus:ring-green-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200"
             />
           </div>
           {/* Removed global expand bar for cleaner UI */}
-          <ul className="max-h-60 overflow-y-auto py-1 text-sm">
+          <ul className="max-h-56 overflow-y-auto py-1">
             {filtered.length === 0 && (
               <li className="px-3 py-2 text-gray-500 dark:text-gray-400">
                 No archives found
@@ -345,7 +298,7 @@ export const HierarchicalArchivePicker: React.FC<
               return (
                 <li
                   key={a.id + key}
-                  className={`group flex cursor-pointer items-center justify-between px-3 py-1.5 hover:bg-gray-100 dark:hover:bg-gray-700 ${
+                  className={`group flex cursor-pointer items-center justify-between px-3 py-1 hover:bg-gray-100 dark:hover:bg-gray-700 ${
                     active ? "bg-green-50 dark:bg-gray-700/70" : ""
                   }`}>
                   <div
@@ -404,20 +357,12 @@ export const HierarchicalArchivePicker: React.FC<
               );
             })}
           </ul>
-          <div className="flex items-center gap-2 border-t border-gray-100 p-3 dark:border-gray-700">
-            {clearable && (
-              <button
-                type="button"
-                onClick={clearSelection}
-                className="rounded-md border border-gray-300 bg-white px-4 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600">
-                Clear
-              </button>
-            )}
+          <div className="border-t border-gray-100 p-2 dark:border-gray-700">
             <button
               type="button"
               disabled={!tempSelection}
               onClick={commitSelection}
-              className="ml-auto rounded-md bg-demplon px-5 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-green-700 disabled:cursor-not-allowed disabled:opacity-50">
+              className="mt-1 w-full rounded-md bg-demplon py-2 text-sm font-semibold text-white shadow-sm hover:bg-green-700 disabled:cursor-not-allowed disabled:opacity-50">
               Choose
             </button>
           </div>
