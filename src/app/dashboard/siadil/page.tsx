@@ -874,6 +874,7 @@ export default function SiadilPage() {
           setNewDocument={setNewDocument}
           archives={archives}
           editingDocId={editingDocId}
+          baseArchiveId={currentFolderId}
         />
       )}
       {isSearchPopupOpen && (

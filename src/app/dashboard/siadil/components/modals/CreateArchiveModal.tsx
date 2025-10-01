@@ -1,5 +1,7 @@
+"use client";
 import { useState } from "react";
 import { Archive } from "../../types";
+import { HierarchicalArchivePicker } from "./HierarchicalArchivePicker";
 
 type CreateArchiveModalProps = {
   isOpen: boolean;
@@ -69,25 +71,19 @@ const CreateArchiveModal = ({
               autoFocus
             />
           </div>
-          <div>
-            <label
-              htmlFor="parentId"
-              className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
-              Simpan di dalam
-            </label>
-            <select
-              id="parentId"
-              value={parentId}
-              onChange={(e) => setParentId(e.target.value)}
-              className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:border-green-500 focus:ring-green-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200">
-              <option value="root">Root</option>
-              {archives.map((archive) => (
-                <option key={archive.id} value={archive.id}>
-                  {archive.name}
-                </option>
-              ))}
-            </select>
-          </div>
+          <HierarchicalArchivePicker
+            archives={archives}
+            value={parentId}
+            onChange={setParentId}
+            baseArchiveId={currentFolderId}
+            selectionKey="id"
+            label="Simpan di dalam"
+            placeholder="Pilih Folder"
+            excludeBase={false}
+            showRootOptionAtRoot={true}
+            enableExpandAllToggle={true}
+            showChildCount={true}
+          />
         </div>
 
         {/* Footer */}
@@ -109,3 +105,5 @@ const CreateArchiveModal = ({
 };
 
 export default CreateArchiveModal;
+
+// Removed inline ParentArchivePicker in favor of shared HierarchicalArchivePicker
