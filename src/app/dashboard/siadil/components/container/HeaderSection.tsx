@@ -58,7 +58,11 @@ const InfoCard = ({
   }, []);
 
   return (
-    <div ref={cardRef} className="group relative w-full">
+    <div
+      ref={cardRef}
+      className={`group relative w-full ${onClick ? "cursor-pointer" : ""}`}
+      onClick={onClick}
+    >
       {/* Efek border yang menyala mengikuti kursor */}
       <div
         className="pointer-events-none absolute -inset-0.5 rounded-xl opacity-0 transition-opacity duration-300 group-hover:opacity-75"
