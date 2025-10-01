@@ -171,41 +171,6 @@ export const generateDummyData = (): Document[] => {
 
 export const allDocuments: Document[] = generateDummyData();
 
-// export const reminders = [
-//   {
-//     id: "ssl-2",
-//     title: "SSL",
-//     description: "pupuk-kujang.co.id (Non GCP)",
-//     message: "This document will expire in 2 months 11 days",
-//     type: "warning" as const,
-//     expireDate: "2025-12-10", // Tambahkan ini
-//   },
-//   {
-//     id: "kontrak-kerja",
-//     title: "kontrak-kerja",
-//     description: "pupuk-kujang.co.id (Non GCP)",
-//     message: "This document will expire in 2 months 11 days",
-//     type: "error" as const,
-//     expireDate: "2025-12-10", // Tambahkan ini
-//   },
-//   {
-//     id: "kontrak-perusahaan",
-//     title: "kontrak-perusahaan",
-//     description: "pupuk-kujang.co.id (Non GCP)",
-//     message: "This document will expire in 2 months 11 days",
-//     type: "error" as const,
-//     expireDate: "2025-12-10", // Tambahkan ini
-//   },
-//   {
-//     id: "Dokumen-legal",
-//     title: "Dokumen-legal",
-//     description: "pupuk-kujang.co.id (Non GCP)",
-//     message: "This document will expire in 2 months 11 days",
-//     type: "warning" as const,
-//     expireDate: "2025-12-10", // Tambahkan ini
-//   },
-// ];
-
 export const expireInOptions = [
   { id: "1w", label: "In 1 Week" },
   { id: "2w", label: "In 2 Weeks" },

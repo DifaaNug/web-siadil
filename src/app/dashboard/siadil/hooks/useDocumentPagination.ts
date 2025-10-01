@@ -3,10 +3,9 @@ import { Document } from "../types";
 
 export const useDocumentPagination = (
   documents: Document[],
-  documentCurrentPage: number, // Terima state dari luar
-  setDocumentCurrentPage: (page: number) => void // Terima setter dari luar
+  documentCurrentPage: number,
+  setDocumentCurrentPage: (page: number) => void
 ) => {
-  // Hapus useState untuk documentCurrentPage dari sini
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
   const handleRowsPerPageChange = (value: number) => {
@@ -25,7 +24,6 @@ export const useDocumentPagination = (
     currentPage: documentCurrentPage,
   };
 
-  // Hapus documentCurrentPage dan setDocumentCurrentPage dari return
   return {
     rowsPerPage,
     handleRowsPerPageChange,

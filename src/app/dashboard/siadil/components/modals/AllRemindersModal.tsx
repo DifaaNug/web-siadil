@@ -3,24 +3,22 @@
 import { useState, useRef, useEffect, useMemo } from "react";
 import { useOnClickOutside } from "../../hooks/useOnClickOutside";
 
-// Tipe data untuk sebuah pengingat
 type Reminder = {
   id: string;
   title: string;
   description: string;
   message: string;
   type: "error" | "warning";
-  // Properti baru untuk aksi dan tanggal
+
   documentId?: string;
   expireDate?: string;
 };
 
-// Tipe data untuk props komponen
 type Props = {
   isOpen: boolean;
   onClose: () => void;
   reminders: Reminder[];
-  // Prop baru untuk menangani aksi klik pada dokumen
+
   onDocumentClick?: (documentId: string) => void;
   initialTab?: ActiveTab;
 };
@@ -42,7 +40,6 @@ export const AllRemindersModal = ({
   const [sortOption, setSortOption] = useState<SortOption>("default");
   const [activeTab, setActiveTab] = useState<ActiveTab>(initialTab);
 
-  // Efek untuk menyinkronkan state jika props initialTab berubah saat modal sudah terbuka
   useEffect(() => {
     if (isOpen) {
       setActiveTab(initialTab);
@@ -52,12 +49,10 @@ export const AllRemindersModal = ({
   const processedReminders = useMemo(() => {
     let filtered = reminders;
 
-    // 1. Filter berdasarkan Tab
     if (activeTab !== "all") {
       filtered = filtered.filter((r) => r.type === activeTab);
     }
 
-    // 2. Filter berdasarkan Pencarian
     if (searchTerm) {
       const lowercasedTerm = searchTerm.toLowerCase();
       filtered = filtered.filter(
@@ -68,7 +63,6 @@ export const AllRemindersModal = ({
       );
     }
 
-    // 3. Lakukan Pengurutan
     switch (sortOption) {
       case "title-asc":
         return [...filtered].sort((a, b) => a.title.localeCompare(b.title));
@@ -80,7 +74,6 @@ export const AllRemindersModal = ({
           );
         });
       default:
-        // Urutan default: error dulu, baru warning
         return [...filtered].sort((a, b) => {
           if (a.type === "error" && b.type === "warning") return -1;
           if (a.type === "warning" && b.type === "error") return 1;
@@ -111,11 +104,11 @@ export const AllRemindersModal = ({
             </svg>
           ),
         };
-      default: // 'warning'
+      default:
         return {
           bgColor: "bg-yellow-50 dark:bg-yellow-900/50",
           borderColor: "border-yellow-200 dark:border-yellow-700",
-          accentColor: "bg-yellow-500", // Ditambahkan
+          accentColor: "bg-yellow-500",
           iconBg: "bg-yellow-100 dark:bg-yellow-900",
           iconColor: "text-yellow-600 dark:text-yellow-400",
           titleColor: "text-yellow-800 dark:text-yellow-200",
@@ -136,8 +129,7 @@ export const AllRemindersModal = ({
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
       <div
         ref={modalRef}
-        className="flex w-full max-w-2xl flex-col rounded-xl bg-white shadow-2xl dark:bg-gray-800 max-h-[90vh]"
-      >
+        className="flex w-full max-w-2xl flex-col rounded-xl bg-white shadow-2xl dark:bg-gray-800 max-h-[90vh]">
         {/* Header */}
         <div className="border-b p-5 dark:border-gray-700">
           <div className="flex items-center justify-between">
@@ -146,14 +138,12 @@ export const AllRemindersModal = ({
             </h3>
             <button
               onClick={onClose}
-              className="p-1 rounded-full text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600"
-            >
+              className="p-1 rounded-full text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600">
               <svg
                 className="h-6 w-6"
                 fill="none"
                 viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
+                stroke="currentColor">
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -174,20 +164,17 @@ export const AllRemindersModal = ({
           <div className="flex-shrink-0 bg-gray-200 dark:bg-gray-700 p-1 rounded-lg flex items-center">
             <TabButton
               isActive={activeTab === "all"}
-              onClick={() => setActiveTab("all")}
-            >
+              onClick={() => setActiveTab("all")}>
               Semua
             </TabButton>
             <TabButton
               isActive={activeTab === "error"}
-              onClick={() => setActiveTab("error")}
-            >
+              onClick={() => setActiveTab("error")}>
               Kedaluwarsa
             </TabButton>
             <TabButton
               isActive={activeTab === "warning"}
-              onClick={() => setActiveTab("warning")}
-            >
+              onClick={() => setActiveTab("warning")}>
               Akan Datang
             </TabButton>
           </div>
@@ -203,8 +190,7 @@ export const AllRemindersModal = ({
             <select
               value={sortOption}
               onChange={(e) => setSortOption(e.target.value as SortOption)}
-              className="rounded-md border-gray-300 bg-white py-2 px-3 text-sm focus:border-demplon focus:ring-demplon dark:bg-gray-700 dark:border-gray-600"
-            >
+              className="rounded-md border-gray-300 bg-white py-2 px-3 text-sm focus:border-demplon focus:ring-demplon dark:bg-gray-700 dark:border-gray-600">
               <option value="default">Urutkan</option>
               <option value="expiry-asc">Tanggal Terdekat</option>
               <option value="title-asc">Judul (A-Z)</option>
@@ -235,21 +221,18 @@ export const AllRemindersModal = ({
                     isClickable
                       ? "cursor-pointer hover:shadow-md hover:border-gray-300 dark:hover:border-gray-500"
                       : ""
-                  } ${styles.borderColor} ${styles.bgColor}`}
-                >
+                  } ${styles.borderColor} ${styles.bgColor}`}>
                   <div
                     className={`absolute left-0 top-0 h-full w-1.5 ${styles.accentColor}`}
                   />
                   <div className="flex items-center gap-4 p-3 pl-6">
                     <div
-                      className={`flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full ${styles.iconBg} ${styles.iconColor}`}
-                    >
+                      className={`flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full ${styles.iconBg} ${styles.iconColor}`}>
                       {styles.icon}
                     </div>
                     <div className="flex-1 min-w-0">
                       <p
-                        className={`text-sm font-semibold truncate ${styles.titleColor}`}
-                      >
+                        className={`text-sm font-semibold truncate ${styles.titleColor}`}>
                         {reminder.title}
                       </p>
                       <p className="text-xs text-gray-600 dark:text-gray-400 truncate">
@@ -265,8 +248,7 @@ export const AllRemindersModal = ({
                       className="h-6 w-6 text-gray-400"
                       fill="none"
                       viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
+                      stroke="currentColor">
                       <path
                         strokeLinecap="round"
                         strokeLinejoin="round"
@@ -305,8 +287,7 @@ const TabButton = ({
       isActive
         ? "bg-white dark:bg-gray-800 text-demplon shadow-sm"
         : "text-gray-600 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50"
-    }`}
-  >
+    }`}>
     {children}
   </button>
 );

@@ -121,7 +121,6 @@ export const SearchPopup = ({
         <div className="overflow-y-auto">
           {searchQuery && filteredDocuments.length > 0 ? (
             <ul className="p-2">
-              {/* PERHATIKAN PENGGUNAAN KURUNG KURAWAL {} PADA ARGUMEN MAP */}
               {filteredDocuments.map(({ doc, matchReason }) => (
                 <li key={doc.id}>
                   <button
