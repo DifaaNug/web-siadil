@@ -70,7 +70,7 @@ const InfoCard = ({
         className="pointer-events-none absolute -inset-0.5 rounded-xl opacity-0 transition-opacity duration-300 group-hover:opacity-75"
         style={{
           background:
-            "radial-gradient(400px at var(--mouse-x) var(--mouse-y), rgba(1, 121, 59, 0.5), transparent 80%)",
+            "radial-gradient(400px at var(--mouse-x) var(--mouse-y), rgb(4, 207, 18), transparent 80%)",
         }}
       />
       {/* Konten Kartu */}
@@ -181,7 +181,7 @@ const HeaderSection: React.FC<HeaderSectionProps> = ({
               subtitle="Total Arsip Aktif"
               icon={
                 <svg
-                  className="h-[28px] w-[28px] text-white"
+                  className="h-6 w-6 text-white"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
