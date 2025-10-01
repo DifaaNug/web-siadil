@@ -72,7 +72,7 @@ const ModernHeader: React.FC<ModernHeaderProps> = ({
         }}
       />
       {/* --- Kartu Konten Utama --- */}
-      <div className="relative w-full overflow-hidden rounded-xl bg-gradient-to-r from-green-700 to-teal-600 p-11 text-white shadow-lg">
+      <div className="relative w-full pb-7 pt-7 overflow-hidden rounded-xl bg-gradient-to-r from-green-700 to-teal-600 p-11 text-white shadow-lg">
         <div className="absolute inset-0 bg-black/10 mix-blend-multiply"></div>
         <div className="relative z-10 flex flex-col justify-between h-full">
           {/* Baris Atas */}

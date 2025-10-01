@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { reminders } from "../../data";
+import { AddNewMenu } from "../ui/AddNewMenu";
 
 // Interface props yang sudah diperbaiki
 interface HeaderSectionProps {
@@ -9,6 +10,13 @@ interface HeaderSectionProps {
   expiredCount: number;
   expiringSoonCount: number;
   onViewAllReminders: () => void;
+  addNewButtonRef: React.RefObject<HTMLDivElement | null>;
+  isAddNewMenuOpen: boolean;
+  onToggleAddNewMenu: () => void;
+  onCloseAddNewMenu: () => void;
+  onNewFolder: () => void;
+  onFileUpload: () => void;
+  currentFolderId: string;
 }
 
 // Komponen Card dengan efek hover border mengikuti kursor
@@ -58,12 +66,12 @@ const InfoCard = ({
       />
       {/* Konten Kartu */}
       <div
-        className={`relative z-10 rounded-xl p-3 text-white shadow-lg transition-all duration-300 ease-in-out ${gradient}`}
+        className={`relative z-10 rounded-xl p-3 pb-1 pt-1 text-white shadow-lg transition-all duration-300 ease-in-out ${gradient}`}
       >
         <div className="absolute top-4 right-4 flex h-10 w-10 items-center justify-center rounded-lg bg-white/30 backdrop-blur-sm">
           {icon}
         </div>
-        <div className="mt-7">
+        <div className="mt-7 p-2 pt-0">
           <p className="text-3xl font-bold">{value}</p>
           <p className="text-base font-semibold mt-1">{title}</p>
           <p className="text-xs opacity-80">{subtitle}</p>
@@ -78,36 +86,36 @@ const HeaderSection: React.FC<HeaderSectionProps> = ({
   expiredCount,
   expiringSoonCount,
   onViewAllReminders,
+  addNewButtonRef,
+  isAddNewMenuOpen,
+  onToggleAddNewMenu,
+  onCloseAddNewMenu,
+  onNewFolder,
+  onFileUpload,
+  currentFolderId,
 }) => {
   const [currentReminderIndex, setCurrentReminderIndex] = useState(0);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
   const startInterval = () => {
-    // Hentikan interval yang sudah ada sebelum memulai yang baru
-    if (intervalRef.current) {
-      clearInterval(intervalRef.current);
-    }
+    if (intervalRef.current) clearInterval(intervalRef.current);
     intervalRef.current = setInterval(() => {
-      setCurrentReminderIndex((prevIndex) =>
-        prevIndex === reminders.length - 1 ? 0 : prevIndex + 1
+      setCurrentReminderIndex((prev) =>
+        prev === reminders.length - 1 ? 0 : prev + 1
       );
-    }, 5000); // Ganti setiap 5 detik
+    }, 3000); // Ganti setiap 5 detik
   };
 
   const stopInterval = () => {
-    if (intervalRef.current) {
-      clearInterval(intervalRef.current);
-    }
+    if (intervalRef.current) clearInterval(intervalRef.current);
   };
 
   useEffect(() => {
     if (reminders.length > 1) {
       startInterval();
     }
-    // Cleanup function untuk membersihkan interval saat komponen di-unmount
     return () => stopInterval();
   }, []);
-
   const getReminderStyles = (type: "error" | "warning" | undefined) => {
     switch (type) {
       case "error":
@@ -149,11 +157,11 @@ const HeaderSection: React.FC<HeaderSectionProps> = ({
     }
   };
   return (
-    <div className="mb-4">
+    <div className="mb-2">
       <div className="flex flex-col lg:flex-row items-start justify-between">
         {/* === KOLOM KIRI === */}
-        <div className="flex-1 w-full lg:mt-8">
-          <div className="mt-0 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="flex-1 w-full lg:mt-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <InfoCard
               gradient="bg-gradient-to-br from-demplon to-teal-600"
               value={totalDocuments}
@@ -217,56 +225,98 @@ const HeaderSection: React.FC<HeaderSectionProps> = ({
                 </svg>
               }
             />
+            {/* =================== TAMBAHKAN KODE BARU DI SINI =================== */}
+            <div
+              ref={addNewButtonRef}
+              onClick={onToggleAddNewMenu}
+              className="group relative flex h-full cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-gray-300 bg-gray-50/50 p-5 shadow-sm transition-all duration-300 ease-in-out hover:border-demplon hover:bg-green-50/50 hover:shadow-md dark:border-gray-600 dark:bg-gray-800/50 dark:hover:border-demplon dark:hover:bg-demplon/10"
+            >
+              <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-slate-100 text-slate-400 ring-1 ring-slate-200 transition-all duration-300 group-hover:bg-gradient-to-br group-hover:from-demplon group-hover:to-teal-500 group-hover:text-white group-hover:ring-white/20 group-hover:shadow-lg group-hover:shadow-teal-500/20 dark:bg-slate-800 dark:text-slate-500 dark:ring-slate-700">
+                <svg
+                  className="h-6 w-6"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 6v12m6-6H6"
+                  />
+                </svg>
+              </div>
+              <h3 className="mt-3 text-sm font-bold text-gray-800 dark:text-gray-200">
+                Add New
+              </h3>
+              {isAddNewMenuOpen && (
+                <AddNewMenu
+                  buttonRef={addNewButtonRef}
+                  onClose={onCloseAddNewMenu}
+                  onNewFolder={onNewFolder}
+                  onFileUpload={onFileUpload}
+                  context={
+                    currentFolderId === "root" ? "archives" : "documents"
+                  }
+                />
+              )}
+            </div>
+            {/* =================== AKHIR DARI KODE BARU =================== */}
           </div>
         </div>
+      </div>
 
-        {/* === KOLOM KANAN (REMINDERS) === */}
-        <div className="w-full lg:w-80 lg:ml-8 mt-6 lg:mt-0 flex-shrink-0">
-          <div className="flex w-full items-center justify-between mt-6 mb-3">
-            <h3 className="text-base font-semibold text-gray-900 dark:text-white">
-              Reminders
-            </h3>
-            <button
-              type="button"
-              onClick={onViewAllReminders}
-              className="inline-flex items-center gap-1 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-semibold text-gray-700 shadow-sm hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#01793B]/40 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700"
-              aria-label="View all Reminders"
-            >
-              View All
-              <svg
-                className="h-3.5 w-3.5"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-              >
-                <path
-                  d="M9 5l7 7-7 7"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </button>
-          </div>
-          {/* --- Reminder Container --- */}
-          <div
-            className="relative h-28 overflow-hidden"
-            onMouseEnter={stopInterval}
-            onMouseLeave={startInterval}
+      {/* BAGIAN BAWAH: Reminders (sekarang di bawah) */}
+      <div className="w-full mt-6 mb-6">
+        <div className="flex w-full items-center justify-between mb-3">
+          <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
+            Reminders
+          </h3>
+          <button
+            type="button"
+            onClick={onViewAllReminders}
+            className="inline-flex items-center gap-1 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-semibold text-gray-700 shadow-sm hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#01793B]/40 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700"
+            aria-label="View all Reminders"
           >
-            {reminders.map((reminder, index) => {
-              const styles = getReminderStyles(reminder.type);
-              return (
-                <div
-                  key={reminder.id}
-                  className={`absolute top-0 left-0 w-full transition-all duration-500 ease-in-out ${
-                    index === currentReminderIndex
-                      ? "opacity-100 translate-y-0"
-                      : "opacity-0 -translate-y-4"
-                  }`}
-                >
+            View All
+            <svg
+              className="h-3.5 w-3.5"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+            >
+              <path
+                d="M9 5l7 7-7 7"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </button>
+        </div>
+        {/* Kontainer Grid untuk 3 Kartu Reminder Animasi */}
+        <div
+          className="grid grid-cols-1 md:grid-cols-3 gap-4"
+          onMouseEnter={stopInterval}
+          onMouseLeave={startInterval}
+        >
+          {/* Loop ini membuat 3 placeholder untuk kartu */}
+          {[0, 1, 2].map((cardIndex) => {
+            // Menghitung data reminder yang akan tampil berdasarkan urutan animasi
+            const reminderIndex =
+              (currentReminderIndex + cardIndex) % reminders.length;
+            const reminder = reminders[reminderIndex];
+            const styles = getReminderStyles(reminder.type);
+
+            return (
+              <div
+                key={`${reminder.id}-${cardIndex}`} // Key unik agar React me-render ulang
+                className="relative flex items-center overflow-hidden rounded-lg border p-0 shadow-sm transition-all h-27"
+              >
+                {/* Div ini yang akan membuat efek transisi konten */}
+                <div className="w-full transition-all duration-500 ease-in-out">
                   <div
-                    className={`relative flex items-center gap-4 overflow-hidden rounded-lg border p-3 shadow-sm cursor-pointer ${styles.bgColor} ${styles.borderColor} w-full flex-shrink-0`}
+                    className={`relative flex items-center gap-4 p-3 rounded-lg ${styles.bgColor} ${styles.borderColor}`}
                   >
                     <div
                       className={`absolute left-0 top-0 h-full w-1.5 ${styles.accentColor}`}
@@ -291,9 +341,9 @@ const HeaderSection: React.FC<HeaderSectionProps> = ({
                     </div>
                   </div>
                 </div>
-              );
-            })}
-          </div>
+              </div>
+            );
+          })}
         </div>
       </div>
     </div>
