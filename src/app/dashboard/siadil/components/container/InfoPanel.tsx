@@ -1,4 +1,3 @@
-// src/app/dashboard/siadil/components/InfoPanel.tsx
 "use client";
 
 import { Document } from "../../types";

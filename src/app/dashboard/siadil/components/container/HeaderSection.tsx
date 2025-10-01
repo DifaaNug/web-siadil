@@ -4,7 +4,6 @@ import React, { useState, useEffect, useRef } from "react";
 import { reminders } from "../../data";
 import { AddNewMenu } from "../ui/AddNewMenu";
 
-// Interface props yang sudah diperbaiki
 interface HeaderSectionProps {
   totalDocuments: number;
   expiredCount: number;
@@ -19,7 +18,6 @@ interface HeaderSectionProps {
   currentFolderId: string;
 }
 
-// Komponen Card dengan efek hover border mengikuti kursor
 const InfoCard = ({
   gradient,
   icon,
@@ -56,7 +54,6 @@ const InfoCard = ({
 
   return (
     <div ref={cardRef} className="group relative w-full">
-      {/* Efek border yang menyala mengikuti kursor */}
       <div
         className="pointer-events-none absolute -inset-0.5 rounded-xl opacity-0 transition-opacity duration-300 group-hover:opacity-75"
         style={{
@@ -64,10 +61,11 @@ const InfoCard = ({
             "radial-gradient(400px at var(--mouse-x) var(--mouse-y), rgba(1, 121, 59, 0.5), transparent 80%)",
         }}
       />
-      {/* Konten Kartu */}
       <div
+
         className={`relative z-10 rounded-xl p-3 pb-1 pt-1 text-white shadow-lg transition-all duration-300 ease-in-out ${gradient}`}
       >
+
         <div className="absolute top-4 right-4 flex h-10 w-10 items-center justify-center rounded-lg bg-white/30 backdrop-blur-sm">
           {icon}
         </div>
@@ -98,12 +96,16 @@ const HeaderSection: React.FC<HeaderSectionProps> = ({
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
   const startInterval = () => {
+
     if (intervalRef.current) clearInterval(intervalRef.current);
+
     intervalRef.current = setInterval(() => {
       setCurrentReminderIndex((prev) =>
         prev === reminders.length - 1 ? 0 : prev + 1
       );
-    }, 3000); // Ganti setiap 5 detik
+
+    }, 3000); 
+
   };
 
   const stopInterval = () => {
@@ -122,7 +124,7 @@ const HeaderSection: React.FC<HeaderSectionProps> = ({
         return {
           bgColor: "bg-red-50 dark:bg-red-900/50",
           borderColor: "border-red-200 dark:border-red-700",
-          accentColor: "bg-red-500", // Ditambahkan
+          accentColor: "bg-red-500",
           iconBg: "bg-red-100 dark:bg-red-900",
           iconColor: "text-red-600 dark:text-red-400",
           titleColor: "text-red-800 dark:text-red-200",
@@ -136,11 +138,11 @@ const HeaderSection: React.FC<HeaderSectionProps> = ({
             </svg>
           ),
         };
-      default: // 'warning'
+      default:
         return {
           bgColor: "bg-yellow-50 dark:bg-yellow-900/50",
           borderColor: "border-yellow-200 dark:border-yellow-700",
-          accentColor: "bg-yellow-500", // Ditambahkan
+          accentColor: "bg-yellow-500",
           iconBg: "bg-yellow-100 dark:bg-yellow-900",
           iconColor: "text-yellow-600 dark:text-yellow-400",
           titleColor: "text-yellow-800 dark:text-yellow-200",
@@ -172,8 +174,7 @@ const HeaderSection: React.FC<HeaderSectionProps> = ({
                   className="h-6 w-6 text-white"
                   fill="none"
                   viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
+                  stroke="currentColor">
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -193,8 +194,7 @@ const HeaderSection: React.FC<HeaderSectionProps> = ({
                   className="h-6 w-6 text-white"
                   fill="none"
                   viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
+                  stroke="currentColor">
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -214,8 +214,7 @@ const HeaderSection: React.FC<HeaderSectionProps> = ({
                   className="h-6 w-6 text-white"
                   fill="none"
                   viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
+                  stroke="currentColor">
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -261,7 +260,7 @@ const HeaderSection: React.FC<HeaderSectionProps> = ({
                 />
               )}
             </div>
-            {/* =================== AKHIR DARI KODE BARU =================== */}
+          
           </div>
         </div>
       </div>
@@ -294,15 +293,12 @@ const HeaderSection: React.FC<HeaderSectionProps> = ({
             </svg>
           </button>
         </div>
-        {/* Kontainer Grid untuk 3 Kartu Reminder Animasi */}
         <div
           className="grid grid-cols-1 md:grid-cols-3 gap-4"
           onMouseEnter={stopInterval}
           onMouseLeave={startInterval}
         >
-          {/* Loop ini membuat 3 placeholder untuk kartu */}
           {[0, 1, 2].map((cardIndex) => {
-            // Menghitung data reminder yang akan tampil berdasarkan urutan animasi
             const reminderIndex =
               (currentReminderIndex + cardIndex) % reminders.length;
             const reminder = reminders[reminderIndex];
@@ -319,17 +315,14 @@ const HeaderSection: React.FC<HeaderSectionProps> = ({
                     className={`relative flex items-center gap-4 p-3 rounded-lg ${styles.bgColor} ${styles.borderColor}`}
                   >
                     <div
-                      className={`absolute left-0 top-0 h-full w-1.5 ${styles.accentColor}`}
-                    ></div>
+                      className={`absolute left-0 top-0 h-full w-1.5 ${styles.accentColor}`}></div>
                     <div
-                      className={`ml-2 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full ${styles.iconBg} ${styles.iconColor}`}
-                    >
+                      className={`ml-2 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full ${styles.iconBg} ${styles.iconColor}`}>
                       {styles.icon}
                     </div>
                     <div className="flex-1 min-w-0">
                       <p
-                        className={`text-sm font-semibold truncate ${styles.titleColor}`}
-                      >
+                        className={`text-sm font-semibold truncate ${styles.titleColor}`}>
                         {reminder.title}
                       </p>
                       <p className="text-xs text-gray-600 dark:text-gray-400 truncate">

@@ -1,5 +1,3 @@
-// src/app/dashboard/siadil/components/container/DocumentsContainer.tsx
-
 import { useState, useEffect, useRef, ReactNode, ChangeEvent } from "react";
 import ReactDOM from "react-dom";
 import { useOnClickOutside } from "../../hooks/useOnClickOutside";
