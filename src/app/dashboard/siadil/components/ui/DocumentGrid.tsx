@@ -32,10 +32,21 @@ export const DocumentGrid = ({
   onManageContributors,
   isInfoPanelOpen,
 }: DocumentGridProps) => {
-  const [activeActionMenu, setActiveActionMenu] = useState<null | {
-    docId: string;
-    buttonEl: HTMLButtonElement;
-  }>(null);
+  const [activeActionMenu, setActiveActionMenu] = useState<
+    | null
+    | {
+        docId: string;
+        buttonEl: HTMLButtonElement;
+        anchorRect: {
+          top: number;
+          bottom: number;
+          left: number;
+          right: number;
+          width: number;
+          height: number;
+        };
+      }
+  >(null);
   const [contextMenu, setContextMenu] = useState<ContextMenuState>(null);
 
   const handleContextMenu = (event: React.MouseEvent, docId: string) => {
@@ -118,9 +129,24 @@ export const DocumentGrid = ({
                   aria-label="Actions"
                   onClick={(e) => {
                     e.stopPropagation();
+                    // Jika menu untuk dokumen ini sudah terbuka, tutup saja lalu keluar
+                    if (activeActionMenu?.docId === doc.id) {
+                      setActiveActionMenu(null);
+                      return;
+                    }
+
+                    const rect = e.currentTarget.getBoundingClientRect();
                     setActiveActionMenu({
                       docId: doc.id,
                       buttonEl: e.currentTarget,
+                      anchorRect: {
+                        top: rect.top,
+                        bottom: rect.bottom,
+                        left: rect.left,
+                        right: rect.right,
+                        width: rect.width,
+                        height: rect.height,
+                      },
                     });
                   }}>
                   <svg
@@ -159,6 +185,7 @@ export const DocumentGrid = ({
                 documentId={doc.id}
                 onClose={() => setActiveActionMenu(null)}
                 buttonEl={activeActionMenu.buttonEl}
+                anchorRect={activeActionMenu.anchorRect}
                 onMove={onMove}
                 onEdit={onEdit}
                 onDelete={onDelete}

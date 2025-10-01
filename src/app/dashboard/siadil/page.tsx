@@ -588,8 +588,7 @@ export default function SiadilPage() {
       <div
         className={`transition-all duration-300 ease-in-out ${
           isInfoPanelOpen ? "mr-80" : "mr-0"
-        }`}
-      >
+        }`}>
         <DashboardHeader
           userName={userData.name}
           breadcrumbItems={breadcrumbItems}
@@ -633,16 +632,14 @@ export default function SiadilPage() {
               <div
                 className={`relative w-full sm:max-w-xs ${
                   pageView === "archives" ? "visible" : "invisible"
-                }`}
-              >
+                }`}>
                 <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5">
                   <svg
                     className="h-4 w-4 text-gray-400"
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
                     viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
+                    stroke="currentColor">
                     <path
                       strokeLinecap="round"
                       strokeLinejoin="round"
@@ -672,8 +669,7 @@ export default function SiadilPage() {
                   pageView === "archives"
                     ? "border-demplon text-demplon"
                     : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-                }`}
-              >
+                }`}>
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="16"
@@ -683,8 +679,7 @@ export default function SiadilPage() {
                   stroke="currentColor"
                   strokeWidth="2"
                   strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
+                  strokeLinejoin="round">
                   <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
                 </svg>
                 <span>Archives</span>
@@ -696,8 +691,7 @@ export default function SiadilPage() {
                   pageView === "starred"
                     ? "border-demplon text-demplon"
                     : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-                }`}
-              >
+                }`}>
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="16"
@@ -707,8 +701,7 @@ export default function SiadilPage() {
                   stroke="currentColor"
                   strokeWidth="2"
                   strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
+                  strokeLinejoin="round">
                   <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
                 </svg>
                 <span>Starred</span>
@@ -720,8 +713,7 @@ export default function SiadilPage() {
                   pageView === "trash"
                     ? "border-demplon text-demplon"
                     : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-                }`}
-              >
+                }`}>
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="16"
@@ -731,8 +723,7 @@ export default function SiadilPage() {
                   stroke="currentColor"
                   strokeWidth="2"
                   strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
+                  strokeLinejoin="round">
                   <polyline points="3 6 5 6 21 6"></polyline>
                   <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
                 </svg>
@@ -886,8 +877,7 @@ export default function SiadilPage() {
           onConfirm={handleConfirmAction}
           title={confirmationModalData.title}
           confirmText={confirmationModalData.confirmText}
-          variant={confirmationModalData.variant}
-        >
+          variant={confirmationModalData.variant}>
           <p>{confirmationModalData.body}</p>
         </ConfirmationModal>
       )}
