@@ -27,7 +27,6 @@ import { ViewAllQuickAccessModal } from "./components/modals/ViewAllQuickAccessM
 import ArchiveView from "./components/views/ArchiveView";
 import DocumentView from "./components/views/DocumentView";
 import StarredView from "./components/views/StarredView";
-import { AddNewMenu } from "./components/ui/AddNewMenu";
 import { InfoPanel } from "./components/container/InfoPanel";
 import CreateArchiveModal from "./components/modals/CreateArchiveModal";
 import { AddDocumentModal } from "./components/modals/AddDocumentModal";
@@ -72,7 +71,7 @@ export default function SiadilPage() {
     id: "1990123",
   };
   const [isAddNewMenuOpen, setIsAddNewMenuOpen] = useState(false);
-  const addNewButtonRef = useRef<HTMLButtonElement>(null);
+  const addNewButtonRef = useRef<HTMLDivElement>(null);
   const [isExporting, setIsExporting] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [isRemindersModalOpen, setIsRemindersModalOpen] = useState(false);
@@ -583,6 +582,7 @@ export default function SiadilPage() {
 
     return { expiredCount: expired, expiringSoonCount: expiringSoon };
   }, [documents]);
+
   return (
     <>
       <div
@@ -600,43 +600,20 @@ export default function SiadilPage() {
           expiredCount={expiredCount}
           expiringSoonCount={expiringSoonCount}
           onViewAllReminders={() => setIsRemindersModalOpen(true)}
+          addNewButtonRef={addNewButtonRef}
+          isAddNewMenuOpen={isAddNewMenuOpen}
+          onToggleAddNewMenu={() => setIsAddNewMenuOpen(!isAddNewMenuOpen)}
+          onCloseAddNewMenu={() => setIsAddNewMenuOpen(false)}
+          onNewFolder={() => setIsCreateModalOpen(true)}
+          onFileUpload={handleOpenAddModalInContext}
+          currentFolderId={currentFolderId}
         />
-        <div className="relative mb-10">
-          <button
-            ref={addNewButtonRef}
-            onClick={() => setIsAddNewMenuOpen(!isAddNewMenuOpen)}
-            className="bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 font-semibold px-5 py-2.5 rounded-lg shadow hover:shadow-lg transition-all duration-200 ease-in-out flex items-center border border-gray-200 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
-          >
-            <svg
-              className="w-5 h-5 mr-2 -ml-1"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 4v16m8-8H4"
-              />
-            </svg>
-            <span>Add New</span>
-          </button>
-          {isAddNewMenuOpen && (
-            <AddNewMenu
-              buttonRef={addNewButtonRef}
-              onClose={() => setIsAddNewMenuOpen(false)}
-              onNewFolder={() => setIsCreateModalOpen(true)}
-              onFileUpload={handleOpenAddModalInContext}
-              context={currentFolderId === "root" ? "archives" : "documents"}
-            />
-          )}
-        </div>
         <AllRemindersModal
           isOpen={isRemindersModalOpen}
           onClose={() => setIsRemindersModalOpen(false)}
           reminders={reminders}
         />
+
         {currentFolderId === "root" && (
           <QuickAccessSection
             documents={quickAccessDocuments}

@@ -20,7 +20,7 @@ type AddNewMenuProps = {
   onClose: () => void;
   onNewFolder: () => void;
   onFileUpload: () => void;
-  buttonRef: React.RefObject<HTMLButtonElement | null>;
+  buttonRef: React.RefObject<HTMLDivElement | null>;
   context?: "archives" | "documents";
 };
 
@@ -30,7 +30,8 @@ const Icon = ({ path }: { path: string }) => (
     fill="none"
     viewBox="0 0 24 24"
     stroke="currentColor"
-    strokeWidth={1.5}>
+    strokeWidth={1.5}
+  >
     <path strokeLinecap="round" strokeLinejoin="round" d={path} />
   </svg>
 );
@@ -106,7 +107,8 @@ export const AddNewMenu = ({
       ref={menuRef}
       className={`absolute left-0 top-full mt-2 w-60 origin-top-left rounded-xl border border-gray-200 bg-white p-2 shadow-2xl transition-all duration-200 ease-out dark:border-gray-700 dark:bg-gray-800 z-50 ${
         isVisible ? "scale-100 opacity-100" : "scale-95 opacity-0"
-      }`}>
+      }`}
+    >
       <ul>
         {itemsToRender.map((item, index) =>
           item.isSeparator ? (
@@ -117,7 +119,8 @@ export const AddNewMenu = ({
             <li key={index}>
               <button
                 onClick={() => handleAction(item.action)}
-                className="flex w-full items-center rounded-lg px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700">
+                className="flex w-full items-center rounded-lg px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
+              >
                 <Icon path={item.icon} />
                 <span>{item.label}</span>
               </button>
