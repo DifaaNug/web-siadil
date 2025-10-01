@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useMemo } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 import { useOnClickOutside } from "../../hooks/useOnClickOutside";
 
 // Tipe data untuk sebuah pengingat
@@ -22,6 +22,7 @@ type Props = {
   reminders: Reminder[];
   // Prop baru untuk menangani aksi klik pada dokumen
   onDocumentClick?: (documentId: string) => void;
+  initialTab?: ActiveTab;
 };
 
 type SortOption = "default" | "title-asc" | "expiry-asc";
@@ -32,13 +33,21 @@ export const AllRemindersModal = ({
   onClose,
   reminders,
   onDocumentClick,
+  initialTab = "all",
 }: Props) => {
   const modalRef = useRef<HTMLDivElement>(null);
   useOnClickOutside(modalRef, onClose);
 
   const [searchTerm, setSearchTerm] = useState("");
   const [sortOption, setSortOption] = useState<SortOption>("default");
-  const [activeTab, setActiveTab] = useState<ActiveTab>("all");
+  const [activeTab, setActiveTab] = useState<ActiveTab>(initialTab);
+
+  // Efek untuk menyinkronkan state jika props initialTab berubah saat modal sudah terbuka
+  useEffect(() => {
+    if (isOpen) {
+      setActiveTab(initialTab);
+    }
+  }, [initialTab, isOpen]);
 
   const processedReminders = useMemo(() => {
     let filtered = reminders;

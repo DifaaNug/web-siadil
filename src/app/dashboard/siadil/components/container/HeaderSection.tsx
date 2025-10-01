@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
-import { reminders } from "../../data";
+import React, { useState, useEffect, useRef, useCallback } from "react";
+import { Reminder } from "../../types";
 import { AddNewMenu } from "../ui/AddNewMenu";
 
 // Interface props yang sudah diperbaiki
@@ -17,6 +17,9 @@ interface HeaderSectionProps {
   onNewFolder: () => void;
   onFileUpload: () => void;
   currentFolderId: string;
+  onExpiredCardClick: () => void;
+  onExpiringSoonCardClick: () => void;
+  reminders: Reminder[];
 }
 
 // Komponen Card dengan efek hover border mengikuti kursor
@@ -26,12 +29,14 @@ const InfoCard = ({
   value,
   title,
   subtitle,
+  onClick,
 }: {
   gradient: string;
   icon: React.ReactNode;
   value: number;
   title: string;
   subtitle: string;
+  onClick?: () => void;
 }) => {
   const cardRef = useRef<HTMLDivElement>(null);
 
@@ -55,7 +60,11 @@ const InfoCard = ({
   }, []);
 
   return (
-    <div ref={cardRef} className="group relative w-full">
+    <div
+      ref={cardRef}
+      className={`group relative w-full ${onClick ? "cursor-pointer" : ""}`}
+      onClick={onClick}
+    >
       {/* Efek border yang menyala mengikuti kursor */}
       <div
         className="pointer-events-none absolute -inset-0.5 rounded-xl opacity-0 transition-opacity duration-300 group-hover:opacity-75"
@@ -93,29 +102,32 @@ const HeaderSection: React.FC<HeaderSectionProps> = ({
   onNewFolder,
   onFileUpload,
   currentFolderId,
+  onExpiredCardClick,
+  onExpiringSoonCardClick,
+  reminders,
 }) => {
   const [currentReminderIndex, setCurrentReminderIndex] = useState(0);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  const startInterval = () => {
+  const stopInterval = useCallback(() => {
     if (intervalRef.current) clearInterval(intervalRef.current);
-    intervalRef.current = setInterval(() => {
-      setCurrentReminderIndex((prev) =>
-        prev === reminders.length - 1 ? 0 : prev + 1
-      );
-    }, 3000); // Ganti setiap 5 detik
-  };
+  }, []);
 
-  const stopInterval = () => {
-    if (intervalRef.current) clearInterval(intervalRef.current);
-  };
+  const startInterval = useCallback(() => {
+    stopInterval(); // Hentikan interval sebelumnya untuk menghindari duplikasi
+    if (reminders.length > 0) {
+      intervalRef.current = setInterval(() => {
+        setCurrentReminderIndex((prev) => (prev + 1) % reminders.length);
+      }, 3000);
+    }
+  }, [reminders.length, stopInterval]);
 
   useEffect(() => {
     if (reminders.length > 1) {
       startInterval();
     }
     return () => stopInterval();
-  }, []);
+  }, [reminders.length, startInterval, stopInterval]);
   const getReminderStyles = (type: "error" | "warning" | undefined) => {
     switch (type) {
       case "error":
@@ -188,6 +200,7 @@ const HeaderSection: React.FC<HeaderSectionProps> = ({
               value={expiredCount}
               title="Kedaluwarsa"
               subtitle="Butuh Perhatian Segera"
+              onClick={onExpiredCardClick}
               icon={
                 <svg
                   className="h-6 w-6 text-white"
@@ -209,6 +222,7 @@ const HeaderSection: React.FC<HeaderSectionProps> = ({
               value={expiringSoonCount}
               title="Akan Kedaluwarsa"
               subtitle="Dalam 30 Hari Kedepan"
+              onClick={onExpiringSoonCardClick}
               icon={
                 <svg
                   className="h-6 w-6 text-white"
