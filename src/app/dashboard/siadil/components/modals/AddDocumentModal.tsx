@@ -1,5 +1,8 @@
+"use client";
 import { ChangeEvent } from "react";
 import { NewDocumentData, Archive } from "../../types";
+// Removed custom inline ArchivePicker; using shared HierarchicalArchivePicker
+import { HierarchicalArchivePicker } from "./HierarchicalArchivePicker";
 
 type AddDocumentModalProps = {
   onClose: () => void;
@@ -10,6 +13,7 @@ type AddDocumentModalProps = {
   ) => void;
   archives: Archive[];
   editingDocId: string | null;
+  baseArchiveId?: string;
 };
 
 export const AddDocumentModal = ({
@@ -19,6 +23,7 @@ export const AddDocumentModal = ({
   setNewDocument,
   archives,
   editingDocId,
+  baseArchiveId = "root",
 }: AddDocumentModalProps) => {
   const isEditing = !!editingDocId;
   const handleInputChange = (
@@ -68,36 +73,22 @@ export const AddDocumentModal = ({
         {/* === BODY === */}
         <div className="overflow-y-auto p-5">
           <div className="grid grid-cols-1 gap-x-6 gap-y-5 md:grid-cols-2">
-            {/* --- Archive --- */}
-            <div className="relative md:col-span-2">
-              <label
-                htmlFor="archive"
-                className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                Archive
-              </label>
-              <select
-                name="archive"
-                id="archive"
+            {/* --- Archive (Hierarchical Picker) --- */}
+            <div className="md:col-span-2">
+              <HierarchicalArchivePicker
+                archives={archives}
+                baseArchiveId={baseArchiveId}
                 value={newDocument.archive}
-                onChange={handleInputChange}
-                className="w-full appearance-none rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:border-green-500 focus:ring-green-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200">
-                <option value="" disabled>
-                  Select Archive
-                </option>
-                {archives.map((a) => (
-                  <option key={a.id} value={a.code}>
-                    {a.name}
-                  </option>
-                ))}
-              </select>
-              <div className="pointer-events-none absolute inset-y-0 right-0 top-7 flex items-center px-2 text-gray-700 dark:text-gray-400">
-                <svg
-                  className="h-4 w-4 fill-current"
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 20 20">
-                  <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
-                </svg>
-              </div>
+                onChange={(code) =>
+                  setNewDocument((prev) => ({ ...prev, archive: code }))
+                }
+                selectionKey="code"
+                excludeBase={true}
+                showRootOptionAtRoot={true}
+                label="Archive"
+                placeholder="Select Archive"
+                showChildCount={true}
+              />
             </div>
 
             {/* --- Number --- */}
@@ -288,3 +279,5 @@ export const AddDocumentModal = ({
     </div>
   );
 };
+
+// Removed inline ArchivePicker in favor of shared HierarchicalArchivePicker
