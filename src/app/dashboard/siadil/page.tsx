@@ -9,6 +9,7 @@ import {
   NewDocumentData,
   TableColumn,
   Contributor,
+  Reminder,
 } from "./types";
 
 import { useData } from "./hooks/useData";
@@ -34,11 +35,13 @@ import { SearchPopup } from "./components/modals/SearchPopup";
 import { MoveToModal } from "./components/modals/MoveToModal";
 
 import { AllRemindersModal } from "./components/modals/AllRemindersModal";
-import { reminders } from "./data";
+// import { reminders } from "./data";
 import { toast } from "sonner";
 import { ConfirmationModal } from "./components/modals/ConfirmationModal";
 import DashboardHeader from "./components/container/DashboardHeader";
 import { AllHistoryModal } from "./components/modals/AllHistoryModal";
+
+type ReminderTab = "all" | "error" | "warning";
 
 const allTableColumns: TableColumn[] = [
   { id: "numberAndTitle", label: "Number & Title" },
@@ -75,6 +78,9 @@ export default function SiadilPage() {
   const [isExporting, setIsExporting] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [isRemindersModalOpen, setIsRemindersModalOpen] = useState(false);
+
+  const [initialReminderTab, setInitialReminderTab] =
+    useState<ReminderTab>("all");
 
   const [isContributorsModalOpen, setIsContributorsModalOpen] = useState(false);
   const [selectedDocForContributors, setSelectedDocForContributors] =
@@ -121,6 +127,53 @@ export default function SiadilPage() {
     subfolderArchives,
     handleToggleStar,
   } = useData(currentFolderId);
+
+  const { dynamicReminders, expiredCount, expiringSoonCount } = useMemo(() => {
+    const reminders: Reminder[] = [];
+    let expired = 0;
+    let expiringSoon = 0;
+    const now = new Date();
+    const thirtyDaysFromNow = new Date();
+    thirtyDaysFromNow.setDate(now.getDate() + 30);
+
+    documents.forEach((doc) => {
+      if (!doc.expireDate || doc.status === "Trashed") return;
+
+      const expireDate = new Date(doc.expireDate);
+      const diffTime = expireDate.getTime() - now.getTime();
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+      if (expireDate < now) {
+        expired++;
+        reminders.push({
+          id: doc.id,
+          documentId: doc.id,
+          title: doc.title,
+          description: `Dokumen di arsip ${doc.archive}`,
+          message: `Telah kedaluwarsa ${Math.abs(diffDays)} hari yang lalu.`,
+          type: "error",
+          expireDate: doc.expireDate,
+        });
+      } else if (expireDate <= thirtyDaysFromNow) {
+        expiringSoon++;
+        reminders.push({
+          id: doc.id,
+          documentId: doc.id,
+          title: doc.title,
+          description: `Dokumen di arsip ${doc.archive}`,
+          message: `Akan kedaluwarsa dalam ${diffDays} hari.`,
+          type: "warning",
+          expireDate: doc.expireDate,
+        });
+      }
+    });
+
+    return {
+      dynamicReminders: reminders,
+      expiredCount: expired,
+      expiringSoonCount: expiringSoon,
+    };
+  }, [documents]);
 
   // Memo untuk semua dokumen riwayat
   const allHistoryDocuments = useMemo(() => {
@@ -562,26 +615,10 @@ export default function SiadilPage() {
     }
   }, [confirmationAction]);
 
-  const { expiredCount, expiringSoonCount } = useMemo(() => {
-    const now = new Date();
-    const thirtyDaysFromNow = new Date();
-    thirtyDaysFromNow.setDate(now.getDate() + 30);
-
-    const expired = documents.filter(
-      (doc) => new Date(doc.expireDate) < now && doc.status !== "Trashed"
-    ).length;
-
-    const expiringSoon = documents.filter((doc) => {
-      const expireDate = new Date(doc.expireDate);
-      return (
-        expireDate >= now &&
-        expireDate <= thirtyDaysFromNow &&
-        doc.status !== "Trashed"
-      );
-    }).length;
-
-    return { expiredCount: expired, expiringSoonCount: expiringSoon };
-  }, [documents]);
+  const handleOpenReminders = (tab: ReminderTab) => {
+    setInitialReminderTab(tab);
+    setIsRemindersModalOpen(true);
+  };
 
   return (
     <>
@@ -599,6 +636,8 @@ export default function SiadilPage() {
           expiredCount={expiredCount}
           expiringSoonCount={expiringSoonCount}
           onViewAllReminders={() => setIsRemindersModalOpen(true)}
+          onExpiredCardClick={() => handleOpenReminders("error")}
+          onExpiringSoonCardClick={() => handleOpenReminders("warning")}
           addNewButtonRef={addNewButtonRef}
           isAddNewMenuOpen={isAddNewMenuOpen}
           onToggleAddNewMenu={() => setIsAddNewMenuOpen(!isAddNewMenuOpen)}
@@ -606,11 +645,13 @@ export default function SiadilPage() {
           onNewFolder={() => setIsCreateModalOpen(true)}
           onFileUpload={handleOpenAddModalInContext}
           currentFolderId={currentFolderId}
+          reminders={dynamicReminders}
         />
         <AllRemindersModal
           isOpen={isRemindersModalOpen}
           onClose={() => setIsRemindersModalOpen(false)}
-          reminders={reminders}
+          reminders={dynamicReminders}
+          initialTab={initialReminderTab}
         />
 
         {currentFolderId === "root" && (

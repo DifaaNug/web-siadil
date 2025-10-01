@@ -55,6 +55,7 @@ const ModernHeader: React.FC<ModernHeaderProps> = ({
     .replace(/\./g, ":");
 
   const formattedDate = currentTime.toLocaleDateString("id-ID", {
+    weekday: "long",
     day: "numeric",
     month: "long",
     year: "numeric",

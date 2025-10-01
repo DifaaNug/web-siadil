@@ -57,3 +57,13 @@ export type TableColumn = {
   id: string;
   label: string;
 };
+
+export type Reminder = {
+  id: string;
+  title: string;
+  description: string;
+  message: string;
+  type: "error" | "warning";
+  documentId?: string;
+  expireDate?: string;
+};

@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
-import { reminders } from "../../data";
+import React, { useState, useEffect, useRef, useCallback } from "react";
+import { Reminder } from "../../types";
 import { AddNewMenu } from "../ui/AddNewMenu";
 
 interface HeaderSectionProps {
@@ -16,6 +16,9 @@ interface HeaderSectionProps {
   onNewFolder: () => void;
   onFileUpload: () => void;
   currentFolderId: string;
+  onExpiredCardClick: () => void;
+  onExpiringSoonCardClick: () => void;
+  reminders: Reminder[];
 }
 
 const InfoCard = ({
@@ -24,12 +27,14 @@ const InfoCard = ({
   value,
   title,
   subtitle,
+  onClick,
 }: {
   gradient: string;
   icon: React.ReactNode;
   value: number;
   title: string;
   subtitle: string;
+  onClick?: () => void;
 }) => {
   const cardRef = useRef<HTMLDivElement>(null);
 
@@ -53,19 +58,22 @@ const InfoCard = ({
   }, []);
 
   return (
-    <div ref={cardRef} className="group relative w-full">
+    <div
+      ref={cardRef}
+      className={`group relative w-full ${onClick ? "cursor-pointer" : ""}`}
+      onClick={onClick}
+    >
+      {/* Efek border yang menyala mengikuti kursor */}
       <div
         className="pointer-events-none absolute -inset-0.5 rounded-xl opacity-0 transition-opacity duration-300 group-hover:opacity-75"
         style={{
           background:
-            "radial-gradient(400px at var(--mouse-x) var(--mouse-y), rgba(1, 121, 59, 0.5), transparent 80%)",
+            "radial-gradient(400px at var(--mouse-x) var(--mouse-y), rgb(4, 207, 18), transparent 80%)",
         }}
       />
       <div
-
         className={`relative z-10 rounded-xl p-3 pb-1 pt-1 text-white shadow-lg transition-all duration-300 ease-in-out ${gradient}`}
       >
-
         <div className="absolute top-4 right-4 flex h-10 w-10 items-center justify-center rounded-lg bg-white/30 backdrop-blur-sm">
           {icon}
         </div>
@@ -91,33 +99,32 @@ const HeaderSection: React.FC<HeaderSectionProps> = ({
   onNewFolder,
   onFileUpload,
   currentFolderId,
+  onExpiredCardClick,
+  onExpiringSoonCardClick,
+  reminders,
 }) => {
   const [currentReminderIndex, setCurrentReminderIndex] = useState(0);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  const startInterval = () => {
-
+  const startInterval = useCallback(() => {
     if (intervalRef.current) clearInterval(intervalRef.current);
-
     intervalRef.current = setInterval(() => {
       setCurrentReminderIndex((prev) =>
         prev === reminders.length - 1 ? 0 : prev + 1
       );
+    }, 3000); // Ganti setiap 3 detik
+  }, [reminders.length]);
 
-    }, 3000); 
-
-  };
-
-  const stopInterval = () => {
+  const stopInterval = useCallback(() => {
     if (intervalRef.current) clearInterval(intervalRef.current);
-  };
+  }, []);
 
   useEffect(() => {
     if (reminders.length > 1) {
       startInterval();
     }
     return () => stopInterval();
-  }, []);
+  }, [reminders.length, startInterval, stopInterval]);
   const getReminderStyles = (type: "error" | "warning" | undefined) => {
     switch (type) {
       case "error":
@@ -174,7 +181,8 @@ const HeaderSection: React.FC<HeaderSectionProps> = ({
                   className="h-6 w-6 text-white"
                   fill="none"
                   viewBox="0 0 24 24"
-                  stroke="currentColor">
+                  stroke="currentColor"
+                >
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -189,12 +197,14 @@ const HeaderSection: React.FC<HeaderSectionProps> = ({
               value={expiredCount}
               title="Kedaluwarsa"
               subtitle="Butuh Perhatian Segera"
+              onClick={onExpiredCardClick}
               icon={
                 <svg
                   className="h-6 w-6 text-white"
                   fill="none"
                   viewBox="0 0 24 24"
-                  stroke="currentColor">
+                  stroke="currentColor"
+                >
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -209,12 +219,14 @@ const HeaderSection: React.FC<HeaderSectionProps> = ({
               value={expiringSoonCount}
               title="Akan Kedaluwarsa"
               subtitle="Dalam 30 Hari Kedepan"
+              onClick={onExpiringSoonCardClick}
               icon={
                 <svg
                   className="h-6 w-6 text-white"
                   fill="none"
                   viewBox="0 0 24 24"
-                  stroke="currentColor">
+                  stroke="currentColor"
+                >
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -260,7 +272,6 @@ const HeaderSection: React.FC<HeaderSectionProps> = ({
                 />
               )}
             </div>
-          
           </div>
         </div>
       </div>
@@ -315,14 +326,17 @@ const HeaderSection: React.FC<HeaderSectionProps> = ({
                     className={`relative flex items-center gap-4 p-3 rounded-lg ${styles.bgColor} ${styles.borderColor}`}
                   >
                     <div
-                      className={`absolute left-0 top-0 h-full w-1.5 ${styles.accentColor}`}></div>
+                      className={`absolute left-0 top-0 h-full w-1.5 ${styles.accentColor}`}
+                    ></div>
                     <div
-                      className={`ml-2 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full ${styles.iconBg} ${styles.iconColor}`}>
+                      className={`ml-2 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full ${styles.iconBg} ${styles.iconColor}`}
+                    >
                       {styles.icon}
                     </div>
                     <div className="flex-1 min-w-0">
                       <p
-                        className={`text-sm font-semibold truncate ${styles.titleColor}`}>
+                        className={`text-sm font-semibold truncate ${styles.titleColor}`}
+                      >
                         {reminder.title}
                       </p>
                       <p className="text-xs text-gray-600 dark:text-gray-400 truncate">
