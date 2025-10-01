@@ -97,6 +97,7 @@ export const AllRemindersModal = ({
         return {
           bgColor: "bg-red-50 dark:bg-red-900/50",
           borderColor: "border-red-200 dark:border-red-700",
+          accentColor: "bg-red-500", // Ditambahkan
           iconBg: "bg-red-100 dark:bg-red-900",
           iconColor: "text-red-600 dark:text-red-400",
           titleColor: "text-red-800 dark:text-red-200",
@@ -114,6 +115,7 @@ export const AllRemindersModal = ({
         return {
           bgColor: "bg-yellow-50 dark:bg-yellow-900/50",
           borderColor: "border-yellow-200 dark:border-yellow-700",
+          accentColor: "bg-yellow-500", // Ditambahkan
           iconBg: "bg-yellow-100 dark:bg-yellow-900",
           iconColor: "text-yellow-600 dark:text-yellow-400",
           titleColor: "text-yellow-800 dark:text-yellow-200",
@@ -229,25 +231,28 @@ export const AllRemindersModal = ({
                         }
                       : undefined
                   }
-                  className={`w-full flex items-center justify-between rounded-lg border p-4 shadow-sm transition-all ${
+                  className={`w-full text-left relative flex items-center justify-between overflow-hidden rounded-lg border p-0 shadow-sm transition-all ${
                     isClickable
                       ? "cursor-pointer hover:shadow-md hover:border-gray-300 dark:hover:border-gray-500"
                       : ""
-                  } ${styles.bgColor} ${styles.borderColor}`}
+                  } ${styles.borderColor} ${styles.bgColor}`}
                 >
-                  <div className="flex items-center">
+                  <div
+                    className={`absolute left-0 top-0 h-full w-1.5 ${styles.accentColor}`}
+                  />
+                  <div className="flex items-center gap-4 p-3 pl-6">
                     <div
                       className={`flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full ${styles.iconBg} ${styles.iconColor}`}
                     >
                       {styles.icon}
                     </div>
-                    <div className="ml-4 text-left">
+                    <div className="flex-1 min-w-0">
                       <p
-                        className={`text-sm font-semibold ${styles.titleColor}`}
+                        className={`text-sm font-semibold truncate ${styles.titleColor}`}
                       >
                         {reminder.title}
                       </p>
-                      <p className="text-xs text-gray-600 dark:text-gray-400">
+                      <p className="text-xs text-gray-600 dark:text-gray-400 truncate">
                         {reminder.description}
                       </p>
                       <p className="mt-1 text-xs text-gray-500 dark:text-gray-500">
@@ -255,9 +260,9 @@ export const AllRemindersModal = ({
                       </p>
                     </div>
                   </div>
-                  <div className="flex h-6 w-6 items-center justify-center rounded-full hover:bg-black/5 dark:hover:bg-white/10">
+                  <div className="mr-2 flex h-8 w-8 items-center justify-center rounded-full transition-colors hover:bg-black/5 dark:hover:bg-white/10">
                     <svg
-                      className="h-5 w-5 text-gray-400"
+                      className="h-6 w-6 text-gray-400"
                       fill="none"
                       viewBox="0 0 24 24"
                       stroke="currentColor"

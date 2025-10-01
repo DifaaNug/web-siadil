@@ -181,7 +181,7 @@ const HeaderSection: React.FC<HeaderSectionProps> = ({
               subtitle="Total Arsip Aktif"
               icon={
                 <svg
-                  className="h-6 w-6 text-white"
+                  className="h-[28px] w-[28px] text-white"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
