@@ -46,17 +46,23 @@ export const AddDocumentModal = ({
   const [expireDate, setExpireDate] = React.useState<Date | undefined>(
     newDocument.expireDate ? new Date(newDocument.expireDate) : undefined
   );
+  // Popover open states for auto-close behavior
+  const [openDocDate, setOpenDocDate] = React.useState(false);
+  const [openExpireDate, setOpenExpireDate] = React.useState(false);
 
   // Gunakan useEffect untuk menyinkronkan state lokal kalender ke state utama 'newDocument'
   useEffect(() => {
     const formattedDate = documentDate
       ? format(documentDate, "yyyy-MM-dd")
       : "";
-    // Hanya update jika nilainya berbeda untuk menghindari render berulang
     if (formattedDate !== newDocument.documentDate) {
       setNewDocument((prev) => ({ ...prev, documentDate: formattedDate }));
     }
-  }, [documentDate, newDocument.documentDate, setNewDocument]);
+    // Jika expireDate tidak valid lagi (<= documentDate) maka reset
+    if (documentDate && expireDate && expireDate <= documentDate) {
+      setExpireDate(undefined);
+    }
+  }, [documentDate, newDocument.documentDate, setNewDocument, expireDate]);
 
   useEffect(() => {
     const formattedDate = expireDate ? format(expireDate, "yyyy-MM-dd") : "";
@@ -98,8 +104,7 @@ export const AddDocumentModal = ({
           </div>
           <button
             onClick={onClose}
-            className="ml-auto inline-flex items-center rounded-lg bg-transparent p-1.5 text-sm text-gray-400 hover:bg-gray-200 hover:text-gray-900 dark:hover:bg-gray-600 dark:hover:text-white"
-          >
+            className="ml-auto inline-flex items-center rounded-lg bg-transparent p-1.5 text-sm text-gray-400 hover:bg-gray-200 hover:text-gray-900 dark:hover:bg-gray-600 dark:hover:text-white">
             <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
               <path
                 fillRule="evenodd"
@@ -135,8 +140,7 @@ export const AddDocumentModal = ({
             <div className="md:col-span-2">
               <label
                 htmlFor="number"
-                className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300"
-              >
+                className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
                 Number
               </label>
               <input
@@ -157,8 +161,7 @@ export const AddDocumentModal = ({
             <div className="md:col-span-2">
               <label
                 htmlFor="title"
-                className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300"
-              >
+                className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
                 Title
               </label>
               <input
@@ -179,8 +182,7 @@ export const AddDocumentModal = ({
             <div className="md:col-span-2">
               <label
                 htmlFor="description"
-                className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300"
-              >
+                className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
                 Description
               </label>
               <textarea
@@ -200,19 +202,17 @@ export const AddDocumentModal = ({
             <div className="md:col-span-1">
               <label
                 htmlFor="documentDate"
-                className="block text-sm font-medium text-gray-700 mb-1"
-              >
+                className="block text-sm font-medium text-gray-700 mb-1">
                 Document Date
               </label>
-              <Popover>
+              <Popover open={openDocDate} onOpenChange={setOpenDocDate}>
                 <PopoverTrigger asChild>
                   <Button
                     variant={"outline"}
                     className={cn(
                       "w-full justify-start text-left font-normal",
                       !documentDate && "text-muted-foreground"
-                    )}
-                  >
+                    )}>
                     <CalendarIcon className="mr-2 h-4 w-4" />
                     {documentDate ? (
                       format(documentDate, "PPP")
@@ -225,7 +225,10 @@ export const AddDocumentModal = ({
                   <Calendar
                     mode="single"
                     selected={documentDate}
-                    onSelect={setDocumentDate}
+                    onSelect={(d) => {
+                      setDocumentDate(d);
+                      if (d) setOpenDocDate(false);
+                    }}
                     initialFocus
                     captionLayout="dropdown"
                     fromYear={1980} // Atur tahun mulai
@@ -239,19 +242,18 @@ export const AddDocumentModal = ({
             <div className="md:col-span-1">
               <label
                 htmlFor="expireDate"
-                className="block text-sm font-medium text-gray-700 mb-1"
-              >
+                className="block text-sm font-medium text-gray-700 mb-1">
                 Document Expire Date
               </label>
-              <Popover>
+              <Popover open={openExpireDate} onOpenChange={setOpenExpireDate}>
                 <PopoverTrigger asChild>
                   <Button
                     variant={"outline"}
                     className={cn(
                       "w-full justify-start text-left font-normal",
-                      !expireDate && "text-muted-foreground"
-                    )}
-                  >
+                      !expireDate && "text-muted-foreground",
+                      !documentDate && "opacity-50 cursor-not-allowed"
+                    )}>
                     <CalendarIcon className="mr-2 h-4 w-4" />
                     {expireDate ? (
                       format(expireDate, "PPP")
@@ -264,7 +266,14 @@ export const AddDocumentModal = ({
                   <Calendar
                     mode="single"
                     selected={expireDate}
-                    onSelect={setExpireDate}
+                    onSelect={(d) => {
+                      if (documentDate && d && d <= documentDate) return; // block invalid
+                      setExpireDate(d);
+                      if (d) setOpenExpireDate(false);
+                    }}
+                    disabled={(d) =>
+                      !documentDate || !!(documentDate && d <= documentDate)
+                    }
                     initialFocus
                     captionLayout="dropdown"
                     fromYear={1980}
@@ -279,8 +288,7 @@ export const AddDocumentModal = ({
               <div className="md:col-span-2">
                 <label
                   htmlFor="file-upload"
-                  className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300"
-                >
+                  className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
                   File
                 </label>
                 <div className="mt-1 flex justify-center rounded-lg border-2 border-dashed border-gray-300 px-6 pb-6 pt-5 dark:border-gray-600">
@@ -290,8 +298,7 @@ export const AddDocumentModal = ({
                       stroke="currentColor"
                       fill="none"
                       viewBox="0 0 48 48"
-                      aria-hidden="true"
-                    >
+                      aria-hidden="true">
                       <path
                         d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8"
                         strokeWidth="2"
@@ -302,8 +309,7 @@ export const AddDocumentModal = ({
                     <div className="mt-4 flex text-sm text-gray-600 dark:text-gray-400">
                       <label
                         htmlFor="file"
-                        className="relative cursor-pointer rounded-md bg-white font-medium text-green-600 focus-within:outline-none focus-within:ring-2 focus-within:ring-green-500 focus-within:ring-offset-2 hover:text-green-500 dark:bg-gray-800"
-                      >
+                        className="relative cursor-pointer rounded-md bg-white font-medium text-green-600 focus-within:outline-none focus-within:ring-2 focus-within:ring-green-500 focus-within:ring-offset-2 hover:text-green-500 dark:bg-gray-800">
                         <span>Upload a file</span>
                         <input
                           id="file"
@@ -336,22 +342,19 @@ export const AddDocumentModal = ({
         <div className="flex items-center justify-end space-x-2 rounded-b-lg border-t border-gray-200 bg-gray-50 p-5 dark:border-gray-700 dark:bg-gray-800">
           <button
             onClick={onClose}
-            className="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-semibold text-gray-800 hover:bg-gray-100 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
-          >
+            className="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-semibold text-gray-800 hover:bg-gray-100 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600">
             Cancel
           </button>
           <button
             onClick={onSave}
-            className="flex items-center gap-2 rounded-lg bg-demplon px-4 py-2 text-sm font-semibold text-white hover:bg-green-700"
-          >
+            className="flex items-center gap-2 rounded-lg bg-demplon px-4 py-2 text-sm font-semibold text-white hover:bg-green-700">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               className="h-4 w-4"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
-              strokeWidth={2}
-            >
+              strokeWidth={2}>
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
