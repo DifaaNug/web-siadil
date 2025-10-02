@@ -83,7 +83,8 @@ export const DocumentsContainer = ({
   useOnClickOutside(
     filterPopoverRef,
     () => setIsFilterOpen(false),
-    filterButtonRef
+    filterButtonRef,
+    ["[data-filter-date-popover]"]
   );
   useOnClickOutside(
     columnTogglePopoverRef,
