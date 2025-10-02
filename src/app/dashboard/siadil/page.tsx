@@ -128,7 +128,19 @@ export default function SiadilPage() {
     handleToggleStar,
   } = useData(currentFolderId);
 
+  // Total document count logic (root = all active docs, subfolder = active docs in subtree)
+  const totalDocumentsDisplayed = useMemo(() => {
+    const activeDocuments = documents.filter((d) => d.status !== "Trashed");
+    if (currentFolderId === "root") return activeDocuments.length;
+    // searchableDocuments already scoped to current folder + descendants & excludes trashed
+    return searchableDocuments.length;
+  }, [documents, currentFolderId, searchableDocuments]);
+
   const { dynamicReminders, expiredCount, expiringSoonCount } = useMemo(() => {
+    // Gunakan dokumen subtree jika bukan root
+    const baseDocs =
+      currentFolderId === "root" ? documents : searchableDocuments; // sudah tidak termasuk Trashed
+
     const reminders: Reminder[] = [];
     let expired = 0;
     let expiringSoon = 0;
@@ -136,9 +148,8 @@ export default function SiadilPage() {
     const thirtyDaysFromNow = new Date();
     thirtyDaysFromNow.setDate(now.getDate() + 30);
 
-    documents.forEach((doc) => {
+    baseDocs.forEach((doc) => {
       if (!doc.expireDate || doc.status === "Trashed") return;
-
       const expireDate = new Date(doc.expireDate);
       const diffTime = expireDate.getTime() - now.getTime();
       const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
@@ -173,7 +184,7 @@ export default function SiadilPage() {
       expiredCount: expired,
       expiringSoonCount: expiringSoon,
     };
-  }, [documents]);
+  }, [documents, searchableDocuments, currentFolderId]);
 
   // Memo untuk semua dokumen riwayat
   const allHistoryDocuments = useMemo(() => {
@@ -632,7 +643,7 @@ export default function SiadilPage() {
           onBreadcrumbClick={setCurrentFolderId}
         />
         <HeaderSection
-          totalDocuments={documents.length}
+          totalDocuments={totalDocumentsDisplayed}
           expiredCount={expiredCount}
           expiringSoonCount={expiringSoonCount}
           onViewAllReminders={() => setIsRemindersModalOpen(true)}
