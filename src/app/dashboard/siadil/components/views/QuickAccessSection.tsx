@@ -153,7 +153,7 @@ const QuickAccessSection: React.FC<QuickAccessSectionProps> = ({
 
               {/* Right content */}
               <div className="min-w-0 flex-1">
-                <div className="flex items-start justify-between gap-3">
+                <div className="flex items-center justify-between gap-3">
                   <div className="min-w-0">
                     <h4
                       className="truncate text-sm font-semibold leading-6 text-gray-900 dark:text-white"
@@ -174,7 +174,7 @@ const QuickAccessSection: React.FC<QuickAccessSectionProps> = ({
 
                   {/* Chevron */}
                   <svg
-                    className="mt-1 h-4 w-4 flex-shrink-0 text-gray-400 transition-all duration-200 group-hover:translate-x-0.5 group-hover:text-gray-500 dark:text-gray-500"
+                    className="h-4 w-4 flex-shrink-0 text-gray-400 transition-all duration-200 group-hover:translate-x-0.5 group-hover:text-gray-500 dark:text-gray-500"
                     width="16"
                     height="16"
                     viewBox="0 0 24 24"
