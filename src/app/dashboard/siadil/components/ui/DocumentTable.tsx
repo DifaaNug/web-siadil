@@ -2,13 +2,9 @@ import { useState } from "react";
 import { Document } from "../../types";
 import { ActionMenu } from "./ActionMenu";
 import { HeaderSortMenu } from "./HeaderSortMenu";
-import { ContextMenu } from "./ContextMenu";
+// Right-click context menu removed per request
 
-type ContextMenuState = {
-  x: number;
-  y: number;
-  documentId: string;
-} | null;
+// Context menu state removed
 
 type ActiveMenuState = { docId: string; buttonEl: HTMLButtonElement } | null;
 type ActiveHeaderMenuState = {
@@ -49,20 +45,7 @@ export const DocumentTable = ({
     useState<ActiveMenuState>(null);
   const [activeHeaderMenu, setActiveHeaderMenu] =
     useState<ActiveHeaderMenuState>(null);
-  const [contextMenu, setContextMenu] = useState<ContextMenuState>(null);
-
-  const handleContextMenu = (event: React.MouseEvent, docId: string) => {
-    event.preventDefault();
-    event.stopPropagation();
-    if (!selectedDocumentIds.has(docId)) {
-      onDocumentSelect(docId, event);
-    }
-    setContextMenu({ x: event.clientX, y: event.clientY, documentId: docId });
-  };
-
-  const handleCloseContextMenu = () => {
-    setContextMenu(null);
-  };
+  // Removed custom context menu logic
 
   const handleMenuToggle = (docId: string, buttonEl: HTMLButtonElement) => {
     setActiveActionMenu((prev) =>
@@ -196,7 +179,7 @@ export const DocumentTable = ({
               <tr
                 key={doc.id}
                 id={`doc-table-${doc.id}`}
-                onContextMenu={(e) => handleContextMenu(e, doc.id)}
+                // right-click context menu disabled
                 onClick={(e) => onDocumentSelect(doc.id, e)}
                 className={`transition-colors cursor-pointer  border-gray-200 dark:border-gray-600 ${
                   selectedDocumentIds.has(doc.id)
@@ -355,17 +338,7 @@ export const DocumentTable = ({
           }}
         />
       )}
-      {contextMenu && (
-        <ContextMenu
-          x={contextMenu.x}
-          y={contextMenu.y}
-          documentId={contextMenu.documentId}
-          onClose={handleCloseContextMenu}
-          onMove={onMove}
-          onEdit={onEdit}
-          onDelete={onDelete}
-        />
-      )}
+      {/* Context menu removed */}
     </>
   );
 };
