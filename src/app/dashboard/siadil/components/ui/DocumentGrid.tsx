@@ -3,9 +3,8 @@
 import { useState } from "react";
 import { Document, Archive } from "../../types";
 import { ActionMenu } from "./ActionMenu";
-import { ContextMenu } from "./ContextMenu";
 
-type ContextMenuState = { x: number; y: number; documentId: string } | null;
+// Right-click context menu removed per request
 
 type DocumentGridProps = {
   documents: Document[];
@@ -47,20 +46,7 @@ export const DocumentGrid = ({
         };
       }
   >(null);
-  const [contextMenu, setContextMenu] = useState<ContextMenuState>(null);
-
-  const handleContextMenu = (event: React.MouseEvent, docId: string) => {
-    event.stopPropagation();
-    event.preventDefault();
-    if (!selectedDocumentIds.has(docId)) {
-      onDocumentSelect(docId, event);
-    }
-    setContextMenu({ x: event.clientX, y: event.clientY, documentId: docId });
-  };
-
-  const handleCloseContextMenu = () => {
-    setContextMenu(null);
-  };
+  // Removed custom context menu handler
 
   const formatDate = (dateString: string) =>
     new Date(dateString).toLocaleDateString("id-ID");
@@ -82,7 +68,7 @@ export const DocumentGrid = ({
           <div
             key={doc.id}
             id={`doc-grid-${doc.id}`}
-            onContextMenu={(e) => handleContextMenu(e, doc.id)}
+            // right-click context menu disabled
             onClick={(e) => onDocumentSelect(doc.id, e)}
             className={`group relative flex flex-col cursor-pointer overflow-hidden rounded-xl border bg-gradient-to-br  p-4 shadow transition-all duration-300 ease-in-out dark:border-gray-700 dark:from-gray-800 dark:to-gray-700/50 ${
               selectedDocumentIds.has(doc.id)
@@ -196,17 +182,6 @@ export const DocumentGrid = ({
         ))}
       </div>
 
-      {contextMenu && (
-        <ContextMenu
-          x={contextMenu.x}
-          y={contextMenu.y}
-          documentId={contextMenu.documentId}
-          onClose={handleCloseContextMenu}
-          onMove={onMove}
-          onEdit={onEdit}
-          onDelete={onDelete}
-        />
-      )}
     </>
   );
 };
