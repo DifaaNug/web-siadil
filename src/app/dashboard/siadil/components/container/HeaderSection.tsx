@@ -61,7 +61,8 @@ const InfoCard = ({
     <div
       ref={cardRef}
       className={`group relative w-full ${onClick ? "cursor-pointer" : ""}`}
-      onClick={onClick}>
+      onClick={onClick}
+    >
       {/* Efek border yang menyala mengikuti kursor */}
       <div
         className="pointer-events-none absolute -inset-0.5 rounded-xl opacity-0 transition-opacity duration-300 group-hover:opacity-75"
@@ -71,7 +72,8 @@ const InfoCard = ({
         }}
       />
       <div
-        className={`relative z-10 rounded-xl p-3 pb-1 pt-1 text-white shadow-lg transition-all duration-300 ease-in-out ${gradient}`}>
+        className={`relative z-10 rounded-xl p-3 pb-1 pt-1 text-white shadow-lg transition-all duration-300 ease-in-out ${gradient}`}
+      >
         <div className="absolute top-4 right-4 flex h-10 w-10 items-center justify-center rounded-lg bg-white/30 backdrop-blur-sm">
           {icon}
         </div>
@@ -172,14 +174,15 @@ const HeaderSection: React.FC<HeaderSectionProps> = ({
             <InfoCard
               gradient="bg-gradient-to-br from-demplon to-teal-600"
               value={totalDocuments}
-              title="Dokumen"
-              subtitle="Total Arsip Aktif"
+              title="Documents"
+              subtitle="Total Active Archives"
               icon={
                 <svg
                   className="h-6 w-6 text-white"
                   fill="none"
                   viewBox="0 0 24 24"
-                  stroke="currentColor">
+                  stroke="currentColor"
+                >
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -192,15 +195,16 @@ const HeaderSection: React.FC<HeaderSectionProps> = ({
             <InfoCard
               gradient="bg-gradient-to-br from-red-700 to-red-500"
               value={expiredCount}
-              title="Kedaluwarsa"
-              subtitle="Butuh Perhatian Segera"
+              title="Expired"
+              subtitle="Needs Immediate Attention"
               onClick={onExpiredCardClick}
               icon={
                 <svg
                   className="h-6 w-6 text-white"
                   fill="none"
                   viewBox="0 0 24 24"
-                  stroke="currentColor">
+                  stroke="currentColor"
+                >
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -213,15 +217,16 @@ const HeaderSection: React.FC<HeaderSectionProps> = ({
             <InfoCard
               gradient="bg-gradient-to-br from-yellow-600 to-yellow-500"
               value={expiringSoonCount}
-              title="Akan Kedaluwarsa"
-              subtitle="Dalam 30 Hari Kedepan"
+              title="Will Expire"
+              subtitle="In the next 30 days"
               onClick={onExpiringSoonCardClick}
               icon={
                 <svg
                   className="h-6 w-6 text-white"
                   fill="none"
                   viewBox="0 0 24 24"
-                  stroke="currentColor">
+                  stroke="currentColor"
+                >
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -235,13 +240,15 @@ const HeaderSection: React.FC<HeaderSectionProps> = ({
             <div
               ref={addNewButtonRef}
               onClick={onToggleAddNewMenu}
-              className="group relative flex h-full cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-gray-300 bg-gray-50/50 p-5 shadow-sm transition-all duration-300 ease-in-out hover:border-demplon hover:bg-green-50/50 hover:shadow-md dark:border-gray-600 dark:bg-gray-800/50 dark:hover:border-demplon dark:hover:bg-demplon/10">
+              className="group relative flex h-full cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-gray-300 bg-gray-50/50 p-5 shadow-sm transition-all duration-300 ease-in-out hover:border-demplon hover:bg-green-50/50 hover:shadow-md dark:border-gray-600 dark:bg-gray-800/50 dark:hover:border-demplon dark:hover:bg-demplon/10"
+            >
               <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-slate-100 text-slate-400 ring-1 ring-slate-200 transition-all duration-300 group-hover:bg-gradient-to-br group-hover:from-demplon group-hover:to-teal-500 group-hover:text-white group-hover:ring-white/20 group-hover:shadow-lg group-hover:shadow-teal-500/20 dark:bg-slate-800 dark:text-slate-500 dark:ring-slate-700">
                 <svg
                   className="h-6 w-6"
                   fill="none"
                   viewBox="0 0 24 24"
-                  stroke="currentColor">
+                  stroke="currentColor"
+                >
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -279,13 +286,15 @@ const HeaderSection: React.FC<HeaderSectionProps> = ({
             type="button"
             onClick={onViewAllReminders}
             className="inline-flex items-center gap-1 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-semibold text-gray-700 shadow-sm hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#01793B]/40 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700"
-            aria-label="View all Reminders">
+            aria-label="View all Reminders"
+          >
             View All
             <svg
               className="h-3.5 w-3.5"
               viewBox="0 0 24 24"
               fill="none"
-              stroke="currentColor">
+              stroke="currentColor"
+            >
               <path
                 d="M9 5l7 7-7 7"
                 strokeWidth="2"
@@ -298,7 +307,8 @@ const HeaderSection: React.FC<HeaderSectionProps> = ({
         <div
           className="grid grid-cols-1 md:grid-cols-3 gap-4"
           onMouseEnter={stopInterval}
-          onMouseLeave={startInterval}>
+          onMouseLeave={startInterval}
+        >
           {[0, 1, 2].map((cardIndex) => {
             const reminderIndex =
               (currentReminderIndex + cardIndex) % reminders.length;
@@ -308,20 +318,25 @@ const HeaderSection: React.FC<HeaderSectionProps> = ({
             return (
               <div
                 key={`${reminder.id}-${cardIndex}`}
-                className="relative flex items-center overflow-hidden rounded-lg border p-0 shadow-sm transition-all h-27">
+                className="relative flex items-center overflow-hidden rounded-lg border p-0 shadow-sm transition-all h-27"
+              >
                 {/* Div ini yang akan membuat efek transisi konten */}
                 <div className="w-full transition-all duration-500 ease-in-out">
                   <div
-                    className={`relative flex items-center gap-4 p-3 rounded-lg ${styles.bgColor} ${styles.borderColor}`}>
+                    className={`relative flex items-center gap-4 p-3 rounded-lg ${styles.bgColor} ${styles.borderColor}`}
+                  >
                     <div
-                      className={`absolute left-0 top-0 h-full w-1.5 ${styles.accentColor}`}></div>
+                      className={`absolute left-0 top-0 h-full w-1.5 ${styles.accentColor}`}
+                    ></div>
                     <div
-                      className={`ml-2 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full ${styles.iconBg} ${styles.iconColor}`}>
+                      className={`ml-2 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full ${styles.iconBg} ${styles.iconColor}`}
+                    >
                       {styles.icon}
                     </div>
                     <div className="flex-1 min-w-0">
                       <p
-                        className={`text-sm font-semibold truncate ${styles.titleColor}`}>
+                        className={`text-sm font-semibold truncate ${styles.titleColor}`}
+                      >
                         {reminder.title}
                       </p>
                       <p className="text-xs text-gray-600 dark:text-gray-400 truncate">
