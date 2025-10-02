@@ -62,7 +62,6 @@ const InfoCard = ({
       ref={cardRef}
       className={`group relative w-full ${onClick ? "cursor-pointer" : ""}`}
       onClick={onClick}>
-      {/* Efek border yang menyala mengikuti kursor */}
       <div
         className="pointer-events-none absolute -inset-0.5 rounded-xl opacity-0 transition-opacity duration-300 group-hover:opacity-75"
         style={{
@@ -315,43 +314,60 @@ const HeaderSection: React.FC<HeaderSectionProps> = ({
           className="grid grid-cols-1 md:grid-cols-3 gap-4"
           onMouseEnter={stopInterval}
           onMouseLeave={startInterval}>
-          {[0, 1, 2].map((cardIndex) => {
-            const reminderIndex =
-              (currentReminderIndex + cardIndex) % reminders.length;
-            const reminder = reminders[reminderIndex];
-            const styles = getReminderStyles(reminder.type);
-
-            return (
-              <div
-                key={`${reminder.id}-${cardIndex}`}
-                className="relative flex items-center overflow-hidden rounded-lg border p-0 shadow-sm transition-all h-27">
-                {/* Div ini yang akan membuat efek transisi konten */}
-                <div className="w-full transition-all duration-500 ease-in-out">
+          {reminders.length === 0 ? (
+            <div className="col-span-3 flex items-center justify-center py-6 rounded-lg border border-dashed text-xs text-gray-500 dark:text-gray-400">
+              Tidak ada reminder aktif.
+            </div>
+          ) : (
+            [0, 1, 2].map((cardIndex) => {
+              if (cardIndex >= reminders.length) {
+                // Jika reminder kurang dari 3, tampilkan placeholder kosong agar grid tetap rapi
+                return (
                   <div
-                    className={`relative flex items-center gap-4 p-3 rounded-lg ${styles.bgColor} ${styles.borderColor}`}>
+                    key={`placeholder-${cardIndex}`}
+                    className="rounded-lg border border-dashed p-3 h-27 flex items-center justify-center text-[11px] text-gray-400 dark:text-gray-500">
+                    -
+                  </div>
+                );
+              }
+              const reminderIndex =
+                (currentReminderIndex + cardIndex) % reminders.length;
+              const reminder = reminders[reminderIndex];
+              if (!reminder) {
+                return null;
+              }
+              const styles = getReminderStyles(reminder.type);
+              return (
+                <div
+                  key={`${reminder.id}-${cardIndex}`}
+                  className="relative flex items-center overflow-hidden rounded-lg border p-0 shadow-sm transition-all h-27">
+                  <div className="w-full transition-all duration-500 ease-in-out">
                     <div
-                      className={`absolute left-0 top-0 h-full w-1.5 ${styles.accentColor}`}></div>
-                    <div
-                      className={`ml-2 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full ${styles.iconBg} ${styles.iconColor}`}>
-                      {styles.icon}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p
-                        className={`text-sm font-semibold truncate ${styles.titleColor}`}>
-                        {reminder.title}
-                      </p>
-                      <p className="text-xs text-gray-600 dark:text-gray-400 truncate">
-                        {reminder.description}
-                      </p>
-                      <p className="mt-1 text-xs text-gray-500 dark:text-gray-500">
-                        {reminder.message}
-                      </p>
+                      className={`relative flex items-center gap-4 p-3 rounded-lg ${styles.bgColor} ${styles.borderColor}`}>
+                      <div
+                        className={`absolute left-0 top-0 h-full w-1.5 ${styles.accentColor}`}></div>
+                      <div
+                        className={`ml-2 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full ${styles.iconBg} ${styles.iconColor}`}>
+                        {styles.icon}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p
+                          className={`text-sm font-semibold truncate ${styles.titleColor}`}>
+                          {reminder.title}
+                        </p>
+                        <p className="text-xs text-gray-600 dark:text-gray-400 truncate">
+                          {reminder.description}
+                        </p>
+                        <p className="mt-1 text-xs text-gray-500 dark:text-gray-500">
+                          {reminder.message}
+                        </p>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            );
-          })}
+              );
+            })
+          )}
         </div>
       </div>
     </div>
