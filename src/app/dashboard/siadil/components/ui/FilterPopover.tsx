@@ -30,7 +30,8 @@ export const FilterPopover = forwardRef<HTMLDivElement, FilterPopoverProps>(
     return (
       <div
         ref={ref}
-        className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg w-full flex flex-col h-full">
+        className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg w-full flex flex-col h-full"
+      >
         <div className="p-4 border-b border-gray-200 dark:border-gray-600">
           <h3 className="font-semibold text-gray-800 dark:text-white">
             Date Filter
@@ -74,7 +75,8 @@ export const FilterPopover = forwardRef<HTMLDivElement, FilterPopoverProps>(
                   expireFilterMethod === "range"
                     ? "bg-demplon text-white"
                     : "bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-300"
-                }`}>
+                }`}
+              >
                 By Date Range
               </button>
               <button
@@ -83,7 +85,8 @@ export const FilterPopover = forwardRef<HTMLDivElement, FilterPopoverProps>(
                   expireFilterMethod === "period"
                     ? "bg-demplon text-white"
                     : "bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-300"
-                }`}>
+                }`}
+              >
                 By Period
               </button>
             </div>
@@ -113,7 +116,8 @@ export const FilterPopover = forwardRef<HTMLDivElement, FilterPopoverProps>(
                 {expireInOptions.map((option) => (
                   <label
                     key={option.id}
-                    className="flex items-center space-x-2 text-sm cursor-pointer">
+                    className="flex items-center space-x-2 text-sm cursor-pointer"
+                  >
                     <input
                       type="checkbox"
                       value={option.id}
@@ -130,33 +134,19 @@ export const FilterPopover = forwardRef<HTMLDivElement, FilterPopoverProps>(
             )}
           </div>
           {/* TAMBAHKAN FILTER TIPE FILE DI SINI */}
-          <div>
-            <label
-              htmlFor="fileType"
-              className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              File Type (e.g., pdf, docx)
-            </label>
-            <input
-              type="text"
-              name="fileType"
-              id="fileType"
-              value={filters.fileType || ""}
-              onChange={onFilterChange}
-              className="w-full text-sm text-gray-900 border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300"
-              placeholder="pdf"
-            />
-          </div>
         </div>
 
         <div className="p-4 border-t border-gray-200 dark:border-gray-600 flex justify-end space-x-2 bg-gray-50 dark:bg-gray-800/50">
           <button
             onClick={onReset}
-            className="px-4 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:bg-gray-600">
+            className="px-4 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:bg-gray-600"
+          >
             Reset
           </button>
           <button
             onClick={onApply}
-            className="px-4 py-1.5 text-sm font-medium text-white bg-demplon border border-transparent rounded-md hover:bg-opacity-90">
+            className="px-4 py-1.5 text-sm font-medium text-white bg-demplon border border-transparent rounded-md hover:bg-opacity-90"
+          >
             Apply Filters
           </button>
         </div>
