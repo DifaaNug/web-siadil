@@ -116,13 +116,19 @@ export const FilterPopover = forwardRef<HTMLDivElement, FilterPopoverProps>(
               </Popover>
               <span className="text-gray-700 dark:text-gray-400">to</span>
               {/* End Date */}
-              <Popover open={openDocEnd} onOpenChange={setOpenDocEnd}>
+              <Popover
+                open={openDocEnd}
+                onOpenChange={(o) => {
+                  if (!filters.docDateStart && o) return; // block open if no start
+                  setOpenDocEnd(o);
+                }}>
                 <PopoverTrigger asChild>
                   <Button
                     variant={"outline"}
                     className={cn(
                       "w-full justify-start text-left font-normal text-sm",
-                      !filters.docDateEnd && "text-muted-foreground"
+                      !filters.docDateEnd && "text-muted-foreground",
+                      !filters.docDateStart && "opacity-50 cursor-not-allowed"
                     )}>
                     <CalendarIcon className="mr-2 h-4 w-4" />
                     {filters.docDateEnd ? (
@@ -157,12 +163,13 @@ export const FilterPopover = forwardRef<HTMLDivElement, FilterPopoverProps>(
                       onFilterChange(syntheticEvent);
                       if (d) setOpenDocEnd(false);
                     }}
-                    disabled={(d) => {
-                      return !!(
+                    disabled={(d) =>
+                      !filters.docDateStart ||
+                      !!(
                         filters.docDateStart &&
                         d < parseISO(filters.docDateStart)
-                      );
-                    }}
+                      )
+                    }
                     captionLayout="dropdown"
                     fromYear={1980}
                     toYear={2040}
@@ -257,13 +264,20 @@ export const FilterPopover = forwardRef<HTMLDivElement, FilterPopoverProps>(
                 </Popover>
                 <span className="text-gray-700 dark:text-gray-400">to</span>
                 {/* Expire End */}
-                <Popover open={openExpEnd} onOpenChange={setOpenExpEnd}>
+                <Popover
+                  open={openExpEnd}
+                  onOpenChange={(o) => {
+                    if (!filters.expireDateStart && o) return;
+                    setOpenExpEnd(o);
+                  }}>
                   <PopoverTrigger asChild>
                     <Button
                       variant={"outline"}
                       className={cn(
                         "w-full justify-start text-left font-normal text-sm",
-                        !filters.expireDateEnd && "text-muted-foreground"
+                        !filters.expireDateEnd && "text-muted-foreground",
+                        !filters.expireDateStart &&
+                          "opacity-50 cursor-not-allowed"
                       )}>
                       <CalendarIcon className="mr-2 h-4 w-4" />
                       {filters.expireDateEnd ? (
@@ -299,6 +313,7 @@ export const FilterPopover = forwardRef<HTMLDivElement, FilterPopoverProps>(
                         if (d) setOpenExpEnd(false);
                       }}
                       disabled={(d) =>
+                        !filters.expireDateStart ||
                         !!(
                           filters.expireDateStart &&
                           d < parseISO(filters.expireDateStart)
@@ -336,22 +351,6 @@ export const FilterPopover = forwardRef<HTMLDivElement, FilterPopoverProps>(
             )}
           </div>
           {/* TAMBAHKAN FILTER TIPE FILE DI SINI */}
-          <div>
-            <label
-              htmlFor="fileType"
-              className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              File Type (e.g., pdf, docx)
-            </label>
-            <input
-              type="text"
-              name="fileType"
-              id="fileType"
-              value={filters.fileType || ""}
-              onChange={onFilterChange}
-              className="w-full text-sm text-gray-900 border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300"
-              placeholder="pdf"
-            />
-          </div>
         </div>
 
         <div className="p-4 border-t border-gray-200 dark:border-gray-600 flex justify-end space-x-2 bg-gray-50 dark:bg-gray-800/50">

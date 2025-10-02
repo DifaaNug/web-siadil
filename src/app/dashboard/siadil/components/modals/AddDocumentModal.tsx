@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { ChangeEvent, useEffect } from "react";
+import { ChangeEvent, useEffect, useState, DragEvent } from "react";
 import { NewDocumentData, Archive } from "../../types";
 import { HierarchicalArchivePicker } from "./HierarchicalArchivePicker";
 import { format } from "date-fns";
@@ -36,6 +36,7 @@ export const AddDocumentModal = ({
   editingDocId,
   baseArchiveId = "root",
 }: AddDocumentModalProps) => {
+  const [isDragging, setIsDragging] = useState(false);
   const isEditing = !!editingDocId;
 
   // State lokal untuk kalender, diinisialisasi dari props 'newDocument'
@@ -84,6 +85,36 @@ export const AddDocumentModal = ({
       }));
     } else {
       setNewDocument((prevDoc) => ({ ...prevDoc, [name]: value }));
+    }
+  };
+  const handleDragEnter = (e: DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e: DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+  };
+
+  const handleDragOver = (e: DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation(); // Ini penting untuk mencegah browser membuka file
+  };
+
+  const handleDrop = (e: DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+
+    const files = e.dataTransfer.files;
+    if (files && files.length > 0) {
+      setNewDocument((prevDoc) => ({
+        ...prevDoc,
+        file: files[0], // Ambil file pertama yang di-drop
+      }));
     }
   };
 
@@ -291,10 +322,21 @@ export const AddDocumentModal = ({
                   className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
                   File
                 </label>
-                <div className="mt-1 flex justify-center rounded-lg border-2 border-dashed border-gray-300 px-6 pb-6 pt-5 dark:border-gray-600">
+                <div
+                  onDragEnter={handleDragEnter}
+                  onDragLeave={handleDragLeave}
+                  onDragOver={handleDragOver}
+                  onDrop={handleDrop}
+                  className={`mt-1 flex justify-center rounded-lg border-2 border-dashed px-6 pb-6 pt-5
+        ${
+          isDragging
+            ? "border-green-500 bg-green-50 dark:bg-green-900/50" // Kelas saat dragging
+            : "border-gray-300 dark:border-gray-600" // Kelas normal
+        }`}
+                >
                   <div className="text-center">
                     <svg
-                      className="mx-auto h-12 w-12 text-gray-400"
+                      className="mx-auto h-12 w-12 text-gray-400 pointer-events-none"
                       stroke="currentColor"
                       fill="none"
                       viewBox="0 0 48 48"
@@ -317,18 +359,19 @@ export const AddDocumentModal = ({
                           type="file"
                           onChange={handleInputChange}
                           className="sr-only"
-                          accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx"
                         />
                       </label>
-                      <p className="pl-1">or drag and drop</p>
+                      <p className="pl-1 pointer-events-none">
+                        or drag and drop
+                      </p>
                     </div>
                     {newDocument.file ? (
-                      <p className="mt-2 text-sm font-semibold text-green-700 dark:text-green-400">
+                      <p className="mt-2 text-sm font-semibold text-green-700 dark:text-green-400 pointer-events-none">
                         {newDocument.file.name}
                       </p>
                     ) : (
-                      <p className="text-xs text-gray-500">
-                        PDF, DOC, XLS, PPT up to 10MB
+                      <p className="text-xs text-gray-500 pointer-events-none">
+                        Semua jenis file hingga 10MB
                       </p>
                     )}
                   </div>

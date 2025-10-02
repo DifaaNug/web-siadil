@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState, useMemo } from "react";
+import { X } from "lucide-react";
 import { Document } from "../../types";
 import { useOnClickOutside } from "../../hooks/useOnClickOutside";
 
@@ -59,7 +60,14 @@ export const ViewAllQuickAccessModal = ({ isOpen, onClose, documents, onOpenArch
               </svg>
             </div>
           </div>
-          <button onClick={onClose} className="ml-2 rounded-md border bg-white px-3 py-2 text-sm font-medium text-gray-800 hover:bg-gray-100 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200">Close</button>
+          <button
+            onClick={onClose}
+            aria-label="Close"
+            title="Close"
+            className="ml-2 inline-flex items-center justify-center rounded-md border bg-white p-2 text-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200"
+          >
+            <X className="h-4 w-4" />
+          </button>
         </div>
 
         <div className="overflow-y-auto p-4 divide-y divide-gray-100 dark:divide-gray-700">
