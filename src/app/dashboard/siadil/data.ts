@@ -119,24 +119,39 @@ export const generateDummyData = (): Document[] => {
 
   archivesToFill.forEach((archive) => {
     const docCount = 20;
+    const currentYear = new Date().getFullYear();
 
     for (let i = 0; i < docCount; i++) {
       docIdCounter++;
       const appData = sampleApps[docIdCounter % sampleApps.length];
 
-      const createdDate = new Date(
-        2024,
-        0,
-        1 + (docIdCounter % 365),
-        i % 24,
-        i % 60
-      );
+      // Created date di tahun berjalan (sebar sepanjang tahun)
+      const dayOfYear = (docIdCounter % 365) + 1; // 1..365
+      const createdDate = new Date(currentYear, 0, 1);
+      createdDate.setDate(dayOfYear);
+      createdDate.setHours(i % 24, i % 60, 0, 0);
 
       const updatedDate = new Date(createdDate);
       updatedDate.setDate(createdDate.getDate() + (i + 1));
-      const now = new Date();
-      const randomDaysToAdd = i < 3 ? -30 * (i + 1) : docIdCounter % 300;
-      const expireDate = new Date(now.setDate(now.getDate() + randomDaysToAdd));
+
+      // Expire date: bikin variasi expired, expiring soon (<30 hari), future (>30 hari)
+      // Pola: beberapa pertama expired mundur, beberapa berikutnya dalam 30 hari, sisanya maju acak 31-240 hari
+      let expireDate: Date;
+      if (i < 3) {
+        // sudah lewat 15/30/45 hari
+        expireDate = new Date();
+        expireDate.setDate(expireDate.getDate() - (i + 1) * 15);
+      } else if (i < 8) {
+        // akan kedaluwarsa dalam 5..25 hari
+        const daysAhead = 5 + ((i * 4) % 25); // 5..29
+        expireDate = new Date();
+        expireDate.setDate(expireDate.getDate() + daysAhead);
+      } else {
+        // jauh ke depan 31..240 hari
+        const far = 31 + (docIdCounter % 210); // 31..240
+        expireDate = new Date();
+        expireDate.setDate(expireDate.getDate() + far);
+      }
 
       const doc: Document = {
         id: `${docIdCounter}`,

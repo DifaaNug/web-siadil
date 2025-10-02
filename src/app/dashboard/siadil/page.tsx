@@ -128,7 +128,19 @@ export default function SiadilPage() {
     handleToggleStar,
   } = useData(currentFolderId);
 
+  // Total document count logic (root = all active docs, subfolder = active docs in subtree)
+  const totalDocumentsDisplayed = useMemo(() => {
+    const activeDocuments = documents.filter((d) => d.status !== "Trashed");
+    if (currentFolderId === "root") return activeDocuments.length;
+    // searchableDocuments already scoped to current folder + descendants & excludes trashed
+    return searchableDocuments.length;
+  }, [documents, currentFolderId, searchableDocuments]);
+
   const { dynamicReminders, expiredCount, expiringSoonCount } = useMemo(() => {
+    // Gunakan dokumen subtree jika bukan root
+    const baseDocs =
+      currentFolderId === "root" ? documents : searchableDocuments; // sudah tidak termasuk Trashed
+
     const reminders: Reminder[] = [];
     let expired = 0;
     let expiringSoon = 0;
@@ -136,9 +148,8 @@ export default function SiadilPage() {
     const thirtyDaysFromNow = new Date();
     thirtyDaysFromNow.setDate(now.getDate() + 30);
 
-    documents.forEach((doc) => {
+    baseDocs.forEach((doc) => {
       if (!doc.expireDate || doc.status === "Trashed") return;
-
       const expireDate = new Date(doc.expireDate);
       const diffTime = expireDate.getTime() - now.getTime();
       const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
@@ -173,7 +184,7 @@ export default function SiadilPage() {
       expiredCount: expired,
       expiringSoonCount: expiringSoon,
     };
-  }, [documents]);
+  }, [documents, searchableDocuments, currentFolderId]);
 
   // Memo untuk semua dokumen riwayat
   const allHistoryDocuments = useMemo(() => {
@@ -622,240 +633,251 @@ export default function SiadilPage() {
 
   return (
     <>
-      <div
-        className={`transition-all duration-300 ease-in-out ${
-          isInfoPanelOpen ? "mr-80" : "mr-0"
-        }`}>
-        <DashboardHeader
-          userName={userData.name}
-          breadcrumbItems={breadcrumbItems}
-          onBreadcrumbClick={setCurrentFolderId}
-        />
-        <HeaderSection
-          totalDocuments={documents.length}
-          expiredCount={expiredCount}
-          expiringSoonCount={expiringSoonCount}
-          onViewAllReminders={() => setIsRemindersModalOpen(true)}
-          onExpiredCardClick={() => handleOpenReminders("error")}
-          onExpiringSoonCardClick={() => handleOpenReminders("warning")}
-          addNewButtonRef={addNewButtonRef}
-          isAddNewMenuOpen={isAddNewMenuOpen}
-          onToggleAddNewMenu={() => setIsAddNewMenuOpen(!isAddNewMenuOpen)}
-          onCloseAddNewMenu={() => setIsAddNewMenuOpen(false)}
-          onNewFolder={() => setIsCreateModalOpen(true)}
-          onFileUpload={handleOpenAddModalInContext}
-          currentFolderId={currentFolderId}
-          reminders={dynamicReminders}
-        />
-        <AllRemindersModal
-          isOpen={isRemindersModalOpen}
-          onClose={() => setIsRemindersModalOpen(false)}
-          reminders={dynamicReminders}
-          initialTab={initialReminderTab}
-        />
-
-        {currentFolderId === "root" && (
-          <QuickAccessSection
-            documents={quickAccessDocuments}
-            onDocumentClick={handleQuickAccessClick}
-            isInfoPanelOpen={isInfoPanelOpen}
-            onViewAll={() => setIsViewAllQAOpen(true)}
+      <div className={"relative"}>
+        {/* Wrapper that adds smooth reserved space on xl screens while panel open */}
+        <div
+          className={`transition-[padding] duration-300 ease-[cubic-bezier(.4,0,.2,1)]
+            xl:pr-0 ${isInfoPanelOpen ? "xl:pr-80" : "xl:pr-0"}`}>
+          <DashboardHeader
+            userName={userData.name}
+            breadcrumbItems={breadcrumbItems}
+            onBreadcrumbClick={setCurrentFolderId}
           />
-        )}
+          <HeaderSection
+            totalDocuments={totalDocumentsDisplayed}
+            expiredCount={expiredCount}
+            expiringSoonCount={expiringSoonCount}
+            onViewAllReminders={() => setIsRemindersModalOpen(true)}
+            onExpiredCardClick={() => handleOpenReminders("error")}
+            onExpiringSoonCardClick={() => handleOpenReminders("warning")}
+            addNewButtonRef={addNewButtonRef}
+            isAddNewMenuOpen={isAddNewMenuOpen}
+            onToggleAddNewMenu={() => setIsAddNewMenuOpen(!isAddNewMenuOpen)}
+            onCloseAddNewMenu={() => setIsAddNewMenuOpen(false)}
+            onNewFolder={() => setIsCreateModalOpen(true)}
+            onFileUpload={handleOpenAddModalInContext}
+            currentFolderId={currentFolderId}
+            reminders={dynamicReminders}
+          />
+          <AllRemindersModal
+            isOpen={isRemindersModalOpen}
+            onClose={() => setIsRemindersModalOpen(false)}
+            reminders={dynamicReminders}
+            initialTab={initialReminderTab}
+          />
 
-        {currentFolderId === "root" && (
-          <>
-            <div className="flex items-center justify-between gap-4 mb-4">
-              <h2 className="text-2xl font-bold text-gray-800 dark:text-white shrink-0">
-                {pageTitle}
-              </h2>
+          {currentFolderId === "root" && (
+            <QuickAccessSection
+              documents={quickAccessDocuments}
+              onDocumentClick={handleQuickAccessClick}
+              isInfoPanelOpen={isInfoPanelOpen}
+              onViewAll={() => setIsViewAllQAOpen(true)}
+            />
+          )}
 
-              <div
-                className={`relative w-full sm:max-w-xs ${
-                  pageView === "archives" ? "visible" : "invisible"
-                }`}>
-                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5">
-                  <svg
-                    className="h-4 w-4 text-gray-400"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor">
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                    />
-                  </svg>
+          {currentFolderId === "root" && (
+            <>
+              <div className="flex items-center justify-between gap-4 mb-4">
+                <h2 className="text-2xl font-bold text-gray-800 dark:text-white shrink-0">
+                  {pageTitle}
+                </h2>
+
+                <div
+                  className={`relative w-full sm:max-w-xs ${
+                    pageView === "archives" ? "visible" : "invisible"
+                  }`}>
+                  <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5">
+                    <svg
+                      className="h-4 w-4 text-gray-400"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor">
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                      />
+                    </svg>
+                  </div>
+                  <input
+                    type="text"
+                    placeholder="Search Archive..."
+                    value={archiveSearchQuery}
+                    onChange={(e) => setArchiveSearchQuery(e.target.value)}
+                    className="w-full rounded-lg border border-gray-200  py-2 pl-10 pr-4 text-sm text-gray-900 placeholder-gray-500 transition-colors duration-200 focus:border-demplon focus:bg-white focus:ring-2 focus:ring-demplon/30 dark:border-gray-700 dark:bg-gray-900/50 dark:text-gray-200 dark:placeholder-gray-400 dark:focus:bg-gray-800"
+                  />
                 </div>
-                <input
-                  type="text"
-                  placeholder="Search Archive..."
-                  value={archiveSearchQuery}
-                  onChange={(e) => setArchiveSearchQuery(e.target.value)}
-                  className="w-full rounded-lg border border-gray-200  py-2 pl-10 pr-4 text-sm text-gray-900 placeholder-gray-500 transition-colors duration-200 focus:border-demplon focus:bg-white focus:ring-2 focus:ring-demplon/30 dark:border-gray-700 dark:bg-gray-900/50 dark:text-gray-200 dark:placeholder-gray-400 dark:focus:bg-gray-800"
-                />
               </div>
+            </>
+          )}
+
+          {currentFolderId === "root" && (
+            <div className="mb-6 border-b border-gray-200 dark:border-gray-700">
+              <nav className="-mb-px flex space-x-6" aria-label="Tabs">
+                <button
+                  onClick={() => setPageView("archives")}
+                  className={`flex items-center gap-2 whitespace-nowrap py-3 px-1 border-b-2 text-sm font-semibold transition-colors ${
+                    pageView === "archives"
+                      ? "border-demplon text-demplon"
+                      : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                  }`}>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round">
+                    <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+                  </svg>
+                  <span>Archives</span>
+                </button>
+
+                <button
+                  onClick={() => setPageView("starred")}
+                  className={`flex items-center gap-2 whitespace-nowrap py-3 px-1 border-b-2 text-sm font-semibold transition-colors ${
+                    pageView === "starred"
+                      ? "border-demplon text-demplon"
+                      : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                  }`}>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round">
+                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                  </svg>
+                  <span>Starred</span>
+                </button>
+
+                <button
+                  onClick={() => setPageView("trash")}
+                  className={`flex items-center gap-2 whitespace-nowrap py-3 px-1 border-b-2 text-sm font-semibold transition-colors ${
+                    pageView === "trash"
+                      ? "border-demplon text-demplon"
+                      : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                  }`}>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round">
+                    <polyline points="3 6 5 6 21 6"></polyline>
+                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                  </svg>
+                  <span>Trash</span>
+                </button>
+              </nav>
             </div>
-          </>
-        )}
+          )}
 
-        {currentFolderId === "root" && (
-          <div className="mb-6 border-b border-gray-200 dark:border-gray-700">
-            <nav className="-mb-px flex space-x-6" aria-label="Tabs">
-              <button
-                onClick={() => setPageView("archives")}
-                className={`flex items-center gap-2 whitespace-nowrap py-3 px-1 border-b-2 text-sm font-semibold transition-colors ${
-                  pageView === "archives"
-                    ? "border-demplon text-demplon"
-                    : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-                }`}>
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round">
-                  <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
-                </svg>
-                <span>Archives</span>
-              </button>
-
-              <button
-                onClick={() => setPageView("starred")}
-                className={`flex items-center gap-2 whitespace-nowrap py-3 px-1 border-b-2 text-sm font-semibold transition-colors ${
-                  pageView === "starred"
-                    ? "border-demplon text-demplon"
-                    : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-                }`}>
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round">
-                  <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
-                </svg>
-                <span>Starred</span>
-              </button>
-
-              <button
-                onClick={() => setPageView("trash")}
-                className={`flex items-center gap-2 whitespace-nowrap py-3 px-1 border-b-2 text-sm font-semibold transition-colors ${
-                  pageView === "trash"
-                    ? "border-demplon text-demplon"
-                    : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-                }`}>
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round">
-                  <polyline points="3 6 5 6 21 6"></polyline>
-                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                </svg>
-                <span>Trash</span>
-              </button>
-            </nav>
-          </div>
-        )}
-
-        {currentFolderId === "root" ? (
-          (() => {
-            switch (pageView) {
-              case "starred":
-                return (
-                  <StarredView
-                    documents={starredDocuments}
-                    archives={archives}
-                    selectedDocumentIds={selectedDocumentIds}
-                    onDocumentSelect={handleDocumentSelect}
-                    onEdit={handleOpenEditModal}
-                    onMove={handleOpenMoveModal}
-                    onDelete={handleDeleteDocument}
-                    onToggleStar={handleToggleStar}
-                    onManageContributors={handleOpenContributorsModal}
-                    isInfoPanelOpen={isInfoPanelOpen}
-                  />
-                );
-              case "trash":
-                return (
-                  <TrashView
-                    documents={trashedDocuments}
-                    archives={archives}
-                    onRestore={handleRestoreDocument}
-                    onDeletePermanently={handleDeletePermanently}
-                  />
-                );
-              case "archives":
-              default:
-                return (
-                  <ArchiveView
-                    archives={archives.filter((a) => a.parentId === "root")}
-                    archiveDocCounts={archiveDocCounts}
-                    onArchiveClick={setCurrentFolderId}
-                    searchQuery={archiveSearchQuery}
-                  />
-                );
-            }
-          })()
-        ) : (
-          <DocumentView
-            archives={subfolderArchives}
-            paginatedDocuments={paginatedDocuments}
-            visibleColumns={visibleColumns}
-            sortColumn={sortColumn}
-            sortOrder={sortOrder}
-            selectedDocumentIds={selectedDocumentIds}
-            filters={filters}
-            expireFilterMethod={expireFilterMethod}
-            pagination={pagination}
-            isExporting={isExporting}
-            viewMode={viewMode}
-            allTableColumns={allTableColumns}
-            archiveDocCounts={archiveDocCounts}
-            onGoBack={handleGoBack}
-            setViewMode={setViewMode}
-            onFilterChange={handleFilterChange}
-            onCheckboxChange={handleCheckboxChange}
-            onFilterReset={handleFilterReset}
-            onPageChange={setDocumentCurrentPage}
-            onRowsPerPageChange={handleRowsPerPageChange}
-            setExpireFilterMethod={handleExpireMethodChange}
-            onColumnToggle={handleColumnToggle}
-            isInfoPanelOpen={isInfoPanelOpen}
-            onArchiveCheckboxChange={handleArchiveCheckboxChange}
-            onExport={handleExport}
-            onManageContributors={handleOpenContributorsModal}
-            onSortChange={handleSort}
-            onDocumentSelect={handleDocumentSelect}
-            onMove={handleOpenMoveModal}
-            onEdit={handleOpenEditModal}
-            onDelete={handleDeleteDocument}
-            onToggleStar={handleToggleStar}
-            currentFolderName={pageTitle}
-            onArchiveClick={setCurrentFolderId}
-          />
-        )}
+          {currentFolderId === "root" ? (
+            (() => {
+              switch (pageView) {
+                case "starred":
+                  return (
+                    <StarredView
+                      documents={starredDocuments}
+                      archives={archives}
+                      selectedDocumentIds={selectedDocumentIds}
+                      onDocumentSelect={handleDocumentSelect}
+                      onEdit={handleOpenEditModal}
+                      onMove={handleOpenMoveModal}
+                      onDelete={handleDeleteDocument}
+                      onToggleStar={handleToggleStar}
+                      onManageContributors={handleOpenContributorsModal}
+                      isInfoPanelOpen={isInfoPanelOpen}
+                    />
+                  );
+                case "trash":
+                  return (
+                    <TrashView
+                      documents={trashedDocuments}
+                      archives={archives}
+                      onRestore={handleRestoreDocument}
+                      onDeletePermanently={handleDeletePermanently}
+                    />
+                  );
+                case "archives":
+                default:
+                  return (
+                    <ArchiveView
+                      archives={archives.filter((a) => a.parentId === "root")}
+                      archiveDocCounts={archiveDocCounts}
+                      onArchiveClick={setCurrentFolderId}
+                      searchQuery={archiveSearchQuery}
+                    />
+                  );
+              }
+            })()
+          ) : (
+            <DocumentView
+              archives={subfolderArchives}
+              paginatedDocuments={paginatedDocuments}
+              visibleColumns={visibleColumns}
+              sortColumn={sortColumn}
+              sortOrder={sortOrder}
+              selectedDocumentIds={selectedDocumentIds}
+              filters={filters}
+              expireFilterMethod={expireFilterMethod}
+              pagination={pagination}
+              isExporting={isExporting}
+              viewMode={viewMode}
+              allTableColumns={allTableColumns}
+              archiveDocCounts={archiveDocCounts}
+              onGoBack={handleGoBack}
+              setViewMode={setViewMode}
+              onFilterChange={handleFilterChange}
+              onCheckboxChange={handleCheckboxChange}
+              onFilterReset={handleFilterReset}
+              onPageChange={setDocumentCurrentPage}
+              onRowsPerPageChange={handleRowsPerPageChange}
+              setExpireFilterMethod={handleExpireMethodChange}
+              onColumnToggle={handleColumnToggle}
+              isInfoPanelOpen={isInfoPanelOpen}
+              onArchiveCheckboxChange={handleArchiveCheckboxChange}
+              onExport={handleExport}
+              onManageContributors={handleOpenContributorsModal}
+              onSortChange={handleSort}
+              onDocumentSelect={handleDocumentSelect}
+              onMove={handleOpenMoveModal}
+              onEdit={handleOpenEditModal}
+              onDelete={handleDeleteDocument}
+              onToggleStar={handleToggleStar}
+              currentFolderName={pageTitle}
+              onArchiveClick={setCurrentFolderId}
+            />
+          )}
+        </div>
       </div>
 
+      {/* Overlay */}
+      <div
+        className={`fixed inset-0 z-40 bg-black/30 backdrop-blur-[2px] transition-opacity duration-300 ${
+          isInfoPanelOpen ? "opacity-100" : "opacity-0 pointer-events-none"
+        }`}
+        onClick={handleCloseInfoPanel}
+        aria-hidden={true}
+      />
       <InfoPanel
         selectedDocument={infoPanelDocument}
         onClose={handleCloseInfoPanel}
+        isOpen={isInfoPanelOpen}
       />
       {isCreateModalOpen && (
         <CreateArchiveModal

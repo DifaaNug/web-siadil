@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect, useMemo } from "react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useOnClickOutside } from "../../hooks/useOnClickOutside";
 
 type Reminder = {
@@ -34,11 +35,16 @@ export const AllRemindersModal = ({
   initialTab = "all",
 }: Props) => {
   const modalRef = useRef<HTMLDivElement>(null);
-  useOnClickOutside(modalRef, onClose);
+  const sortTriggerRef = useRef<HTMLButtonElement | null>(null);
+  // Don't close modal when clicking inside the popover content or on the trigger
+  useOnClickOutside(modalRef, onClose, sortTriggerRef, [
+    "[data-reminders-sort-popover]",
+  ]);
 
   const [searchTerm, setSearchTerm] = useState("");
   const [sortOption, setSortOption] = useState<SortOption>("default");
   const [activeTab, setActiveTab] = useState<ActiveTab>(initialTab);
+  const [sortOpen, setSortOpen] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
@@ -154,7 +160,7 @@ export const AllRemindersModal = ({
             </button>
           </div>
           <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-            Tinjau semua pengingat kedaluwarsa dokumen Anda di sini.
+            Review all document expiry reminders here.
           </p>
         </div>
 
@@ -165,36 +171,115 @@ export const AllRemindersModal = ({
             <TabButton
               isActive={activeTab === "all"}
               onClick={() => setActiveTab("all")}>
-              Semua
+              All
             </TabButton>
             <TabButton
               isActive={activeTab === "error"}
               onClick={() => setActiveTab("error")}>
-              Kedaluwarsa
+              Expired
             </TabButton>
             <TabButton
               isActive={activeTab === "warning"}
               onClick={() => setActiveTab("warning")}>
-              Akan Datang
+              Upcoming
             </TabButton>
           </div>
           {/* Search and Sort */}
           <div className="flex-grow w-full flex items-center gap-4">
             <input
               type="text"
-              placeholder="Cari pengingat..."
+              placeholder="Search reminders..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full rounded-md border border-gray-300 bg-white py-2 px-4 text-sm text-gray-900 focus:border-demplon focus:ring-demplon dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200"
             />
-            <select
-              value={sortOption}
-              onChange={(e) => setSortOption(e.target.value as SortOption)}
-              className="rounded-md border-gray-300 bg-white py-2 px-3 text-sm focus:border-demplon focus:ring-demplon dark:bg-gray-700 dark:border-gray-600">
-              <option value="default">Urutkan</option>
-              <option value="expiry-asc">Tanggal Terdekat</option>
-              <option value="title-asc">Judul (A-Z)</option>
-            </select>
+            {/* Animated dropdown like starred action menu */}
+            <Popover open={sortOpen} onOpenChange={setSortOpen}>
+              <PopoverTrigger asChild>
+                <button
+                  type="button"
+                  aria-haspopup="listbox"
+                  aria-expanded={sortOpen}
+                  ref={sortTriggerRef}
+                  onClick={(e) => e.stopPropagation()}
+                  className="inline-flex items-center justify-between gap-2 rounded-md border border-gray-300 bg-white py-2 px-3 text-sm text-gray-900 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-demplon dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600 dark:hover:bg-gray-600 min-w-[9rem] whitespace-nowrap">
+                  {sortOption === "expiry-asc"
+                    ? "Nearest Date"
+                    : sortOption === "title-asc"
+                    ? "Title (A-Z)"
+                    : "Sort"}
+                  <svg
+                    className={`h-5 w-5 opacity-100 transition-transform duration-200 ${sortOpen ? "rotate-180" : "rotate-0"}`}
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.25} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+              </PopoverTrigger>
+              <PopoverContent
+                data-reminders-sort-popover
+                align="end"
+                onClick={(e) => e.stopPropagation()}
+                className="w-56 p-2 rounded-xl shadow-2xl ring-1 ring-black/5 bg-white/95 dark:bg-gray-800/95 backdrop-blur-md border border-gray-200/60 dark:border-gray-700/60">
+                <ul role="listbox" className="py-1">
+                  <li>
+                    <button
+                      type="button"
+                      role="option"
+                      aria-selected={sortOption === "default"}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSortOption("default");
+                        setSortOpen(false);
+                      }}
+                      className={`group w-full flex items-center justify-between px-3 py-2 text-sm rounded-md transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] ${
+                        sortOption === "default"
+                          ? "text-demplon"
+                          : "text-gray-700 dark:text-gray-300"
+                      } hover:bg-gradient-to-r hover:from-gray-50 hover:to-gray-100 dark:hover:from-gray-700/50 dark:hover:to-gray-600/50 hover:shadow-sm hover:ring-1 hover:ring-gray-200 dark:hover:ring-gray-600 focus:outline-none`}>
+                      <span>Sort</span>
+                    </button>
+                  </li>
+                  <li>
+                    <button
+                      type="button"
+                      role="option"
+                      aria-selected={sortOption === "expiry-asc"}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSortOption("expiry-asc");
+                        setSortOpen(false);
+                      }}
+                      className={`group w-full flex items-center justify-between px-3 py-2 text-sm rounded-md transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] ${
+                        sortOption === "expiry-asc"
+                          ? "text-demplon"
+                          : "text-gray-700 dark:text-gray-300"
+                      } hover:bg-gradient-to-r hover:from-gray-50 hover:to-gray-100 dark:hover:from-gray-700/50 dark:hover:to-gray-600/50 hover:shadow-sm hover:ring-1 hover:ring-gray-200 dark:hover:ring-gray-600 focus:outline-none`}>
+                      <span>Nearest Date</span>
+                    </button>
+                  </li>
+                  <li>
+                    <button
+                      type="button"
+                      role="option"
+                      aria-selected={sortOption === "title-asc"}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSortOption("title-asc");
+                        setSortOpen(false);
+                      }}
+                      className={`group w-full flex items-center justify-between px-3 py-2 text-sm rounded-md transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] ${
+                        sortOption === "title-asc"
+                          ? "text-demplon"
+                          : "text-gray-700 dark:text-gray-300"
+                      } hover:bg-gradient-to-r hover:from-gray-50 hover:to-gray-100 dark:hover:from-gray-700/50 dark:hover:to-gray-600/50 hover:shadow-sm hover:ring-1 hover:ring-gray-200 dark:hover:ring-gray-600 focus:outline-none`}>
+                      <span>Title (A-Z)</span>
+                    </button>
+                  </li>
+                </ul>
+              </PopoverContent>
+            </Popover>
           </div>
         </div>
 
@@ -262,7 +347,7 @@ export const AllRemindersModal = ({
             })
           ) : (
             <p className="py-12 text-center text-sm text-gray-500">
-              Tidak ada pengingat yang cocok dengan filter Anda.
+              No reminders match your filters.
             </p>
           )}
         </div>
