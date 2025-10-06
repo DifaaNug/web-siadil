@@ -70,22 +70,22 @@ export const DocumentGrid = ({
             id={`doc-grid-${doc.id}`}
             // right-click context menu disabled
             onClick={(e) => onDocumentSelect(doc.id, e)}
-            className={`group relative flex flex-col cursor-pointer overflow-hidden rounded-xl border bg-gradient-to-br  p-4 shadow transition-all duration-300 ease-in-out dark:border-gray-700 dark:from-gray-800 dark:to-gray-700/50 ${
+            className={`group relative flex flex-col cursor-pointer overflow-hidden rounded-lg border bg-gradient-to-br p-4 shadow-sm transition-all duration-300 ease-in-out dark:border-gray-700 dark:from-gray-800 dark:to-gray-700/50 hover:shadow-md hover:-translate-y-0.5 ${
               selectedDocumentIds.has(doc.id)
                 ? "border-green-400 ring-2 ring-green-500/30 dark:border-green-600"
-                : "border-gray-300 hover:border-demplon hover:shadow-lg hover:-translate-y-1 dark:hover:border-demplon"
+                : "border-gray-200 hover:border-demplon dark:hover:border-demplon"
             }`}>
-            <div className="flex items-start justify-between mb-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gray-100 dark:bg-gray-700">
+            <div className="flex items-start justify-between mb-2.5">
+              <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-gradient-to-br from-teal-500 to-emerald-600 shadow-sm">
                 <svg
-                  className="h-6 w-6 text-gray-500 dark:text-gray-400"
+                  className="h-6 w-6 text-white"
                   fill="none"
                   stroke="currentColor"
-                  viewBox="0 0 24 24">
+                  viewBox="0 0 24 24"
+                  strokeWidth="2">
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
-                    strokeWidth="1.5"
                     d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
                   />
                 </svg>
@@ -148,18 +148,18 @@ export const DocumentGrid = ({
               </div>
             </div>
 
-            <div className="flex-grow">
+            <div className="flex-grow min-h-[3rem]">
               <h4
-                className="font-bold text-sm text-gray-800 dark:text-white leading-tight"
+                className="font-bold text-base text-gray-900 dark:text-white leading-snug mb-2 line-clamp-2"
                 title={doc.title}>
                 {doc.title}
               </h4>
-              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-auto">
                 in {getParentArchiveName(doc.parentId)}
               </p>
             </div>
 
-            <div className="mt-3 pt-3 border-t border-gray-100 dark:border-gray-700/50 text-xs text-gray-500 dark:text-gray-400">
+            <div className="mt-2 pt-2 border-t border-gray-100 dark:border-gray-700/50 text-xs text-gray-500 dark:text-gray-400">
               <div className="flex justify-between">
                 <span>{doc.number}</span>
                 <span>{formatDate(doc.updatedDate)}</span>

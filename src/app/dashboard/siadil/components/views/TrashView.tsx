@@ -5,24 +5,25 @@ interface TrashViewProps {
   documents: Document[];
   archives: Archive[];
   trashedArchives: Archive[];
+  filter: "all" | "documents" | "folders";
   onRestore: (docId: string) => void;
   onDeletePermanently: (docId: string) => void;
   onRestoreArchive: (archiveId: string) => void;
   onDeleteArchivePermanently: (archiveId: string) => void;
+  onEmptyTrash: () => void;
 }
 
 const TrashView: React.FC<TrashViewProps> = ({
   documents,
   archives,
   trashedArchives,
+  filter,
   onRestore,
   onDeletePermanently,
   onRestoreArchive,
   onDeleteArchivePermanently,
+  onEmptyTrash,
 }) => {
-  const [filter, setFilter] = React.useState<"all" | "documents" | "folders">(
-    "all"
-  );
 
   const getParentArchiveName = (parentId: string) => {
     const parent = archives.find((a) => a.id === parentId);
@@ -32,55 +33,17 @@ const TrashView: React.FC<TrashViewProps> = ({
   const filteredDocuments = filter === "folders" ? [] : documents;
   const filteredArchives = filter === "documents" ? [] : trashedArchives;
 
-  const handleEmptyTrash = () => {
-    alert("Fungsi 'Empty Trash' perlu diimplementasikan di halaman utama.");
-  };
-
   return (
     <div className="mb-10">
-      {/* Filter Tabs */}
-      <div className="flex items-center gap-2 mb-6 border-b border-gray-200 dark:border-gray-700">
-        <button
-          onClick={() => setFilter("all")}
-          className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
-            filter === "all"
-              ? "border-teal-600 text-teal-600"
-              : "border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400"
-          }`}
-        >
-          All ({documents.length + trashedArchives.length})
-        </button>
-        <button
-          onClick={() => setFilter("documents")}
-          className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
-            filter === "documents"
-              ? "border-teal-600 text-teal-600"
-              : "border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400"
-          }`}
-        >
-          Documents ({documents.length})
-        </button>
-        <button
-          onClick={() => setFilter("folders")}
-          className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
-            filter === "folders"
-              ? "border-teal-600 text-teal-600"
-              : "border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400"
-          }`}
-        >
-          Folders ({trashedArchives.length})
-        </button>
-      </div>
-
-      {/* Keterangan di bawah judul, bisa kita gabungkan atau modifikasi di page.tsx jika perlu */}
+      {/* Info and Empty Trash Button */}
       <div className="flex justify-between items-center mb-4">
         <p className="text-sm text-gray-500 dark:text-gray-400">
           Items here will be automatically deleted after 30 days.
         </p>
         {(documents.length > 0 || trashedArchives.length > 0) && (
           <button
-            onClick={handleEmptyTrash}
-            className="flex items-center gap-2 px-3 py-1.5 text-sm font-semibold text-red-600 bg-red-50 border border-red-200 rounded-lg hover:bg-red-100 dark:bg-red-900/50 dark:text-red-300 dark:border-red-800 dark:hover:bg-red-900"
+            onClick={onEmptyTrash}
+            className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-red-600 bg-red-50 border border-red-200 rounded-lg hover:bg-red-100 hover:shadow-sm transition-all dark:bg-red-900/50 dark:text-red-300 dark:border-red-800 dark:hover:bg-red-900"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -141,13 +104,13 @@ const TrashView: React.FC<TrashViewProps> = ({
               <div className="flex items-center gap-2 flex-shrink-0">
                 <button
                   onClick={() => onRestoreArchive(archive.id)}
-                  className="px-3 py-1.5 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
+                  className="px-4 py-2 text-sm font-semibold text-teal-700 bg-teal-50 border border-teal-200 rounded-lg hover:bg-teal-100 hover:shadow-sm transition-all duration-200 dark:bg-teal-900/20 dark:text-teal-400 dark:border-teal-800 dark:hover:bg-teal-900/40"
                 >
                   Restore
                 </button>
                 <button
                   onClick={() => onDeleteArchivePermanently(archive.id)}
-                  className="p-1.5 text-gray-500 rounded-md hover:bg-red-100 hover:text-red-600 dark:hover:bg-red-900/50 dark:hover:text-red-400"
+                  className="p-2 text-red-600 bg-red-50 border border-red-200 rounded-lg hover:bg-red-100 hover:shadow-sm transition-all duration-200 dark:bg-red-900/20 dark:text-red-400 dark:border-red-800 dark:hover:bg-red-900/40"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -175,19 +138,21 @@ const TrashView: React.FC<TrashViewProps> = ({
               className="flex items-center justify-between p-4 rounded-lg border bg-white hover:border-gray-300 dark:bg-gray-800 dark:border-gray-700 dark:hover:border-gray-600"
             >
               <div className="flex items-center gap-4">
-                <svg
-                  className="w-8 h-8 text-gray-400 flex-shrink-0"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="1.5"
-                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                  ></path>
-                </svg>
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-teal-500 to-emerald-600 flex-shrink-0">
+                  <svg
+                    className="w-5 h-5 text-white"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                    ></path>
+                  </svg>
+                </div>
                 <div className="min-w-0">
                   <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">
                     {doc.title} ({getParentArchiveName(doc.parentId)})
@@ -201,13 +166,13 @@ const TrashView: React.FC<TrashViewProps> = ({
               <div className="flex items-center gap-2 flex-shrink-0">
                 <button
                   onClick={() => onRestore(doc.id)}
-                  className="px-3 py-1.5 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
+                  className="px-4 py-2 text-sm font-semibold text-teal-700 bg-teal-50 border border-teal-200 rounded-lg hover:bg-teal-100 hover:shadow-sm transition-all duration-200 dark:bg-teal-900/20 dark:text-teal-400 dark:border-teal-800 dark:hover:bg-teal-900/40"
                 >
                   Restore
                 </button>
                 <button
                   onClick={() => onDeletePermanently(doc.id)}
-                  className="p-1.5 text-gray-500 rounded-md hover:bg-red-100 hover:text-red-600 dark:hover:bg-red-900/50 dark:hover:text-red-400"
+                  className="p-2 text-red-600 bg-red-50 border border-red-200 rounded-lg hover:bg-red-100 hover:shadow-sm transition-all duration-200 dark:bg-red-900/20 dark:text-red-400 dark:border-red-800 dark:hover:bg-red-900/40"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"

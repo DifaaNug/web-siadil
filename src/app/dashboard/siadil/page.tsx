@@ -38,6 +38,7 @@ import { ArchiveContextMenu } from "./components/ui/ArchiveContextMenu";
 import { EditArchiveModal } from "./components/modals/EditArchiveModal";
 import { DeleteArchiveModal } from "./components/modals/DeleteArchiveModal";
 import { MoveArchiveModal } from "./components/modals/MoveArchiveModal";
+import EmptyTrashModal from "./components/modals/EmptyTrashModal";
 
 import { AllRemindersModal } from "./components/modals/AllRemindersModal";
 // import { reminders } from "./data";
@@ -98,6 +99,10 @@ export default function SiadilPage() {
 
   const [archiveSearchQuery, setArchiveSearchQuery] = useState("");
   const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false); // State untuk modal riwayat
+
+  // Trash filter state
+  const [trashFilter, setTrashFilter] = useState<"all" | "documents" | "folders">("all");
+  const [isEmptyTrashModalOpen, setIsEmptyTrashModalOpen] = useState(false);
 
   // Archive context menu state
   const [archiveContextMenu, setArchiveContextMenu] = useState<{
@@ -471,6 +476,42 @@ export default function SiadilPage() {
     }
   };
 
+  const handleEmptyTrash = () => {
+    let deletedCount = 0;
+    
+    if (trashFilter === "all") {
+      // Delete all documents and folders
+      deletedCount = trashedDocuments.length + trashedArchives.length;
+      setDocuments((currentDocs) =>
+        currentDocs.filter((doc) => doc.status !== "Trashed")
+      );
+      setArchives((currentArchives) =>
+        currentArchives.filter((arc) => arc.status !== "Trashed")
+      );
+      toast.error("Trash Emptied", {
+        description: `${deletedCount} items permanently deleted.`,
+      });
+    } else if (trashFilter === "documents") {
+      // Delete only documents
+      deletedCount = trashedDocuments.length;
+      setDocuments((currentDocs) =>
+        currentDocs.filter((doc) => doc.status !== "Trashed")
+      );
+      toast.error("Documents Emptied", {
+        description: `${deletedCount} documents permanently deleted.`,
+      });
+    } else if (trashFilter === "folders") {
+      // Delete only folders
+      deletedCount = trashedArchives.length;
+      setArchives((currentArchives) =>
+        currentArchives.filter((arc) => arc.status !== "Trashed")
+      );
+      toast.error("Folders Emptied", {
+        description: `${deletedCount} folders permanently deleted.`,
+      });
+    }
+  };
+
   const handleConfirmAction = () => {
     if (!confirmationAction) return;
 
@@ -825,7 +866,8 @@ export default function SiadilPage() {
           {currentFolderId === "root" && (
             <div className="mb-8">
               {/* Header dengan Icon sejajar dengan Search */}
-              <div className="flex items-center justify-between gap-4 mb-6">
+              {/* Header Section - Consistent height and spacing */}
+              <div className="flex items-center justify-between gap-4 mb-6 min-h-[48px]">
                 <div className="flex items-center gap-3">
                   <div
                     className={`flex items-center justify-center w-8 h-8 rounded-lg shadow-md transition-all duration-300 ${
@@ -864,7 +906,7 @@ export default function SiadilPage() {
                       )}
                     </svg>
                   </div>
-                  <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+                  <h2 className="text-2xl font-bold text-gray-900 dark:text-white leading-tight">
                     {pageView === "archives"
                       ? "Archives"
                       : pageView === "starred"
@@ -891,8 +933,8 @@ export default function SiadilPage() {
                 )}
               </div>
 
-              {/* Tabs Navigation */}
-              <div className="border-b border-gray-200 dark:border-gray-700">
+              {/* Tabs Navigation - Consistent spacing */}
+              <div className="border-b border-gray-200 dark:border-gray-700 mb-6">
                 <nav className="-mb-px flex space-x-6" aria-label="Tabs">
                   <button
                     onClick={() => setPageView("archives")}
@@ -966,6 +1008,42 @@ export default function SiadilPage() {
                     </svg>
                     <span>Trash</span>
                   </button>
+
+                  {/* Trash Filter Tabs - Only show when in trash view */}
+                  {pageView === "trash" && (
+                    <div className="flex items-center gap-2 ml-4 border-l border-gray-300 dark:border-gray-600 pl-4">
+                      <button
+                        onClick={() => setTrashFilter("all")}
+                        className={`px-3 py-1.5 text-sm font-medium rounded-md transition-all ${
+                          trashFilter === "all"
+                            ? "bg-teal-100 text-teal-700 dark:bg-teal-900/30 dark:text-teal-400"
+                            : "text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700"
+                        }`}
+                      >
+                        All ({trashedDocuments.length + trashedArchives.length})
+                      </button>
+                      <button
+                        onClick={() => setTrashFilter("documents")}
+                        className={`px-3 py-1.5 text-sm font-medium rounded-md transition-all ${
+                          trashFilter === "documents"
+                            ? "bg-teal-100 text-teal-700 dark:bg-teal-900/30 dark:text-teal-400"
+                            : "text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700"
+                        }`}
+                      >
+                        Documents ({trashedDocuments.length})
+                      </button>
+                      <button
+                        onClick={() => setTrashFilter("folders")}
+                        className={`px-3 py-1.5 text-sm font-medium rounded-md transition-all ${
+                          trashFilter === "folders"
+                            ? "bg-teal-100 text-teal-700 dark:bg-teal-900/30 dark:text-teal-400"
+                            : "text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700"
+                        }`}
+                      >
+                        Folders ({trashedArchives.length})
+                      </button>
+                    </div>
+                  )}
                 </nav>
               </div>
             </div>
@@ -995,12 +1073,14 @@ export default function SiadilPage() {
                       documents={trashedDocuments}
                       archives={archives}
                       trashedArchives={trashedArchives}
+                      filter={trashFilter}
                       onRestore={handleRestoreDocument}
                       onDeletePermanently={handleDeletePermanently}
                       onRestoreArchive={handleRestoreArchive}
                       onDeleteArchivePermanently={
                         handleDeleteArchivePermanently
                       }
+                      onEmptyTrash={() => setIsEmptyTrashModalOpen(true)}
                     />
                   );
                 case "archives":
@@ -1192,6 +1272,16 @@ export default function SiadilPage() {
           onConfirm={handleConfirmDeleteArchive}
         />
       )}
+
+      {/* Empty Trash Modal */}
+      <EmptyTrashModal
+        isOpen={isEmptyTrashModalOpen}
+        onClose={() => setIsEmptyTrashModalOpen(false)}
+        onConfirm={handleEmptyTrash}
+        filterType={trashFilter}
+        documentsCount={trashedDocuments.length}
+        foldersCount={trashedArchives.length}
+      />
     </>
   );
 }

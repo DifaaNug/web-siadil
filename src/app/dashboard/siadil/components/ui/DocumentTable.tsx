@@ -6,6 +6,29 @@ import { HeaderSortMenu } from "./HeaderSortMenu";
 
 // Context menu state removed
 
+// Tooltip component for long text
+const Tooltip = ({ text, children }: { text: string; children: React.ReactNode }) => {
+  const [show, setShow] = useState(false);
+  
+  return (
+    <div 
+      className="relative inline-block w-full"
+      onMouseEnter={() => setShow(true)}
+      onMouseLeave={() => setShow(false)}
+    >
+      {children}
+      {show && (
+        <div className="absolute z-50 px-3 py-2 text-sm font-medium text-white bg-gray-900 dark:bg-gray-700 rounded-lg shadow-lg bottom-full left-1/2 transform -translate-x-1/2 mb-2 min-w-[200px] max-w-[400px]">
+          {text}
+          <div className="absolute top-full left-1/2 transform -translate-x-1/2 -mt-1">
+            <div className="border-4 border-transparent border-t-gray-900 dark:border-t-gray-700"></div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
 type ActiveMenuState = { docId: string; buttonEl: HTMLButtonElement } | null;
 type ActiveHeaderMenuState = {
   columnId: keyof Document;
@@ -119,12 +142,12 @@ export const DocumentTable = ({
     align?: "left" | "center" | "right";
   }) => (
     <th
-      className={`px-4 py-3 text-${align} sticky top-0 z-10 bg-green-50 dark:bg-green-900 border-r border-green-200 dark:border-green-700 last:border-r-0`}>
+      className={`px-4 py-3 text-${align} sticky top-0 z-10 bg-gradient-to-r from-teal-50 to-cyan-50 dark:from-gray-800 dark:to-gray-700 border-r border-gray-200 dark:border-gray-600 last:border-r-0`}>
       <button
         onClick={(e) =>
           setActiveHeaderMenu({ columnId, buttonEl: e.currentTarget })
         }
-        className="flex items-center gap-2 text-sm font-bold text-green-800 dark:text-green-100 tracking-wider hover:text-green-900 dark:hover:text-white transition-colors">
+        className="flex items-center gap-2 text-sm font-semibold text-gray-700 dark:text-gray-200 tracking-wider hover:text-teal-600 dark:hover:text-teal-400 transition-colors">
         {label}
         <SortIndicator columnId={columnId} />
       </button>
@@ -135,10 +158,10 @@ export const DocumentTable = ({
     <>
       <div className="overflow-hidden border-green-200 dark:border-green-700">
         <table className="w-full border-collapse">
-          <thead className="bg-green-50 dark:bg-green-900 border-green-300 dark:border-green-600 sticky top-0 z-10 shadow-sm">
+          <thead className="bg-gradient-to-r from-teal-50 to-cyan-50 dark:from-gray-800 dark:to-gray-700 border-gray-200 dark:border-gray-600 sticky top-0 z-10 shadow-sm">
             <tr>
               {visibleColumns.has("actions") && (
-                <th className="px-4 py-3 text-left text-sm font-medium text-green-800 dark:text-green-100 tracking-wider sticky top-0 z-10 bg-green-50 dark:bg-green-900 border-r border-green-200 dark:border-green-700">
+                <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 dark:text-gray-200 tracking-wider sticky top-0 z-10 bg-gradient-to-r from-teal-50 to-cyan-50 dark:from-gray-800 dark:to-gray-700 border-r border-gray-200 dark:border-gray-600">
                   Actions
                 </th>
               )}
@@ -147,7 +170,7 @@ export const DocumentTable = ({
                 <SortableHeader columnId="number" label="Number & Title" />
               )}
               {visibleColumns.has("description") && (
-                <th className="px-4 py-3 text-left text-sm font-medium text-green-800 dark:text-green-100 tracking-wider sticky top-0 z-10 bg-green-50 dark:bg-green-900 border-r border-green-200 dark:border-green-700">
+                <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 dark:text-gray-200 tracking-wider sticky top-0 z-10 bg-gradient-to-r from-teal-50 to-cyan-50 dark:from-gray-800 dark:to-gray-700 border-r border-gray-200 dark:border-gray-600">
                   Description
                 </th>
               )}
@@ -159,7 +182,7 @@ export const DocumentTable = ({
                 />
               )}
               {visibleColumns.has("contributors") && (
-                <th className="px-4 py-3 text-left text-sm font-medium text-green-800 dark:text-green-100 tracking-wider sticky top-0 z-10 bg-green-50 dark:bg-green-900 border-r border-green-200 dark:border-green-700">
+                <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 dark:text-gray-200 tracking-wider sticky top-0 z-10 bg-gradient-to-r from-teal-50 to-cyan-50 dark:from-gray-800 dark:to-gray-700 border-r border-gray-200 dark:border-gray-600">
                   Contributors
                 </th>
               )}
@@ -169,22 +192,22 @@ export const DocumentTable = ({
               {visibleColumns.has("updatedAndCreatedBy") && (
                 <SortableHeader
                   columnId="updatedDate"
-                  label="Update & Create by"
+                  label="Updated"
                 />
               )}
             </tr>
           </thead>
-          <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-600">
+          <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-100 dark:divide-gray-700">
             {documents.map((doc) => (
               <tr
                 key={doc.id}
                 id={`doc-table-${doc.id}`}
                 // right-click context menu disabled
                 onClick={(e) => onDocumentSelect(doc.id, e)}
-                className={`transition-colors cursor-pointer  border-gray-200 dark:border-gray-600 ${
+                className={`transition-all duration-200 cursor-pointer border-gray-100 dark:border-gray-700 ${
                   selectedDocumentIds.has(doc.id)
-                    ? "bg-green-50 dark:bg-green-900/50"
-                    : "hover:bg-gray-50 dark:hover:bg-gray-700"
+                    ? "bg-teal-50 dark:bg-teal-900/30 shadow-sm"
+                    : "hover:bg-gray-50/50 dark:hover:bg-gray-700/50"
                 }`}>
                 {visibleColumns.has("actions") && (
                   <td
@@ -248,27 +271,35 @@ export const DocumentTable = ({
                     )}
                   </td>
                 )}
-                <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white border-r border-gray-200 dark:border-gray-600">
-                  {doc.id}
+                <td className="px-4 py-4 whitespace-nowrap text-sm border-r border-gray-100 dark:border-gray-700">
+                  <span className="inline-flex items-center px-3 py-1 rounded-full bg-gradient-to-r from-teal-500 to-cyan-600 text-white text-xs font-semibold shadow-sm">
+                    {doc.id}
+                  </span>
                 </td>
                 {visibleColumns.has("numberAndTitle") && (
-                  <td className="px-4 py-4 text-sm text-gray-900 dark:text-white border-r border-gray-200 dark:border-gray-600">
-                    <div className="font-medium">{doc.number}</div>
-                    <div className="text-gray-500 dark:text-gray-400">
-                      {doc.title}
-                    </div>
+                  <td className="px-4 py-4 text-sm border-r border-gray-100 dark:border-gray-700">
+                    <div className="font-semibold text-gray-900 dark:text-white mb-1">{doc.number}</div>
+                    <Tooltip text={doc.title}>
+                      <div className="text-gray-600 dark:text-gray-400 line-clamp-2 leading-snug">
+                        {doc.title}
+                      </div>
+                    </Tooltip>
                   </td>
                 )}
                 {visibleColumns.has("description") && (
-                  <td
-                    className="px-4 py-4 text-sm text-gray-500 dark:text-gray-400 max-w-xs border-r border-gray-200 dark:border-gray-600"
-                    title={doc.description}>
-                    {doc.description}
+                  <td className="px-4 py-4 text-sm max-w-xs border-r border-gray-100 dark:border-gray-700">
+                    <Tooltip text={doc.description}>
+                      <div className="text-gray-600 dark:text-gray-400 line-clamp-2 leading-snug">
+                        {doc.description}
+                      </div>
+                    </Tooltip>
                   </td>
                 )}
                 {visibleColumns.has("documentDate") && (
-                  <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white border-r border-gray-200 dark:border-gray-600 text-center">
-                    {formatDate(doc.documentDate)}
+                  <td className="px-4 py-4 whitespace-nowrap text-sm border-r border-gray-100 dark:border-gray-700 text-center">
+                    <span className="inline-flex items-center px-3 py-1 rounded-full bg-gradient-to-r from-blue-500 to-indigo-600 text-white text-xs font-semibold shadow-sm">
+                      {formatDate(doc.documentDate)}
+                    </span>
                   </td>
                 )}
                 {visibleColumns.has("contributors") && (
@@ -294,23 +325,20 @@ export const DocumentTable = ({
                   </td>
                 )}
                 {visibleColumns.has("archive") && (
-                  <td className="px-4 py-4 whitespace-nowrap text-sm border-r border-gray-200 dark:border-gray-600">
-                    <span className="px-2 py-1 text-xs font-medium rounded-full bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300">
+                  <td className="px-4 py-4 whitespace-nowrap text-sm border-r border-gray-100 dark:border-gray-700">
+                    <span className="px-3 py-1 text-xs font-semibold rounded-full bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300">
                       {doc.archive}
                     </span>
                   </td>
                 )}
                 {visibleColumns.has("updatedAndCreatedBy") && (
                   <td className="px-4 py-4 text-sm">
-                    <div>
-                      <div className="text-gray-900 dark:text-white">
+                    <div className="space-y-1">
+                      <div className="text-gray-900 dark:text-white font-medium">
                         Updated: {formatDate(doc.updatedDate)}
                       </div>
-                      <div className="text-gray-500 dark:text-gray-400">
+                      <div className="text-gray-600 dark:text-gray-400 text-xs">
                         by {doc.updatedBy}
-                      </div>
-                      <div className="text-gray-500 dark:text-gray-400 mt-1">
-                        Created by: {doc.createdBy}
                       </div>
                     </div>
                   </td>
