@@ -4,6 +4,7 @@ export type Archive = {
   name: string;
   code: string;
   parentId: string;
+  status?: string;
 };
 export type Document = {
   id: string;

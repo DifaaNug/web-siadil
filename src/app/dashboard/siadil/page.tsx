@@ -33,6 +33,11 @@ import CreateArchiveModal from "./components/modals/CreateArchiveModal";
 import { AddDocumentModal } from "./components/modals/AddDocumentModal";
 import { SearchPopup } from "./components/modals/SearchPopup";
 import { MoveToModal } from "./components/modals/MoveToModal";
+import { GlobalSearch } from "./components/ui/GlobalSearch";
+import { ArchiveContextMenu } from "./components/ui/ArchiveContextMenu";
+import { EditArchiveModal } from "./components/modals/EditArchiveModal";
+import { DeleteArchiveModal } from "./components/modals/DeleteArchiveModal";
+import { MoveArchiveModal } from "./components/modals/MoveArchiveModal";
 
 import { AllRemindersModal } from "./components/modals/AllRemindersModal";
 // import { reminders } from "./data";
@@ -94,6 +99,18 @@ export default function SiadilPage() {
   const [archiveSearchQuery, setArchiveSearchQuery] = useState("");
   const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false); // State untuk modal riwayat
 
+  // Archive context menu state
+  const [archiveContextMenu, setArchiveContextMenu] = useState<{
+    x: number;
+    y: number;
+    archiveId: string;
+  } | null>(null);
+
+  // Archive modal states
+  const [editArchiveId, setEditArchiveId] = useState<string | null>(null);
+  const [deleteArchiveId, setDeleteArchiveId] = useState<string | null>(null);
+  const [moveArchiveId, setMoveArchiveId] = useState<string | null>(null);
+
   const handleColumnToggle = (columnId: string) => {
     setVisibleColumns((prev) => {
       const newSet = new Set(prev);
@@ -137,9 +154,9 @@ export default function SiadilPage() {
   }, [documents, currentFolderId, searchableDocuments]);
 
   const { dynamicReminders, expiredCount, expiringSoonCount } = useMemo(() => {
-    // Gunakan dokumen subtree jika bukan root
+    // Gunakan dokumen sesuai scope folder untuk reminder DAN count
     const baseDocs =
-      currentFolderId === "root" ? documents : searchableDocuments; // sudah tidak termasuk Trashed
+      currentFolderId === "root" ? documents : searchableDocuments;
 
     const reminders: Reminder[] = [];
     let expired = 0;
@@ -200,6 +217,10 @@ export default function SiadilPage() {
   const trashedDocuments = useMemo(() => {
     return documents.filter((doc) => doc.status === "Trashed");
   }, [documents]);
+
+  const trashedArchives = useMemo(() => {
+    return archives.filter((a) => a.status === "Trashed");
+  }, [archives]);
 
   const pageTitle = useMemo(() => {
     if (currentFolderId !== "root") {
@@ -329,6 +350,123 @@ export default function SiadilPage() {
         action: "delete",
         docId,
         docTitle: docToDelete.title,
+      });
+    }
+  };
+
+  // Archive context menu handlers
+  const handleArchiveMenuClick = (e: React.MouseEvent, archiveId: string) => {
+    const archive = archives.find((a) => a.id === archiveId);
+    if (!archive) return;
+
+    setArchiveContextMenu({
+      x: e.clientX,
+      y: e.clientY,
+      archiveId: archive.id,
+    });
+  };
+
+  const handleEditArchive = (archiveId: string) => {
+    setEditArchiveId(archiveId);
+  };
+
+  const handleSaveArchiveEdit = (archiveId: string, newName: string) => {
+    setArchives((currentArchives) =>
+      currentArchives.map((arc) =>
+        arc.id === archiveId ? { ...arc, name: newName } : arc
+      )
+    );
+    toast.success("Archive Updated Successfully", {
+      description: `Archive has been successfully updated.`,
+    });
+    setEditArchiveId(null);
+  };
+
+  const handleMoveArchive = (archiveId: string) => {
+    setMoveArchiveId(archiveId);
+  };
+
+  const handleConfirmMoveArchive = (targetArchiveId: string) => {
+    if (!moveArchiveId) return;
+
+    setArchives((currentArchives) =>
+      currentArchives.map((arc) =>
+        arc.id === moveArchiveId ? { ...arc, parentId: targetArchiveId } : arc
+      )
+    );
+
+    const archive = archives.find((a) => a.id === moveArchiveId);
+    toast.success("Archive Moved Successfully", {
+      description: `Archive "${archive?.name || "Unknown"}" has been moved.`,
+    });
+    setMoveArchiveId(null);
+  };
+
+  const handleDeleteArchive = (archiveId: string) => {
+    setDeleteArchiveId(archiveId);
+  };
+
+  const handleConfirmDeleteArchive = () => {
+    if (!deleteArchiveId) return;
+
+    // Move archive to trash by updating its status
+    const archive = archives.find((a) => a.id === deleteArchiveId);
+    setArchives((currentArchives) =>
+      currentArchives.map((arc) =>
+        arc.id === deleteArchiveId ? { ...arc, status: "Trashed" } : arc
+      )
+    );
+    toast.success("Archive Moved to Trash", {
+      description: `Archive "${
+        archive?.name || "Unknown"
+      }" has been successfully moved to trash.`,
+    });
+    setDeleteArchiveId(null);
+  };
+
+  const handleManageContributors = (archiveId: string) => {
+    // TODO: Implement manage contributors for archive
+    toast.info("Manage Contributors", {
+      description: "This feature is coming soon.",
+    });
+    console.log("Manage contributors for archive:", archiveId);
+  };
+
+  const handleManageFiles = (archiveId: string) => {
+    // Navigate to documents view for this archive
+    setCurrentFolderId(archiveId);
+    setPageView("archives");
+    toast.info("Manage Files", {
+      description: "Opening archive files...",
+    });
+  };
+
+  const handleRestoreArchive = (archiveId: string) => {
+    const archive = archives.find((a) => a.id === archiveId);
+    setArchives((currentArchives) =>
+      currentArchives.map((arc) =>
+        arc.id === archiveId ? { ...arc, status: undefined } : arc
+      )
+    );
+    toast.success("Archive Restored Successfully", {
+      description: `Archive "${archive?.name || "Unknown"}" has been restored.`,
+    });
+  };
+
+  const handleDeleteArchivePermanently = (archiveId: string) => {
+    const archive = archives.find((a) => a.id === archiveId);
+    if (
+      window.confirm(
+        `Are you sure you want to permanently delete "${archive?.name}"? This action cannot be undone.`
+      )
+    ) {
+      setArchives((currentArchives) =>
+        currentArchives.filter((arc) => arc.id !== archiveId)
+      );
+      toast.error("Archive Permanently Deleted", {
+        description: `Archive "${
+          archive?.name || "Unknown"
+        }" has been permanently deleted.`,
       });
     }
   };
@@ -566,6 +704,13 @@ export default function SiadilPage() {
     setSelectedDocumentIds(new Set([doc.id]));
   };
 
+  const handleReminderClick = (documentId: string) => {
+    const doc = documents.find((d) => d.id === documentId);
+    if (doc) {
+      handleQuickAccessClick(doc);
+    }
+  };
+
   const handleSearchSelect = (doc: Document) => {
     setIsSearchPopupOpen(false);
     setSearchQuery("");
@@ -637,7 +782,8 @@ export default function SiadilPage() {
         {/* Wrapper that adds smooth reserved space on xl screens while panel open */}
         <div
           className={`transition-[padding] duration-300 ease-[cubic-bezier(.4,0,.2,1)]
-            xl:pr-0 ${isInfoPanelOpen ? "xl:pr-80" : "xl:pr-0"}`}>
+            xl:pr-0 ${isInfoPanelOpen ? "xl:pr-80" : "xl:pr-0"}`}
+        >
           <DashboardHeader
             userName={userData.name}
             breadcrumbItems={breadcrumbItems}
@@ -658,6 +804,7 @@ export default function SiadilPage() {
             onFileUpload={handleOpenAddModalInContext}
             currentFolderId={currentFolderId}
             reminders={dynamicReminders}
+            onReminderClick={handleReminderClick}
           />
           <AllRemindersModal
             isOpen={isRemindersModalOpen}
@@ -676,113 +823,151 @@ export default function SiadilPage() {
           )}
 
           {currentFolderId === "root" && (
-            <>
-              <div className="flex items-center justify-between gap-4 mb-4">
-                <h2 className="text-2xl font-bold text-gray-800 dark:text-white shrink-0">
-                  {pageTitle}
-                </h2>
-
-                <div
-                  className={`relative w-full sm:max-w-xs ${
-                    pageView === "archives" ? "visible" : "invisible"
-                  }`}>
-                  <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5">
+            <div className="mb-8">
+              {/* Header dengan Icon sejajar dengan Search */}
+              <div className="flex items-center justify-between gap-4 mb-6">
+                <div className="flex items-center gap-3">
+                  <div
+                    className={`flex items-center justify-center w-8 h-8 rounded-lg shadow-md transition-all duration-300 ${
+                      pageView === "archives"
+                        ? "bg-gradient-to-br from-demplon to-teal-600"
+                        : pageView === "starred"
+                        ? "bg-gradient-to-br from-yellow-500 to-amber-600"
+                        : "bg-gradient-to-br from-red-500 to-rose-600"
+                    }`}
+                  >
                     <svg
-                      className="h-4 w-4 text-gray-400"
-                      xmlns="http://www.w3.org/2000/svg"
+                      className="w-5 h-5 text-white"
                       fill="none"
                       viewBox="0 0 24 24"
-                      stroke="currentColor">
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                      />
+                      stroke="currentColor"
+                      strokeWidth={2}
+                    >
+                      {pageView === "archives" ? (
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"
+                        />
+                      ) : pageView === "starred" ? (
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"
+                        />
+                      ) : (
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                        />
+                      )}
                     </svg>
                   </div>
-                  <input
-                    type="text"
-                    placeholder="Search Archive..."
-                    value={archiveSearchQuery}
-                    onChange={(e) => setArchiveSearchQuery(e.target.value)}
-                    className="w-full rounded-lg border border-gray-200  py-2 pl-10 pr-4 text-sm text-gray-900 placeholder-gray-500 transition-colors duration-200 focus:border-demplon focus:bg-white focus:ring-2 focus:ring-demplon/30 dark:border-gray-700 dark:bg-gray-900/50 dark:text-gray-200 dark:placeholder-gray-400 dark:focus:bg-gray-800"
-                  />
+                  <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+                    {pageView === "archives"
+                      ? "Archives"
+                      : pageView === "starred"
+                      ? "Starred Documents"
+                      : "Trash"}
+                  </h2>
                 </div>
+
+                {/* Global Search - visible only on archives view */}
+                {pageView === "archives" && (
+                  <div className="w-full sm:max-w-xs">
+                    <GlobalSearch
+                      documents={documents}
+                      archives={archives}
+                      onDocumentClick={handleQuickAccessClick}
+                      onArchiveClick={(archiveId) => {
+                        setCurrentFolderId(archiveId);
+                        setArchiveSearchQuery("");
+                      }}
+                      placeholder="Search folders and documents..."
+                      onSearchChange={setArchiveSearchQuery}
+                    />
+                  </div>
+                )}
               </div>
-            </>
-          )}
 
-          {currentFolderId === "root" && (
-            <div className="mb-6 border-b border-gray-200 dark:border-gray-700">
-              <nav className="-mb-px flex space-x-6" aria-label="Tabs">
-                <button
-                  onClick={() => setPageView("archives")}
-                  className={`flex items-center gap-2 whitespace-nowrap py-3 px-1 border-b-2 text-sm font-semibold transition-colors ${
-                    pageView === "archives"
-                      ? "border-demplon text-demplon"
-                      : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-                  }`}>
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round">
-                    <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
-                  </svg>
-                  <span>Archives</span>
-                </button>
+              {/* Tabs Navigation */}
+              <div className="border-b border-gray-200 dark:border-gray-700">
+                <nav className="-mb-px flex space-x-6" aria-label="Tabs">
+                  <button
+                    onClick={() => setPageView("archives")}
+                    className={`flex items-center gap-2 whitespace-nowrap py-3 px-1 border-b-2 text-sm font-semibold transition-colors ${
+                      pageView === "archives"
+                        ? "border-demplon text-demplon"
+                        : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                    }`}
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+                    </svg>
+                    <span>Archives</span>
+                  </button>
 
-                <button
-                  onClick={() => setPageView("starred")}
-                  className={`flex items-center gap-2 whitespace-nowrap py-3 px-1 border-b-2 text-sm font-semibold transition-colors ${
-                    pageView === "starred"
-                      ? "border-demplon text-demplon"
-                      : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-                  }`}>
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round">
-                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
-                  </svg>
-                  <span>Starred</span>
-                </button>
+                  <button
+                    onClick={() => setPageView("starred")}
+                    className={`flex items-center gap-2 whitespace-nowrap py-3 px-1 border-b-2 text-sm font-semibold transition-colors ${
+                      pageView === "starred"
+                        ? "border-yellow-500 text-yellow-600 dark:text-yellow-500"
+                        : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                    }`}
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                    </svg>
+                    <span>Starred</span>
+                  </button>
 
-                <button
-                  onClick={() => setPageView("trash")}
-                  className={`flex items-center gap-2 whitespace-nowrap py-3 px-1 border-b-2 text-sm font-semibold transition-colors ${
-                    pageView === "trash"
-                      ? "border-demplon text-demplon"
-                      : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-                  }`}>
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round">
-                    <polyline points="3 6 5 6 21 6"></polyline>
-                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                  </svg>
-                  <span>Trash</span>
-                </button>
-              </nav>
+                  <button
+                    onClick={() => setPageView("trash")}
+                    className={`flex items-center gap-2 whitespace-nowrap py-3 px-1 border-b-2 text-sm font-semibold transition-colors ${
+                      pageView === "trash"
+                        ? "border-red-500 text-red-600 dark:text-red-500"
+                        : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                    }`}
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <polyline points="3 6 5 6 21 6"></polyline>
+                      <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                    </svg>
+                    <span>Trash</span>
+                  </button>
+                </nav>
+              </div>
             </div>
           )}
 
@@ -809,8 +994,13 @@ export default function SiadilPage() {
                     <TrashView
                       documents={trashedDocuments}
                       archives={archives}
+                      trashedArchives={trashedArchives}
                       onRestore={handleRestoreDocument}
                       onDeletePermanently={handleDeletePermanently}
+                      onRestoreArchive={handleRestoreArchive}
+                      onDeleteArchivePermanently={
+                        handleDeleteArchivePermanently
+                      }
                     />
                   );
                 case "archives":
@@ -821,6 +1011,7 @@ export default function SiadilPage() {
                       archiveDocCounts={archiveDocCounts}
                       onArchiveClick={setCurrentFolderId}
                       searchQuery={archiveSearchQuery}
+                      onArchiveMenuClick={handleArchiveMenuClick}
                     />
                   );
               }
@@ -861,6 +1052,7 @@ export default function SiadilPage() {
               onToggleStar={handleToggleStar}
               currentFolderName={pageTitle}
               onArchiveClick={setCurrentFolderId}
+              onArchiveMenuClick={handleArchiveMenuClick}
             />
           )}
         </div>
@@ -941,7 +1133,8 @@ export default function SiadilPage() {
           onConfirm={handleConfirmAction}
           title={confirmationModalData.title}
           confirmText={confirmationModalData.confirmText}
-          variant={confirmationModalData.variant}>
+          variant={confirmationModalData.variant}
+        >
           <p>{confirmationModalData.body}</p>
         </ConfirmationModal>
       )}
@@ -954,6 +1147,51 @@ export default function SiadilPage() {
           setIsHistoryModalOpen(false);
         }}
       />
+
+      {/* Archive Context Menu */}
+      {archiveContextMenu && (
+        <ArchiveContextMenu
+          x={archiveContextMenu.x}
+          y={archiveContextMenu.y}
+          archiveId={archiveContextMenu.archiveId}
+          onClose={() => setArchiveContextMenu(null)}
+          onEdit={handleEditArchive}
+          onMove={handleMoveArchive}
+          onDelete={handleDeleteArchive}
+          onManageContributors={handleManageContributors}
+          onManageFiles={handleManageFiles}
+        />
+      )}
+
+      {/* Edit Archive Modal */}
+      {editArchiveId && (
+        <EditArchiveModal
+          archive={archives.find((a) => a.id === editArchiveId)!}
+          onClose={() => setEditArchiveId(null)}
+          onSave={handleSaveArchiveEdit}
+        />
+      )}
+
+      {/* Move Archive Modal */}
+      {moveArchiveId && (
+        <MoveArchiveModal
+          archives={archives}
+          currentArchiveId={moveArchiveId}
+          onClose={() => setMoveArchiveId(null)}
+          onMove={handleConfirmMoveArchive}
+        />
+      )}
+
+      {/* Delete Archive Modal */}
+      {deleteArchiveId && (
+        <DeleteArchiveModal
+          archiveName={
+            archives.find((a) => a.id === deleteArchiveId)?.name || "Unknown"
+          }
+          onClose={() => setDeleteArchiveId(null)}
+          onConfirm={handleConfirmDeleteArchive}
+        />
+      )}
     </>
   );
 }

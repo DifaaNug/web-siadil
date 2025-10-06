@@ -7,6 +7,7 @@ interface ArchiveViewProps {
   archiveDocCounts: Record<string, number>;
   onArchiveClick: (id: string) => void;
   searchQuery: string;
+  onArchiveMenuClick?: (e: React.MouseEvent, archiveId: string) => void;
 }
 
 const ITEMS_PER_PAGE = 8;
@@ -16,12 +17,13 @@ const ArchiveView: React.FC<ArchiveViewProps> = ({
   archiveDocCounts,
   onArchiveClick,
   searchQuery,
+  onArchiveMenuClick,
 }) => {
   const [currentPage, setCurrentPage] = useState(1);
 
   const filteredArchives = useMemo(() => {
     const archivesInCurrentFolder = archives.filter(
-      (a) => a.parentId === "root"
+      (a) => a.parentId === "root" && a.status !== "Trashed"
     );
     if (!searchQuery) {
       return archivesInCurrentFolder;
@@ -47,9 +49,10 @@ const ArchiveView: React.FC<ArchiveViewProps> = ({
           onClick={() => setCurrentPage(i)}
           className={`px-3 py-1 text-sm font-medium rounded-md transition-colors ${
             currentPage === i
-              ? "bg-demplon text-white"
+              ? "bg-gradient-to-br from-teal-600 to-emerald-600 text-white hover:from-teal-700 hover:to-emerald-700"
               : "bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
-          }`}>
+          }`}
+        >
           {i}
         </button>
       );
@@ -74,6 +77,7 @@ const ArchiveView: React.FC<ArchiveViewProps> = ({
                 archive={archive}
                 docCount={archiveDocCounts[archive.code] || 0}
                 onClick={() => onArchiveClick(archive.id)}
+                onMenuClick={onArchiveMenuClick}
               />
             )
           )}
@@ -89,7 +93,8 @@ const ArchiveView: React.FC<ArchiveViewProps> = ({
           <button
             onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
             disabled={currentPage === 1}
-            className="px-3 py-1 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md disabled:opacity-50 hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700">
+            className="px-3 py-1 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md disabled:opacity-50 hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
+          >
             Previous
           </button>
 
@@ -98,7 +103,8 @@ const ArchiveView: React.FC<ArchiveViewProps> = ({
           <button
             onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
             disabled={currentPage === totalPages}
-            className="px-3 py-1 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md disabled:opacity-50 hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700">
+            className="px-3 py-1 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md disabled:opacity-50 hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
+          >
             Next
           </button>
         </div>

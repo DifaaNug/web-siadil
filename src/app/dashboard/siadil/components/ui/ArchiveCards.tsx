@@ -1,5 +1,4 @@
 import { Archive } from "../../types";
-import Image from "next/image";
 
 const PersonalArchiveCard = ({
   archive,
@@ -10,12 +9,14 @@ const PersonalArchiveCard = ({
 }) => (
   <div
     onClick={onClick}
-    className="group relative flex cursor-pointer flex-col overflow-hidden rounded-xl bg-gradient-to-br from-demplon to-teal-600 p-5 text-white shadow-lg transition-all duration-300 ease-in-out hover:shadow-xl hover:-translate-y-1">
+    className="group relative flex cursor-pointer flex-col overflow-hidden rounded-xl bg-gradient-to-br from-demplon to-teal-600 p-5 text-white shadow-lg transition-all duration-300 ease-in-out hover:shadow-xl hover:-translate-y-1"
+  >
     <div className="absolute top-0 left-0 h-full w-full opacity-10">
       <svg
         className="h-full w-full"
         xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 800 800">
+        viewBox="0 0 800 800"
+      >
         <g fill="none" stroke="#FFF" strokeWidth="0.5">
           <path d="M-200,300 Q-100,250 0,300 t200,0 t200,0 t200,0 t200,0 t200,0" />
           <path d="M-200,350 Q-100,300 0,350 t200,0 t200,0 t200,0 t200,0 t200,0" />
@@ -43,58 +44,77 @@ const PersonalArchiveCard = ({
   </div>
 );
 
+interface ArchiveCardProps {
+  archive: Archive;
+  docCount: number;
+  onClick: () => void;
+  onMenuClick?: (e: React.MouseEvent, archiveId: string) => void;
+}
+
 const ArchiveCard = ({
   archive,
   docCount,
   onClick,
-}: {
-  archive: Archive;
-  docCount: number;
-  onClick: () => void;
-}) => (
-  <div
-    onClick={onClick}
-    className="group relative flex cursor-pointer flex-col overflow-hidden rounded-xl border border-gray-200 bg-gradient-to-br from-gray-50 to-white p-5 shadow-sm transition-all duration-300 ease-in-out  hover:border-green-400 hover:shadow-lg dark:border-gray-700 dark:from-gray-800 dark:to-gray-700/50 dark:hover:border-green-600">
-    <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-lg bg-gradient-to-br from-[#01793B] to-emerald-500 text-white shadow-sm ring-1 ring-inset ring-white/20">
-      <Image
-        src="/archive.svg"
-        alt="Archive icon"
-        width={24}
-        height={24}
-        className="h-6 w-6 invert"
-        priority
-      />
-    </div>
+  onMenuClick,
+}: ArchiveCardProps) => {
+  const handleMenuClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (onMenuClick) {
+      onMenuClick(e, archive.id);
+    }
+  };
 
-    <div className="flex-grow">
-      <h3
-        className="text-base font-bold text-gray-800 dark:text-white"
-        title={archive.name}>
-        {archive.name}
-      </h3>
-    </div>
+  return (
+    <div
+      onClick={onClick}
+      className="group relative flex cursor-pointer flex-col items-start overflow-hidden rounded-lg border border-gray-200 bg-white p-4 shadow-sm transition-all duration-300 ease-in-out hover:shadow-md hover:-translate-y-0.5 dark:border-gray-700 dark:bg-gray-900/50"
+    >
+      {/* Three dots menu button - always visible */}
+      {onMenuClick && (
+        <button
+          onClick={handleMenuClick}
+          className="absolute top-2 right-2 z-10 flex items-center justify-center w-6 h-6 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800 dark:hover:text-gray-300 transition-colors"
+        >
+          <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z" />
+          </svg>
+        </button>
+      )}
 
-    <div className="mt-4">
-      <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
-        {docCount} item{docCount !== 1 ? "s" : ""}
-      </span>
-    </div>
-
-    <div className="absolute bottom-4 right-4 text-gray-300 opacity-0 transition-opacity duration-300 group-hover:opacity-100 dark:text-gray-600">
-      <svg
-        className="h-6 w-6"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor">
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
+      {/* Icon - Smaller and more compact */}
+      <div className="mb-2.5 flex h-12 w-12 items-center justify-center rounded-lg bg-gradient-to-br from-teal-500 to-emerald-600 shadow-sm transition-transform duration-200 group-hover:scale-105">
+        <svg
+          className="w-6 h-6 text-white"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
           strokeWidth={2}
-          d="M17 8l4 4m0 0l-4 4m4-4H3"
-        />
-      </svg>
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"
+          />
+        </svg>
+      </div>
+
+      {/* Content wrapper untuk memastikan alignment */}
+      <div className="flex flex-col flex-1 w-full min-h-[3rem]">
+        {/* Title - Lebih besar dan ada spacing */}
+        <h3
+          className="text-base font-bold text-gray-900 dark:text-white mb-2 line-clamp-2 w-full leading-snug"
+          title={archive.name}
+        >
+          {archive.name}
+        </h3>
+
+        {/* Item count - Fixed position di bawah */}
+        <p className="text-xs text-gray-500 dark:text-gray-400 mt-auto">
+          {docCount} item{docCount !== 1 ? "s" : ""}
+        </p>
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 export { ArchiveCard, PersonalArchiveCard };

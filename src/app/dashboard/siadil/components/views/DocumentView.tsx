@@ -51,6 +51,7 @@ interface DocumentViewProps {
   isInfoPanelOpen: boolean;
   currentFolderName: string | undefined;
   onArchiveClick: (id: string) => void;
+  onArchiveMenuClick?: (e: React.MouseEvent, archiveId: string) => void;
 }
 
 const DocumentView: React.FC<DocumentViewProps> = (props) => {
@@ -89,6 +90,7 @@ const DocumentView: React.FC<DocumentViewProps> = (props) => {
     onArchiveClick,
     onManageContributors,
     isInfoPanelOpen,
+    onArchiveMenuClick,
   } = props;
 
   const hasDocuments = paginatedDocuments.length > 0;
@@ -100,12 +102,14 @@ const DocumentView: React.FC<DocumentViewProps> = (props) => {
           <button
             onClick={onGoBack}
             className="p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-            title="Kembali">
+            title="Kembali"
+          >
             <svg
               className="w-6 h-6 text-gray-600 dark:text-gray-300"
               fill="none"
               viewBox="0 0 24 24"
-              stroke="currentColor">
+              stroke="currentColor"
+            >
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -139,6 +143,7 @@ const DocumentView: React.FC<DocumentViewProps> = (props) => {
                   archive={archive}
                   docCount={archiveDocCounts[archive.code] || 0}
                   onClick={() => onArchiveClick(archive.id)}
+                  onMenuClick={onArchiveMenuClick}
                 />
               )
             )}
@@ -174,7 +179,8 @@ const DocumentView: React.FC<DocumentViewProps> = (props) => {
         onArchiveCheckboxChange={onArchiveCheckboxChange}
         onExport={onExport}
         viewMode={viewMode}
-        setViewMode={setViewMode}>
+        setViewMode={setViewMode}
+      >
         {hasDocuments ? (
           viewMode === "list" ? (
             <DocumentTable
