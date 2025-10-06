@@ -64,12 +64,15 @@ const ModernHeader: React.FC<ModernHeaderProps> = ({
       hour12: false,
     })
     .replace(/\./g, ":");
-  const formattedDate = currentTime.toLocaleDateString("id-ID", {
-    weekday: "long",
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  });
+
+  // Function to get dynamic greeting based on time
+  const getGreeting = () => {
+    const hour = currentTime.getHours();
+    if (hour >= 5 && hour < 12) return "Good Morning";
+    if (hour >= 12 && hour < 17) return "Good Afternoon";
+    if (hour >= 17 && hour < 21) return "Good Evening";
+    return "Good Night";
+  };
 
   // Logika untuk item breadcrumb
   const dropdownItems = breadcrumbItems.slice(0, -1);
@@ -77,64 +80,136 @@ const ModernHeader: React.FC<ModernHeaderProps> = ({
 
   return (
     <div ref={bannerRef} className="group relative w-full">
+      {/* Animated gradient hover effect */}
       <div
-        className="pointer-events-none absolute -inset-0.5 rounded-xl opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+        className="pointer-events-none absolute -inset-1 rounded-2xl opacity-0 blur-xl transition-opacity duration-500 group-hover:opacity-100"
         style={{
           background:
-            "radial-gradient(400px at var(--mouse-x) var(--mouse-y), rgb(77, 238, 32), transparent 80%)",
+            "radial-gradient(800px at var(--mouse-x) var(--mouse-y), rgba(16, 185, 129, 0.15), rgba(20, 184, 166, 0.1), transparent 70%)",
         }}
       />
-      {/* --- KARTU KONTEN UTAMA DENGAN PADDING BARU --- */}
-      <div className="relative w-full overflow-hidden rounded-xl bg-gradient-to-r from-green-700 to-teal-600 px-11 py-7 text-white shadow-lg">
-        <div className="absolute inset-0 bg-black/10 mix-blend-multiply"></div>
-        <div className="relative z-10 flex flex-col justify-between h-full">
-          {/* Baris Atas */}
-          <div className="flex justify-between items-start">
-            <div>
-              <p className="text-lg font-medium text-green-100">
-                Welcome back to SIADIL
-              </p>
-              <h1 className="mt-1 text-3xl font-bold">Hi, {userName}</h1>
-            </div>
-            <div className="text-right flex-shrink-0">
-              <p className="text-3xl font-bold tracking-wider">
-                {formattedTime}
-              </p>
-              <p className="text-sm opacity-90">{formattedDate}</p>
-            </div>
-          </div>
 
-          {/* Baris Bawah */}
-          <div className="mt-3 flex justify-between items-end">
-            <p className="max-w-lg text-sm text-green-50">
-              Manage all your digital documents and archives easily in one
-              place.
-            </p>
+      {/* Main card with decorative elements */}
+      <div className="relative w-full overflow-hidden rounded-2xl border-2 border-gray-200/80 bg-white shadow-lg hover:shadow-xl transition-all duration-300">
+        {/* Decorative background patterns */}
+        <div className="absolute inset-0 bg-gradient-to-br from-emerald-50/80 via-white to-teal-50/60"></div>
 
-            <div className="relative flex items-center gap-1.5 rounded-lg bg-black/10 p-1 backdrop-blur-sm">
-              {dropdownItems.length > 0 && (
-                <>
-                  <button
-                    ref={dropdownButtonRef}
-                    onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                    className="flex flex-shrink-0 items-center justify-center h-full rounded-md px-2 py-1.5 text-green-100 hover:bg-white/10 transition-colors"
-                  >
-                    <svg
-                      className="h-4 w-4"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2.5}
-                        d="M5 12h.01M12 12h.01M19 12h.01"
+        {/* Animated floating shapes */}
+        <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-emerald-200/20 to-teal-200/20 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3 animate-pulse"></div>
+        <div
+          className="absolute bottom-0 left-0 w-48 h-48 bg-gradient-to-tr from-teal-200/20 to-emerald-200/20 rounded-full blur-3xl translate-y-1/2 -translate-x-1/3 animate-pulse"
+          style={{ animationDelay: "1s" }}
+        ></div>
+
+        {/* Decorative dots pattern */}
+        <div className="absolute top-4 left-4 grid grid-cols-3 gap-1 opacity-20">
+          {[...Array(9)].map((_, i) => (
+            <div
+              key={i}
+              className="w-1.5 h-1.5 rounded-full bg-emerald-500"
+            ></div>
+          ))}
+        </div>
+
+        {/* Content wrapper - optimized compact padding */}
+        <div className="relative z-10 px-8 py-4">
+          <div className="flex justify-between items-center gap-8">
+            {/* Left section - User info with larger text and breadcrumb */}
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-3">
+                {/* Compact avatar with ring */}
+                <div className="relative flex-shrink-0">
+                  <div className="absolute inset-0 rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 animate-pulse"></div>
+                  <div className="relative w-14 h-14 rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center text-white font-bold text-lg shadow-lg ring-2 ring-white">
+                    {userName.charAt(0).toUpperCase()}
+                  </div>
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="text-xs font-medium text-gray-500">
+                    Welcome back to Siadil Dashboard
+                  </p>
+                  <h1 className="text-2xl font-bold text-gray-900 truncate mt-0.5">
+                    <span className="bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
+                      {getGreeting()},
+                    </span>{" "}
+                    {userName}
+                  </h1>
+
+                  {/* Breadcrumb section - compact design */}
+                  <div className="mt-2">
+                    <div className="inline-flex items-center gap-1 rounded-md bg-gray-50/80 border border-gray-200 px-2 py-1 shadow-sm">
+                      {dropdownItems.length > 0 && (
+                        <>
+                          <button
+                            ref={dropdownButtonRef}
+                            onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                            className="flex items-center justify-center rounded px-1.5 py-0.5 text-gray-600 hover:bg-white hover:text-emerald-600 transition-all duration-200"
+                            title="Lihat Navigasi"
+                          >
+                            <svg
+                              className="h-3.5 w-3.5"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              stroke="currentColor"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2.5}
+                                d="M5 12h.01M12 12h.01M19 12h.01"
+                              />
+                            </svg>
+                          </button>
+                          <svg
+                            className="h-3.5 w-3.5 text-gray-400"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M9 5l7 7-7 7"
+                            />
+                          </svg>
+                        </>
+                      )}
+
+                      <DropdownMenu
+                        isOpen={isDropdownOpen}
+                        items={dropdownItems}
+                        triggerRef={dropdownButtonRef}
+                        containerRef={dropdownContainerRef}
+                        onItemClick={(id) => {
+                          onBreadcrumbClick(id);
+                          setIsDropdownOpen(false);
+                        }}
                       />
-                    </svg>
-                  </button>
+
+                      {currentItem && (
+                        <div className="flex items-center gap-1 rounded px-2 py-1 bg-emerald-50 border border-emerald-200">
+                          <FolderIcon className="text-emerald-600" />
+                          <span
+                            className="text-xs font-semibold text-emerald-700 whitespace-nowrap"
+                            title={currentItem.label}
+                          >
+                            {currentItem.label}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Right section - Time and date compact */}
+            <div className="text-right flex-shrink-0">
+              <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg px-4 py-2.5 border border-gray-200 shadow-sm">
+                <div className="flex items-center justify-end gap-2 mb-1">
                   <svg
-                    className="h-4 w-4 flex-shrink-0 text-white/40"
+                    className="w-5 h-5 text-emerald-500"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
@@ -142,39 +217,52 @@ const ModernHeader: React.FC<ModernHeaderProps> = ({
                     <path
                       strokeLinecap="round"
                       strokeLinejoin="round"
-                      strokeWidth={2.5}
-                      d="M9 5l7 7-7 7"
+                      strokeWidth={2}
+                      d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
                     />
                   </svg>
-                </>
-              )}
-
-              <DropdownMenu
-                isOpen={isDropdownOpen}
-                items={dropdownItems}
-                triggerRef={dropdownButtonRef}
-                containerRef={dropdownContainerRef}
-                onItemClick={(id) => {
-                  onBreadcrumbClick(id);
-                  setIsDropdownOpen(false);
-                }}
-              />
-
-              {currentItem && (
-                <div className="flex flex-shrink-0 cursor-default items-center gap-1.5 whitespace-nowrap rounded-md bg-white/20 px-3 py-2 text-xs font-medium text-white">
-                  <FolderIcon />
-                  <span title={currentItem.label}>{currentItem.label}</span>
+                  <p className="text-3xl font-bold text-gray-900 tracking-tight tabular-nums">
+                    {formattedTime}
+                  </p>
                 </div>
-              )}
+                <div className="flex items-center justify-end gap-1.5">
+                  <svg
+                    className="w-3.5 h-3.5 text-gray-400"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                  <p className="text-xs font-semibold text-gray-600">
+                    {currentTime.toLocaleDateString("id-ID", {
+                      weekday: "long",
+                      day: "numeric",
+                      month: "long",
+                      year: "numeric",
+                    })}
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
+
+        {/* Animated bottom accent line with gradient */}
+        <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-500 animate-pulse"></div>
+
+        {/* Corner decorations */}
+        <div className="absolute top-0 right-0 w-20 h-20 border-t-2 border-r-2 border-emerald-200/50 rounded-tr-2xl"></div>
+        <div className="absolute bottom-0 left-0 w-20 h-20 border-b-2 border-l-2 border-teal-200/50 rounded-bl-2xl"></div>
       </div>
     </div>
   );
 };
 
-// --- KOMPONEN DROPDOWN MENU DENGAN WARNA BARU ---
+// --- KOMPONEN DROPDOWN MENU MODERN WHITE WITH LARGER TEXT ---
 const DropdownMenu = ({
   isOpen,
   items,
@@ -196,7 +284,7 @@ const DropdownMenu = ({
       setPosition({
         top: rect.bottom + 8,
         left: rect.left,
-        width: 224,
+        width: 200,
       });
     }
   }, [isOpen, triggerRef]);
@@ -214,17 +302,30 @@ const DropdownMenu = ({
         animation: "scale-in 0.1s ease-out forwards",
         zIndex: 50,
       }}
-      className="origin-top-left rounded-lg bg-teal-800/80 p-2 shadow-lg backdrop-blur-lg ring-1 ring-teal-400/20"
+      className="origin-top-left rounded-lg bg-white border border-gray-200 shadow-lg py-1"
     >
-      <ul className="space-y-1">
+      <ul>
         {items.map((item) => (
           <li key={item.id}>
             <button
               onClick={() => onItemClick(item.id)}
-              className="w-full flex items-center gap-2 rounded px-3 py-2 text-left text-xs text-green-100 hover:bg-white/10"
+              className="w-full flex items-center gap-2 px-3 py-2 text-left text-sm font-medium text-gray-700 hover:bg-emerald-50 hover:text-emerald-700 transition-colors duration-150"
             >
-              <FolderIcon />
-              <span>{item.label}</span>
+              <FolderIcon className="text-gray-400 flex-shrink-0" />
+              <span className="truncate flex-1">{item.label}</span>
+              <svg
+                className="w-3.5 h-3.5 text-gray-400"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 5l7 7-7 7"
+                />
+              </svg>
             </button>
           </li>
         ))}

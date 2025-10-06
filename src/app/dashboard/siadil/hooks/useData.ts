@@ -88,7 +88,7 @@ export const useData = (currentFolderId: string) => {
           new Date(b.lastAccessed!).getTime() -
           new Date(a.lastAccessed!).getTime()
       )
-  .slice(0, 6);
+      .slice(0, 6);
   }, [documents]);
 
   // Semua dokumen yang pernah dibuka (tanpa slice) untuk fitur "Lihat semua"
@@ -108,7 +108,10 @@ export const useData = (currentFolderId: string) => {
   }, [documents]);
 
   const subfolderArchives = useMemo(() => {
-    return archives.filter((archive) => archive.parentId === currentFolderId);
+    return archives.filter(
+      (archive) =>
+        archive.parentId === currentFolderId && archive.status !== "Trashed"
+    );
   }, [currentFolderId, archives]);
 
   const handleToggleStar = (docId: string, event: React.MouseEvent) => {
@@ -130,7 +133,7 @@ export const useData = (currentFolderId: string) => {
     breadcrumbItems,
     archiveDocCounts,
     quickAccessDocuments,
-  quickAccessAllDocuments,
+    quickAccessAllDocuments,
     starredDocuments,
     subfolderArchives,
     handleToggleStar,
