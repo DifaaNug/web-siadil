@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect, useMemo } from "react";
+import { useSession } from "next-auth/react";
 import * as XLSX from "xlsx";
 
 import {
@@ -70,14 +71,15 @@ const initialNewDocument: NewDocumentData = {
 };
 
 export default function SiadilPage() {
+  const { data: session } = useSession();
   const [currentFolderId, setCurrentFolderId] = useState("root");
   const [viewMode, setViewMode] = useState<"list" | "grid">("list");
   const [pageView, setPageView] = useState<"archives" | "starred" | "trash">(
     "archives"
   );
   const userData = {
-    name: "Someone",
-    id: "1990123",
+    name: session?.user?.name || "Guest",
+    id: session?.user?.username || session?.user?.id || "000000",
   };
   const [isAddNewMenuOpen, setIsAddNewMenuOpen] = useState(false);
   const addNewButtonRef = useRef<HTMLDivElement>(null);
@@ -614,10 +616,15 @@ export default function SiadilPage() {
           newDocument.documentDate || new Date().toISOString().split("T")[0],
         archive: newDocument.archive,
         expireDate: newDocument.expireDate,
-        contributors: [{ name: "Someone", role: "Uploader" }],
+        contributors: [
+          {
+            name: session?.user?.name || "Guest",
+            role: "Uploader",
+          },
+        ],
         status: "Active",
-        createdBy: "10122059",
-        updatedBy: "10122059",
+        createdBy: session?.user?.username || session?.user?.id || "000000",
+        updatedBy: session?.user?.username || session?.user?.id || "000000",
         createdDate: new Date().toISOString(),
         updatedDate: new Date().toISOString(),
       };
