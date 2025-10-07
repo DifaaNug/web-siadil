@@ -1,48 +1,85 @@
 import { Archive } from "../../types";
+import Image from "next/image";
+import { useState } from "react";
 
 const PersonalArchiveCard = ({
   archive,
   onClick,
+  userName,
+  userId,
+  userPhoto,
 }: {
   archive: Archive;
   onClick: () => void;
-}) => (
-  <div
-    onClick={onClick}
-    className="group relative flex cursor-pointer flex-col overflow-hidden rounded-xl bg-gradient-to-br from-demplon to-teal-600 p-5 text-white shadow-lg transition-all duration-300 ease-in-out hover:shadow-xl hover:-translate-y-1"
-  >
-    <div className="absolute top-0 left-0 h-full w-full opacity-10">
-      <svg
-        className="h-full w-full"
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 800 800"
-      >
-        <g fill="none" stroke="#FFF" strokeWidth="0.5">
-          <path d="M-200,300 Q-100,250 0,300 t200,0 t200,0 t200,0 t200,0 t200,0" />
-          <path d="M-200,350 Q-100,300 0,350 t200,0 t200,0 t200,0 t200,0 t200,0" />
-        </g>
-      </svg>
-    </div>
+  userName?: string;
+  userId?: string;
+  userPhoto?: string;
+}) => {
+  const [imageError, setImageError] = useState(false);
 
-    <div className="relative z-10 flex flex-grow flex-col">
-      <div className="flex items-center gap-4">
-        <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-white/20 backdrop-blur-sm ring-2 ring-white/50">
-          <span className="text-xl font-bold tracking-wide text-white">DF</span>
-        </div>
-        <div className="min-w-0">
-          <h3 className="text-base font-bold text-white" title={archive.name}>
-            {archive.name}
-          </h3>
-          <p className="mt-1 text-sm font-medium text-green-100">10122059</p>
-        </div>
+  // Generate initials from userName (e.g., "Dede Firmansyah" -> "DF")
+  const getInitials = (name: string | undefined) => {
+    if (!name) return "??";
+    const words = name.trim().split(" ");
+    if (words.length === 1) {
+      return words[0].substring(0, 2).toUpperCase();
+    }
+    return (words[0][0] + words[words.length - 1][0]).toUpperCase();
+  };
+
+  return (
+    <div
+      onClick={onClick}
+      className="group relative flex cursor-pointer flex-col overflow-hidden rounded-xl bg-gradient-to-br from-demplon to-teal-600 p-5 text-white shadow-lg transition-all duration-300 ease-in-out hover:shadow-xl hover:-translate-y-1"
+    >
+      <div className="absolute top-0 left-0 h-full w-full opacity-10">
+        <svg
+          className="h-full w-full"
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 800 800"
+        >
+          <g fill="none" stroke="#FFF" strokeWidth="0.5">
+            <path d="M-200,300 Q-100,250 0,300 t200,0 t200,0 t200,0 t200,0 t200,0" />
+            <path d="M-200,350 Q-100,300 0,350 t200,0 t200,0 t200,0 t200,0 t200,0" />
+          </g>
+        </svg>
       </div>
-      <div className="mt-4 flex-grow"></div>
-      <span className="mt-2 self-start rounded-full bg-white/20 px-3 py-1 text-xs font-semibold">
-        Personal
-      </span>
+
+      <div className="relative z-10 flex flex-grow flex-col">
+        <div className="flex items-center gap-4">
+          <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-white/20 backdrop-blur-sm ring-2 ring-white/50 overflow-hidden">
+            {userPhoto && !imageError ? (
+              <Image
+                src={userPhoto}
+                alt={userName || "User"}
+                width={48}
+                height={48}
+                className="h-full w-full object-cover"
+                onError={() => setImageError(true)}
+              />
+            ) : (
+              <span className="text-xl font-bold tracking-wide text-white">
+                {getInitials(userName)}
+              </span>
+            )}
+          </div>
+          <div className="min-w-0">
+            <h3 className="text-base font-bold text-white" title={archive.name}>
+              {archive.name}
+            </h3>
+            <p className="mt-1 text-sm font-medium text-green-100">
+              {userId || "N/A"}
+            </p>
+          </div>
+        </div>
+        <div className="mt-4 flex-grow"></div>
+        <span className="mt-2 self-start rounded-full bg-white/20 px-3 py-1 text-xs font-semibold">
+          Personal
+        </span>
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 interface ArchiveCardProps {
   archive: Archive;

@@ -80,6 +80,7 @@ export default function SiadilPage() {
   const userData = {
     name: session?.user?.name || "Guest",
     id: session?.user?.username || session?.user?.id || "000000",
+    photo: session?.user?.pic || undefined,
   };
   const [isAddNewMenuOpen, setIsAddNewMenuOpen] = useState(false);
   const addNewButtonRef = useRef<HTMLDivElement>(null);
@@ -836,6 +837,7 @@ export default function SiadilPage() {
         >
           <DashboardHeader
             userName={userData.name}
+            userPhoto={userData.photo}
             breadcrumbItems={breadcrumbItems}
             onBreadcrumbClick={setCurrentFolderId}
           />
@@ -1114,6 +1116,9 @@ export default function SiadilPage() {
                       onArchiveClick={setCurrentFolderId}
                       searchQuery={archiveSearchQuery}
                       onArchiveMenuClick={handleArchiveMenuClick}
+                      userName={userData.name}
+                      userId={userData.id}
+                      userPhoto={userData.photo}
                     />
                   );
               }
@@ -1155,6 +1160,9 @@ export default function SiadilPage() {
               currentFolderName={pageTitle}
               onArchiveClick={setCurrentFolderId}
               onArchiveMenuClick={handleArchiveMenuClick}
+              userName={userData.name}
+              userId={userData.id}
+              userPhoto={userData.photo}
             />
           )}
         </div>

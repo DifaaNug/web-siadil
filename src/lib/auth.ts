@@ -122,6 +122,7 @@ export const authOptions: NextAuthOptions = {
             body: JSON.stringify({
               username: credentials.username,
               password: credentials.password,
+              application: "demplonadmin", // Required by SSO server
             }),
           });
 
@@ -144,8 +145,18 @@ export const authOptions: NextAuthOptions = {
             email: loginData.user.email,
             pic: loginData.user.pic,
             roles: loginData.roles,
-            organization: loginData.user.organization,
-            application: loginData.application,
+            organization: {
+              id: loginData.user.organization.id,
+              name: loginData.user.organization.name,
+              leader: loginData.user.organization.leader,
+            },
+            application: {
+              id: loginData.application.id,
+              slug: loginData.application.slug,
+              name: loginData.application.name,
+              description: loginData.application.description,
+              active: loginData.application.active,
+            },
           };
         } catch (error) {
           console.error("❌ Login error:", error);
