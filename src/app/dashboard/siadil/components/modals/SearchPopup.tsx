@@ -93,14 +93,16 @@ export const SearchPopup = ({
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-start justify-center p-4 sm:p-16 z-50">
       <div
         ref={popupRef}
-        className="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-2xl flex flex-col max-h-full">
+        className="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-2xl flex flex-col max-h-full"
+      >
         <div className="p-4 border-b border-gray-200 dark:border-gray-700">
           <div className="relative">
             <svg
               className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5"
               fill="none"
               stroke="currentColor"
-              viewBox="0 0 24 24">
+              viewBox="0 0 24 24"
+            >
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -125,13 +127,15 @@ export const SearchPopup = ({
                 <li key={doc.id}>
                   <button
                     onClick={() => onDocumentSelect(doc)}
-                    className="w-full text-left flex items-start space-x-3 p-3 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg">
+                    className="w-full text-left flex items-start space-x-3 p-3 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg"
+                  >
                     <div className="flex-shrink-0 w-8 h-8 bg-gray-100 dark:bg-gray-700 rounded-lg flex items-center justify-center">
                       <svg
                         className="w-4 h-4 text-gray-500 dark:text-gray-400"
                         fill="none"
                         stroke="currentColor"
-                        viewBox="0 0 24 24">
+                        viewBox="0 0 24 24"
+                      >
                         <path
                           strokeLinecap="round"
                           strokeLinejoin="round"

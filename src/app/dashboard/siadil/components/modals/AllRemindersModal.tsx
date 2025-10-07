@@ -1,7 +1,11 @@
 "use client";
 
 import { useState, useRef, useEffect, useMemo } from "react";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { useOnClickOutside } from "../../hooks/useOnClickOutside";
 
 type Reminder = {
@@ -94,14 +98,16 @@ export const AllRemindersModal = ({
     switch (type) {
       case "error":
         return {
-          bgColor: "bg-red-50 dark:bg-red-900/50",
-          borderColor: "border-red-200 dark:border-red-700",
-          accentColor: "bg-red-500", // Ditambahkan
-          iconBg: "bg-red-100 dark:bg-red-900",
+          bgColor:
+            "bg-gradient-to-br from-red-50 to-rose-50 dark:from-red-900/20 dark:to-rose-900/20",
+          borderColor: "border-red-200/60 dark:border-red-800/60",
+          accentColor: "bg-gradient-to-b from-red-500 to-rose-600",
+          iconBg:
+            "bg-gradient-to-br from-red-100 to-rose-100 dark:from-red-900/50 dark:to-rose-900/50",
           iconColor: "text-red-600 dark:text-red-400",
-          titleColor: "text-red-800 dark:text-red-200",
+          titleColor: "text-red-900 dark:text-red-200",
           icon: (
-            <svg fill="currentColor" viewBox="0 0 20 20">
+            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
               <path
                 fillRule="evenodd"
                 d="M8.257 3.099c.636-1.026 2.85-1.026 3.486 0l5.58 8.998c.636 1.026-.234 2.403-1.743 2.403H4.42c-1.51 0-2.379-1.377-1.743-2.403l5.58-8.998zM10 13a1 1 0 100-2 1 1 0 000 2zm-1-4a1 1 0 011-1h.01a1 1 0 110 2H10a1 1 0 01-1-1z"
@@ -112,17 +118,19 @@ export const AllRemindersModal = ({
         };
       default:
         return {
-          bgColor: "bg-yellow-50 dark:bg-yellow-900/50",
-          borderColor: "border-yellow-200 dark:border-yellow-700",
-          accentColor: "bg-yellow-500",
-          iconBg: "bg-yellow-100 dark:bg-yellow-900",
-          iconColor: "text-yellow-600 dark:text-yellow-400",
-          titleColor: "text-yellow-800 dark:text-yellow-200",
+          bgColor:
+            "bg-gradient-to-br from-amber-50 to-yellow-50 dark:from-amber-900/20 dark:to-yellow-900/20",
+          borderColor: "border-amber-200/60 dark:border-amber-800/60",
+          accentColor: "bg-gradient-to-b from-amber-500 to-yellow-600",
+          iconBg:
+            "bg-gradient-to-br from-amber-100 to-yellow-100 dark:from-amber-900/50 dark:to-yellow-900/50",
+          iconColor: "text-amber-600 dark:text-amber-400",
+          titleColor: "text-amber-900 dark:text-amber-200",
           icon: (
-            <svg fill="currentColor" viewBox="0 0 20 20">
+            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
               <path
                 fillRule="evenodd"
-                d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z"
                 clipRule="evenodd"
               />
             </svg>
@@ -135,7 +143,8 @@ export const AllRemindersModal = ({
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
       <div
         ref={modalRef}
-        className="flex w-full max-w-2xl flex-col rounded-xl bg-white shadow-2xl dark:bg-gray-800 max-h-[90vh]">
+        className="flex w-full max-w-2xl flex-col rounded-xl bg-white shadow-2xl dark:bg-gray-800 max-h-[90vh]"
+      >
         {/* Header */}
         <div className="border-b p-5 dark:border-gray-700">
           <div className="flex items-center justify-between">
@@ -144,12 +153,14 @@ export const AllRemindersModal = ({
             </h3>
             <button
               onClick={onClose}
-              className="p-1 rounded-full text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600">
+              className="p-1 rounded-full text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600"
+            >
               <svg
                 className="h-6 w-6"
                 fill="none"
                 viewBox="0 0 24 24"
-                stroke="currentColor">
+                stroke="currentColor"
+              >
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -170,17 +181,20 @@ export const AllRemindersModal = ({
           <div className="flex-shrink-0 bg-gray-200 dark:bg-gray-700 p-1 rounded-lg flex items-center">
             <TabButton
               isActive={activeTab === "all"}
-              onClick={() => setActiveTab("all")}>
+              onClick={() => setActiveTab("all")}
+            >
               All
             </TabButton>
             <TabButton
               isActive={activeTab === "error"}
-              onClick={() => setActiveTab("error")}>
+              onClick={() => setActiveTab("error")}
+            >
               Expired
             </TabButton>
             <TabButton
               isActive={activeTab === "warning"}
-              onClick={() => setActiveTab("warning")}>
+              onClick={() => setActiveTab("warning")}
+            >
               Upcoming
             </TabButton>
           </div>
@@ -202,18 +216,27 @@ export const AllRemindersModal = ({
                   aria-expanded={sortOpen}
                   ref={sortTriggerRef}
                   onClick={(e) => e.stopPropagation()}
-                  className="inline-flex items-center justify-between gap-2 rounded-md border border-gray-300 bg-white py-2 px-3 text-sm text-gray-900 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-demplon dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600 dark:hover:bg-gray-600 min-w-[9rem] whitespace-nowrap">
+                  className="inline-flex items-center justify-between gap-2 rounded-md border border-gray-300 bg-white py-2 px-3 text-sm text-gray-900 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-demplon dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600 dark:hover:bg-gray-600 min-w-[9rem] whitespace-nowrap"
+                >
                   {sortOption === "expiry-asc"
                     ? "Nearest Date"
                     : sortOption === "title-asc"
                     ? "Title (A-Z)"
                     : "Sort"}
                   <svg
-                    className={`h-5 w-5 opacity-100 transition-transform duration-200 ${sortOpen ? "rotate-180" : "rotate-0"}`}
+                    className={`h-5 w-5 opacity-100 transition-transform duration-200 ${
+                      sortOpen ? "rotate-180" : "rotate-0"
+                    }`}
                     fill="none"
                     viewBox="0 0 24 24"
-                    stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.25} d="M19 9l-7 7-7-7" />
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2.25}
+                      d="M19 9l-7 7-7-7"
+                    />
                   </svg>
                 </button>
               </PopoverTrigger>
@@ -221,7 +244,8 @@ export const AllRemindersModal = ({
                 data-reminders-sort-popover
                 align="end"
                 onClick={(e) => e.stopPropagation()}
-                className="w-56 p-2 rounded-xl shadow-2xl ring-1 ring-black/5 bg-white/95 dark:bg-gray-800/95 backdrop-blur-md border border-gray-200/60 dark:border-gray-700/60">
+                className="w-56 p-2 rounded-xl shadow-2xl ring-1 ring-black/5 bg-white/95 dark:bg-gray-800/95 backdrop-blur-md border border-gray-200/60 dark:border-gray-700/60"
+              >
                 <ul role="listbox" className="py-1">
                   <li>
                     <button
@@ -237,7 +261,8 @@ export const AllRemindersModal = ({
                         sortOption === "default"
                           ? "text-demplon"
                           : "text-gray-700 dark:text-gray-300"
-                      } hover:bg-gradient-to-r hover:from-gray-50 hover:to-gray-100 dark:hover:from-gray-700/50 dark:hover:to-gray-600/50 hover:shadow-sm hover:ring-1 hover:ring-gray-200 dark:hover:ring-gray-600 focus:outline-none`}>
+                      } hover:bg-gradient-to-r hover:from-gray-50 hover:to-gray-100 dark:hover:from-gray-700/50 dark:hover:to-gray-600/50 hover:shadow-sm hover:ring-1 hover:ring-gray-200 dark:hover:ring-gray-600 focus:outline-none`}
+                    >
                       <span>Sort</span>
                     </button>
                   </li>
@@ -255,7 +280,8 @@ export const AllRemindersModal = ({
                         sortOption === "expiry-asc"
                           ? "text-demplon"
                           : "text-gray-700 dark:text-gray-300"
-                      } hover:bg-gradient-to-r hover:from-gray-50 hover:to-gray-100 dark:hover:from-gray-700/50 dark:hover:to-gray-600/50 hover:shadow-sm hover:ring-1 hover:ring-gray-200 dark:hover:ring-gray-600 focus:outline-none`}>
+                      } hover:bg-gradient-to-r hover:from-gray-50 hover:to-gray-100 dark:hover:from-gray-700/50 dark:hover:to-gray-600/50 hover:shadow-sm hover:ring-1 hover:ring-gray-200 dark:hover:ring-gray-600 focus:outline-none`}
+                    >
                       <span>Nearest Date</span>
                     </button>
                   </li>
@@ -273,7 +299,8 @@ export const AllRemindersModal = ({
                         sortOption === "title-asc"
                           ? "text-demplon"
                           : "text-gray-700 dark:text-gray-300"
-                      } hover:bg-gradient-to-r hover:from-gray-50 hover:to-gray-100 dark:hover:from-gray-700/50 dark:hover:to-gray-600/50 hover:shadow-sm hover:ring-1 hover:ring-gray-200 dark:hover:ring-gray-600 focus:outline-none`}>
+                      } hover:bg-gradient-to-r hover:from-gray-50 hover:to-gray-100 dark:hover:from-gray-700/50 dark:hover:to-gray-600/50 hover:shadow-sm hover:ring-1 hover:ring-gray-200 dark:hover:ring-gray-600 focus:outline-none`}
+                    >
                       <span>Title (A-Z)</span>
                     </button>
                   </li>
@@ -284,7 +311,7 @@ export const AllRemindersModal = ({
         </div>
 
         {/* Daftar Konten */}
-        <div className="flex-1 space-y-4 overflow-y-auto p-6">
+        <div className="flex-1 space-y-3 overflow-y-auto p-6">
           {processedReminders.length > 0 ? (
             processedReminders.map((reminder) => {
               const styles = getReminderStyles(reminder.type);
@@ -302,53 +329,115 @@ export const AllRemindersModal = ({
                         }
                       : undefined
                   }
-                  className={`w-full text-left relative flex items-center justify-between overflow-hidden rounded-lg border p-0 shadow-sm transition-all ${
+                  className={`group w-full text-left relative flex items-start gap-4 overflow-hidden rounded-xl border p-4 transition-all duration-300 ${
                     isClickable
-                      ? "cursor-pointer hover:shadow-md hover:border-gray-300 dark:hover:border-gray-500"
+                      ? "cursor-pointer hover:shadow-lg hover:-translate-y-0.5 hover:scale-[1.01] active:scale-[0.99]"
                       : ""
-                  } ${styles.borderColor} ${styles.bgColor}`}>
+                  } ${styles.borderColor} ${styles.bgColor}`}
+                >
+                  {/* Accent bar on left */}
                   <div
-                    className={`absolute left-0 top-0 h-full w-1.5 ${styles.accentColor}`}
+                    className={`absolute left-0 top-0 h-full w-1 ${
+                      styles.accentColor
+                    } transition-all duration-300 ${
+                      isClickable ? "group-hover:w-1.5" : ""
+                    }`}
                   />
-                  <div className="flex items-center gap-4 p-3 pl-6">
-                    <div
-                      className={`flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full ${styles.iconBg} ${styles.iconColor}`}>
-                      {styles.icon}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p
-                        className={`text-sm font-semibold truncate ${styles.titleColor}`}>
-                        {reminder.title}
-                      </p>
-                      <p className="text-xs text-gray-600 dark:text-gray-400 truncate">
-                        {reminder.description}
-                      </p>
-                      <p className="mt-1 text-xs text-gray-500 dark:text-gray-500">
-                        {reminder.message}
-                      </p>
-                    </div>
+
+                  {/* Icon */}
+                  <div
+                    className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl ${
+                      styles.iconBg
+                    } ${styles.iconColor} transition-transform duration-300 ${
+                      isClickable
+                        ? "group-hover:scale-110 group-hover:rotate-3"
+                        : ""
+                    }`}
+                  >
+                    {styles.icon}
                   </div>
-                  <div className="mr-2 flex h-8 w-8 items-center justify-center rounded-full transition-colors hover:bg-black/5 dark:hover:bg-white/10">
-                    <svg
-                      className="h-6 w-6 text-gray-400"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor">
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M9 5l7 7-7 7"
-                      />
-                    </svg>
+
+                  {/* Content */}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="flex-1 min-w-0">
+                        <h4
+                          className={`text-sm font-bold mb-1 ${styles.titleColor} line-clamp-1`}
+                        >
+                          {reminder.title}
+                        </h4>
+                        <p className="text-xs text-gray-600 dark:text-gray-400 line-clamp-2 leading-relaxed">
+                          {reminder.description}
+                        </p>
+                      </div>
+
+                      {/* Arrow icon - only show if clickable */}
+                      {isClickable && (
+                        <div className="flex-shrink-0 flex h-7 w-7 items-center justify-center rounded-lg bg-white/50 dark:bg-gray-700/50 transition-all duration-300 group-hover:bg-white dark:group-hover:bg-gray-700 group-hover:shadow-md">
+                          <svg
+                            className="h-4 w-4 text-gray-500 dark:text-gray-400 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:text-gray-700 dark:group-hover:text-gray-200"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                            strokeWidth={2.5}
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              d="M9 5l7 7-7 7"
+                            />
+                          </svg>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Message */}
+                    <div className="mt-2 pt-2 border-t border-gray-200/50 dark:border-gray-600/50">
+                      <p className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1.5">
+                        <svg
+                          className="w-3.5 h-3.5 flex-shrink-0"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                          strokeWidth={2}
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                          />
+                        </svg>
+                        <span className="line-clamp-1">{reminder.message}</span>
+                      </p>
+                    </div>
                   </div>
                 </Component>
               );
             })
           ) : (
-            <p className="py-12 text-center text-sm text-gray-500">
-              No reminders match your filters.
-            </p>
+            <div className="flex flex-col items-center justify-center py-16 text-center">
+              <div className="w-16 h-16 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center mb-4">
+                <svg
+                  className="w-8 h-8 text-gray-400"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={1.5}
+                    d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
+                </svg>
+              </div>
+              <p className="text-sm font-medium text-gray-900 dark:text-white mb-1">
+                No reminders found
+              </p>
+              <p className="text-xs text-gray-500 dark:text-gray-400">
+                No reminders match your current filters
+              </p>
+            </div>
           )}
         </div>
       </div>
@@ -372,7 +461,8 @@ const TabButton = ({
       isActive
         ? "bg-white dark:bg-gray-800 text-demplon shadow-sm"
         : "text-gray-600 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50"
-    }`}>
+    }`}
+  >
     {children}
   </button>
 );

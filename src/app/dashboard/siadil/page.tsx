@@ -101,7 +101,9 @@ export default function SiadilPage() {
   const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false); // State untuk modal riwayat
 
   // Trash filter state
-  const [trashFilter, setTrashFilter] = useState<"all" | "documents" | "folders">("all");
+  const [trashFilter, setTrashFilter] = useState<
+    "all" | "documents" | "folders"
+  >("all");
   const [isEmptyTrashModalOpen, setIsEmptyTrashModalOpen] = useState(false);
 
   // Archive context menu state
@@ -478,7 +480,7 @@ export default function SiadilPage() {
 
   const handleEmptyTrash = () => {
     let deletedCount = 0;
-    
+
     if (trashFilter === "all") {
       // Delete all documents and folders
       deletedCount = trashedDocuments.length + trashedArchives.length;
@@ -852,6 +854,19 @@ export default function SiadilPage() {
             onClose={() => setIsRemindersModalOpen(false)}
             reminders={dynamicReminders}
             initialTab={initialReminderTab}
+            onDocumentClick={(docId) => {
+              // Find the document and open it
+              const doc = documents.find((d) => d.id === docId);
+              if (doc) {
+                // Navigate to the document's folder
+                setCurrentFolderId(doc.parentId);
+                setPageView("archives");
+                // Open document details in info panel
+                setTimeout(() => {
+                  handleDocumentSelect(docId);
+                }, 100);
+              }
+            }}
           />
 
           {currentFolderId === "root" && (

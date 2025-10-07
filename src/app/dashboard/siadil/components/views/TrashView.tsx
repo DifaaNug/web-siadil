@@ -24,7 +24,6 @@ const TrashView: React.FC<TrashViewProps> = ({
   onDeleteArchivePermanently,
   onEmptyTrash,
 }) => {
-
   const getParentArchiveName = (parentId: string) => {
     const parent = archives.find((a) => a.id === parentId);
     return parent ? parent.name : "Unknown Archive";

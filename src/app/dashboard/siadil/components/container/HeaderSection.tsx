@@ -257,9 +257,7 @@ const HeaderSection: React.FC<HeaderSectionProps> = ({
               <InfoCard
                 gradient="bg-gradient-to-br from-demplon to-teal-600"
                 value={totalDocuments}
-                title={
-                  currentFolderId === "root" ? "Documents" : "Folder Documents"
-                }
+                title={currentFolderId === "root" ? "Documents" : "Documents"}
                 subtitle={
                   currentFolderId === "root"
                     ? "All Active Documents"

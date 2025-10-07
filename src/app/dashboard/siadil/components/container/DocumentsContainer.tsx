@@ -222,7 +222,7 @@ export const DocumentsContainer = ({
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
-      <div className="bg-green-50 dark:bg-green-900/50 p-4 border-b border-green-200 dark:border-green-700 flex justify-between items-center gap-4">
+      <div className="bg-green-50 dark:bg-green-900/30 p-4 border-b border-green-200 dark:border-green-700 flex justify-between items-center gap-4">
         <div className="flex-1 max-w-md">
           <div className="relative">
             <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
@@ -231,7 +231,8 @@ export const DocumentsContainer = ({
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 22 22"
-                stroke="currentColor">
+                stroke="currentColor"
+              >
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -265,7 +266,8 @@ export const DocumentsContainer = ({
                   filterPopoverPosition.top === 0 ? "hidden" : "visible",
                 maxHeight: "75vh",
                 width: "448px",
-              }}>
+              }}
+            >
               <FilterPopover
                 ref={filterPopoverRef}
                 filters={filters}
@@ -294,7 +296,8 @@ export const DocumentsContainer = ({
                 zIndex: 50,
                 visibility:
                   archiveFilterPopoverPosition.top === 0 ? "hidden" : "visible",
-              }}>
+              }}
+            >
               <ArchiveFilterPopover
                 ref={archiveFilterPopoverRef}
                 allArchives={archives}
@@ -318,7 +321,8 @@ export const DocumentsContainer = ({
                 visibility:
                   exportMenuPopoverPosition.top === 0 ? "hidden" : "visible",
               }}
-              className="w-36 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg">
+              className="w-36 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg"
+            >
               <div className="p-2">
                 <div className="px-2 py-1.5">
                   <p className="text-xs font-semibold text-gray-500 dark:text-gray-400">
@@ -332,31 +336,36 @@ export const DocumentsContainer = ({
                     setIsExportMenuOpen(false);
                   }}
                   disabled={isExporting}
-                  className="w-full flex items-center px-2 py-1.5 text-sm rounded-md text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed">
+                  className="w-full flex items-center px-2 py-1.5 text-sm rounded-md text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
                   {isExporting ? (
                     <svg
                       className="animate-spin -ml-1 mr-2 h-4 w-4"
                       xmlns="http://www.w3.org/2000/svg"
                       fill="none"
-                      viewBox="0 0 24 24">
+                      viewBox="0 0 24 24"
+                    >
                       <circle
                         className="opacity-25"
                         cx="12"
                         cy="12"
                         r="10"
                         stroke="currentColor"
-                        strokeWidth="4"></circle>
+                        strokeWidth="4"
+                      ></circle>
                       <path
                         className="opacity-75"
                         fill="currentColor"
-                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      ></path>
                     </svg>
                   ) : (
                     <svg
                       className="w-4 h-4 mr-2"
                       fill="none"
                       viewBox="0 0 24 24"
-                      stroke="currentColor">
+                      stroke="currentColor"
+                    >
                       <path
                         strokeLinecap="round"
                         strokeLinejoin="round"
@@ -376,13 +385,15 @@ export const DocumentsContainer = ({
           <button
             ref={archiveFilterButtonRef}
             onClick={() => setIsArchiveFilterOpen((v) => !v)}
-            className={`px-3 py-1.5 text-sm border rounded-md flex items-center space-x-2 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 transition-all duration-200 hover:border-green-400 dark:hover:border-green-500 hover:shadow-md`}>
+            className={`px-3 py-1.5 text-sm border rounded-md flex items-center space-x-2 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 transition-all duration-200 hover:border-green-400 dark:hover:border-green-500 hover:shadow-md`}
+          >
             <svg
               width="14"
               height="14"
               viewBox="0 0 24 24"
               fill="none"
-              xmlns="http://www.w3.org/2000/svg">
+              xmlns="http://www.w3.org/2000/svg"
+            >
               <path
                 d="M21 8V21H3V8"
                 stroke="currentColor"
@@ -414,13 +425,15 @@ export const DocumentsContainer = ({
           <button
             ref={filterButtonRef}
             onClick={() => setIsFilterOpen((v) => !v)}
-            className="px-3 py-1.5 text-sm border rounded-md flex items-center space-x-2 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 transition-all duration-200 hover:border-green-400 dark:hover:border-green-500 hover:shadow-md">
+            className="px-3 py-1.5 text-sm border rounded-md flex items-center space-x-2 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 transition-all duration-200 hover:border-green-400 dark:hover:border-green-500 hover:shadow-md"
+          >
             <svg
               width="14"
               height="14"
               viewBox="0 0 22 20"
               fill="none"
-              xmlns="http://www.w3.org/2000/svg">
+              xmlns="http://www.w3.org/2000/svg"
+            >
               <path
                 d="M5 4H19C19.5523 4 20 4.44772 20 5V19C20 19.5523 19.5523 20 19 20H5C4.44772 20 4 19.5523 4 19V5C4 4.44772 4.44772 4 5 4Z"
                 stroke="currentColor"
@@ -455,7 +468,8 @@ export const DocumentsContainer = ({
           <button
             ref={exportMenuButtonRef}
             onClick={() => setIsExportMenuOpen((v) => !v)}
-            className="px-3 py-1.5 text-sm border rounded-md flex items-center space-x-2 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 transition-all duration-200 hover:border-green-400 dark:hover:border-green-500 hover:shadow-md">
+            className="px-3 py-1.5 text-sm border rounded-md flex items-center space-x-2 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 transition-all duration-200 hover:border-green-400 dark:hover:border-green-500 hover:shadow-md"
+          >
             <svg width="14" height="14" viewBox="0 0 22 22" fill="none">
               <path
                 d="M21 15V19C21 20.1046 20.1046 21 19 21H5C3.89543 21 3 20.1046 3 19V15M7 10L12 15L17 10M12 15V3"
@@ -470,7 +484,8 @@ export const DocumentsContainer = ({
           <button
             ref={columnToggleButtonRef}
             onClick={() => setIsColumnToggleOpen((v) => !v)}
-            className="px-3 py-1.5 text-sm border rounded-md flex items-center space-x-2 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 transition-all duration-200 hover:border-green-400 dark:hover:border-green-500 hover:shadow-md">
+            className="px-3 py-1.5 text-sm border rounded-md flex items-center space-x-2 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 transition-all duration-200 hover:border-green-400 dark:hover:border-green-500 hover:shadow-md"
+          >
             <svg width="14" height="14" viewBox="0 0 22 22" fill="none">
               <path
                 d="M3 12L5 10M5 10L3 8M5 10H11M13 12L15 10M15 10L13 8M15 10H21M7 20H17C18.1046 20 19 19.1046 19 18V6C19 4.89543 18.1046 4 17 4H7C5.89543 4 5 6V18C5 19.1046 5.89543 20 7 20Z"
@@ -496,7 +511,8 @@ export const DocumentsContainer = ({
                     columnTogglePopoverPosition.top === 0
                       ? "hidden"
                       : "visible",
-                }}>
+                }}
+              >
                 <ColumnTogglePopover
                   ref={columnTogglePopoverRef}
                   columns={allTableColumns}
@@ -530,7 +546,8 @@ export const DocumentsContainer = ({
           <select
             value={pagination.rowsPerPage}
             onChange={(e) => onRowsPerPageChange(Number(e.target.value))}
-            className="border border-gray-300 dark:border-gray-600 rounded px-2 py-1.5 text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white">
+            className="border border-gray-300 dark:border-gray-600 rounded px-2 py-1.5 text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+          >
             <option value={5}>5</option>
             <option value={10}>10</option>
             <option value={20}>20</option>
@@ -542,7 +559,8 @@ export const DocumentsContainer = ({
           <button
             onClick={() => onPageChange(pagination.currentPage - 1)}
             disabled={pagination.currentPage === 1}
-            className="p-1 border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-50 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed">
+            className="p-1 border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-50 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
             <svg width="16" height="16" viewBox="0 0 22 22" fill="none">
               <path
                 d="M15 18L9 12L15 6"
@@ -560,7 +578,8 @@ export const DocumentsContainer = ({
                 Math.ceil(pagination.totalRows / pagination.rowsPerPage) ||
               pagination.totalRows === 0
             }
-            className="p-1 border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-50 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed">
+            className="p-1 border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-50 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
             <svg width="16" height="16" viewBox="0 0 22 22" fill="none">
               <path
                 d="M9 18L15 12L9 6"
