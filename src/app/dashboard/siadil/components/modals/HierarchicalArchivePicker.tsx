@@ -246,7 +246,8 @@ export const HierarchicalArchivePicker: React.FC<
         type="button"
         onClick={() => setOpen((o) => !o)}
         onKeyDown={handleKeyDown}
-        className="flex w-full items-center justify-between rounded-md border border-gray-300 bg-white px-3 py-2 text-left text-sm text-gray-900 focus:border-green-500 focus:outline-none focus:ring-2 focus:ring-green-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200">
+        className="flex w-full items-center justify-between rounded-md border border-gray-300 bg-white px-3 py-2 text-left text-sm text-gray-900 focus:border-green-500 focus:outline-none focus:ring-2 focus:ring-green-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200"
+      >
         <span className={selectedArchive ? "" : "text-gray-400"}>
           {selectedArchive ? selectedArchive.name : placeholder}
         </span>
@@ -256,7 +257,8 @@ export const HierarchicalArchivePicker: React.FC<
           }`}
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 20 20"
-          fill="currentColor">
+          fill="currentColor"
+        >
           <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
         </svg>
       </button>
@@ -265,7 +267,8 @@ export const HierarchicalArchivePicker: React.FC<
           className={`absolute left-0 z-50 w-full rounded-md border border-gray-200 bg-white shadow-lg dark:border-gray-700 dark:bg-gray-800 text-sm ${
             dropUp ? "bottom-full mb-1" : "top-full mt-1"
           }`}
-          onKeyDown={handleKeyDown}>
+          onKeyDown={handleKeyDown}
+        >
           <div className="p-2 pb-1 border-b border-gray-100 dark:border-gray-700">
             <input
               ref={inputRef}
@@ -299,11 +302,13 @@ export const HierarchicalArchivePicker: React.FC<
                 <li
                   key={a.id + key}
                   className={`group flex cursor-pointer items-center justify-between px-3 py-1 hover:bg-gray-100 dark:hover:bg-gray-700 ${
-                    active ? "bg-green-50 dark:bg-gray-700/70" : ""
-                  }`}>
+                    active ? "bg-green-50 dark:bg-green-900/30" : ""
+                  }`}
+                >
                   <div
                     className="flex items-center flex-1 min-w-0"
-                    style={{ paddingLeft: `${Math.max(a.depth, 0) * 10}px` }}>
+                    style={{ paddingLeft: `${Math.max(a.depth, 0) * 10}px` }}
+                  >
                     {hasChildren && !(a.synthetic && a.id === "root") ? (
                       <button
                         type="button"
@@ -311,13 +316,15 @@ export const HierarchicalArchivePicker: React.FC<
                           e.stopPropagation();
                           toggleNode(a.id);
                         }}
-                        className="mr-1 inline-flex h-4 w-4 items-center justify-center text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+                        className="mr-1 inline-flex h-4 w-4 items-center justify-center text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                      >
                         <svg
                           className={`h-3.5 w-3.5 transition-transform ${
                             isExpanded ? "rotate-90" : ""
                           }`}
                           viewBox="0 0 20 20"
-                          fill="currentColor">
+                          fill="currentColor"
+                        >
                           <path d="M6 6l6 4-6 4V6z" />
                         </svg>
                       </button>
@@ -329,7 +336,8 @@ export const HierarchicalArchivePicker: React.FC<
                       onClick={() => setTempSelection(key)}
                       className={`flex flex-1 items-center truncate text-left text-gray-700 dark:text-gray-200 ${
                         active ? "font-medium" : "font-normal"
-                      }`}>
+                      }`}
+                    >
                       <span className="truncate flex-1">{a.name}</span>
                       {showChildCount && count ? (
                         <span className="ml-2 inline-block shrink-0 rounded bg-gray-200 px-1.5 py-0.5 text-[10px] font-semibold text-gray-700 dark:bg-gray-600 dark:text-gray-100">
@@ -345,7 +353,8 @@ export const HierarchicalArchivePicker: React.FC<
                       fill="none"
                       viewBox="0 0 24 24"
                       stroke="currentColor"
-                      strokeWidth={3}>
+                      strokeWidth={3}
+                    >
                       <path
                         strokeLinecap="round"
                         strokeLinejoin="round"
@@ -362,7 +371,8 @@ export const HierarchicalArchivePicker: React.FC<
               type="button"
               disabled={!tempSelection}
               onClick={commitSelection}
-              className="mt-1 w-full rounded-md bg-demplon py-2 text-sm font-semibold text-white shadow-sm hover:bg-green-700 disabled:cursor-not-allowed disabled:opacity-50">
+              className="mt-1 w-full rounded-md bg-[#0F9D58] py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#0C8A4D] hover:shadow-md transition-all disabled:cursor-not-allowed disabled:opacity-50"
+            >
               Choose
             </button>
           </div>

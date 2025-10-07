@@ -7,11 +7,17 @@ import { HeaderSortMenu } from "./HeaderSortMenu";
 // Context menu state removed
 
 // Tooltip component for long text
-const Tooltip = ({ text, children }: { text: string; children: React.ReactNode }) => {
+const Tooltip = ({
+  text,
+  children,
+}: {
+  text: string;
+  children: React.ReactNode;
+}) => {
   const [show, setShow] = useState(false);
-  
+
   return (
-    <div 
+    <div
       className="relative inline-block w-full"
       onMouseEnter={() => setShow(true)}
       onMouseLeave={() => setShow(false)}
@@ -92,7 +98,8 @@ export const DocumentTable = ({
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
-            strokeWidth={2}>
+            strokeWidth={2}
+          >
             <path
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -107,7 +114,8 @@ export const DocumentTable = ({
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
-          strokeWidth={2}>
+          strokeWidth={2}
+        >
           <path
             strokeLinecap="round"
             strokeLinejoin="round"
@@ -121,7 +129,8 @@ export const DocumentTable = ({
         className="w-4 h-4 text-green-400 dark:text-green-300"
         fill="none"
         viewBox="0 0 24 24"
-        stroke="currentColor">
+        stroke="currentColor"
+      >
         <path
           strokeLinecap="round"
           strokeLinejoin="round"
@@ -142,12 +151,14 @@ export const DocumentTable = ({
     align?: "left" | "center" | "right";
   }) => (
     <th
-      className={`px-4 py-3 text-${align} sticky top-0 z-10 bg-gradient-to-r from-teal-50 to-cyan-50 dark:from-gray-800 dark:to-gray-700 border-r border-gray-200 dark:border-gray-600 last:border-r-0`}>
+      className={`px-4 py-3 text-${align} sticky top-0 z-10 bg-gradient-to-r from-teal-50 to-cyan-50 dark:from-gray-800 dark:to-gray-700 border-r border-gray-200 dark:border-gray-600 last:border-r-0`}
+    >
       <button
         onClick={(e) =>
           setActiveHeaderMenu({ columnId, buttonEl: e.currentTarget })
         }
-        className="flex items-center gap-2 text-sm font-semibold text-gray-700 dark:text-gray-200 tracking-wider hover:text-teal-600 dark:hover:text-teal-400 transition-colors">
+        className="flex items-center gap-2 text-sm font-semibold text-gray-700 dark:text-gray-200 tracking-wider hover:text-teal-600 dark:hover:text-teal-400 transition-colors"
+      >
         {label}
         <SortIndicator columnId={columnId} />
       </button>
@@ -190,10 +201,7 @@ export const DocumentTable = ({
                 <SortableHeader columnId="archive" label="Archive" />
               )}
               {visibleColumns.has("updatedAndCreatedBy") && (
-                <SortableHeader
-                  columnId="updatedDate"
-                  label="Updated"
-                />
+                <SortableHeader columnId="updatedDate" label="Updated" />
               )}
             </tr>
           </thead>
@@ -208,11 +216,13 @@ export const DocumentTable = ({
                   selectedDocumentIds.has(doc.id)
                     ? "bg-teal-50 dark:bg-teal-900/30 shadow-sm"
                     : "hover:bg-gray-50/50 dark:hover:bg-gray-700/50"
-                }`}>
+                }`}
+              >
                 {visibleColumns.has("actions") && (
                   <td
                     onClick={(e) => e.stopPropagation()}
-                    className="px-4 py-4 whitespace-nowrap pl-7 text-sm font-medium relative border-r border-gray-200 dark:border-gray-600">
+                    className="px-4 py-4 whitespace-nowrap pl-7 text-sm font-medium relative border-r border-gray-200 dark:border-gray-600"
+                  >
                     <button
                       onClick={(e) => {
                         e.preventDefault();
@@ -225,16 +235,18 @@ export const DocumentTable = ({
                       }}
                       className={`group relative transition-all duration-300 p-2 rounded-lg transform hover:scale-105 active:scale-95 ${
                         activeActionMenu?.docId === doc.id
-                          ? "text-green-600 dark:text-green-400 bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/40 dark:to-green-800/40 shadow-md ring-1 ring-green-200 dark:ring-green-700"
+                          ? "text-[#0F9D58] dark:text-green-400 bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/40 dark:to-green-800/40 shadow-md ring-1 ring-green-200 dark:ring-green-700"
                           : "text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gradient-to-br hover:from-gray-50 hover:to-gray-100 dark:hover:from-gray-700/50 dark:hover:to-gray-600/50 hover:shadow-sm"
-                      }`}>
+                      }`}
+                    >
                       {/* Background glow effect */}
                       <div
                         className={`absolute inset-0 rounded-lg transition-opacity duration-300 ${
                           activeActionMenu?.docId === doc.id
                             ? "bg-green-200/30 opacity-100"
                             : "bg-gray-200/20 opacity-0 group-hover:opacity-100"
-                        } blur-sm -z-10`}></div>
+                        } blur-sm -z-10`}
+                      ></div>
 
                       <svg
                         className={`w-5 h-5 transition-all duration-300 ${
@@ -247,7 +259,8 @@ export const DocumentTable = ({
                         stroke="currentColor"
                         strokeWidth={
                           activeActionMenu?.docId === doc.id ? 2.5 : 2
-                        }>
+                        }
+                      >
                         <path
                           strokeLinecap="round"
                           strokeLinejoin="round"
@@ -278,7 +291,9 @@ export const DocumentTable = ({
                 </td>
                 {visibleColumns.has("numberAndTitle") && (
                   <td className="px-4 py-4 text-sm border-r border-gray-100 dark:border-gray-700">
-                    <div className="font-semibold text-gray-900 dark:text-white mb-1">{doc.number}</div>
+                    <div className="font-semibold text-gray-900 dark:text-white mb-1">
+                      {doc.number}
+                    </div>
                     <Tooltip text={doc.title}>
                       <div className="text-gray-600 dark:text-gray-400 line-clamp-2 leading-snug">
                         {doc.title}
@@ -309,7 +324,8 @@ export const DocumentTable = ({
                         <div
                           key={i}
                           title={c.name}
-                          className="w-7 h-7 bg-gray-200 dark:bg-gray-600 rounded-full flex items-center justify-center text-xs font-medium text-gray-600 dark:text-gray-300 ring-2 ring-white dark:ring-gray-800">
+                          className="w-7 h-7 bg-gray-200 dark:bg-gray-600 rounded-full flex items-center justify-center text-xs font-medium text-gray-600 dark:text-gray-300 ring-2 ring-white dark:ring-gray-800"
+                        >
                           {c.name
                             .split(" ")
                             .map((n) => n[0])
