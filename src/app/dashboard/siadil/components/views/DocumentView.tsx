@@ -52,6 +52,9 @@ interface DocumentViewProps {
   currentFolderName: string | undefined;
   onArchiveClick: (id: string) => void;
   onArchiveMenuClick?: (e: React.MouseEvent, archiveId: string) => void;
+  userName?: string;
+  userId?: string;
+  userPhoto?: string;
 }
 
 const DocumentView: React.FC<DocumentViewProps> = (props) => {
@@ -91,6 +94,9 @@ const DocumentView: React.FC<DocumentViewProps> = (props) => {
     onManageContributors,
     isInfoPanelOpen,
     onArchiveMenuClick,
+    userName,
+    userId,
+    userPhoto,
   } = props;
 
   const hasDocuments = paginatedDocuments.length > 0;
@@ -153,6 +159,9 @@ const DocumentView: React.FC<DocumentViewProps> = (props) => {
                   key={archive.id}
                   archive={archive}
                   onClick={() => onArchiveClick(archive.id)}
+                  userName={userName}
+                  userId={userId}
+                  userPhoto={userPhoto}
                 />
               ) : (
                 <ArchiveCard

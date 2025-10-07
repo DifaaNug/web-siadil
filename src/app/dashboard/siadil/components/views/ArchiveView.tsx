@@ -8,6 +8,9 @@ interface ArchiveViewProps {
   onArchiveClick: (id: string) => void;
   searchQuery: string;
   onArchiveMenuClick?: (e: React.MouseEvent, archiveId: string) => void;
+  userName?: string;
+  userId?: string;
+  userPhoto?: string;
 }
 
 const ITEMS_PER_PAGE = 8;
@@ -18,6 +21,9 @@ const ArchiveView: React.FC<ArchiveViewProps> = ({
   onArchiveClick,
   searchQuery,
   onArchiveMenuClick,
+  userName,
+  userId,
+  userPhoto,
 }) => {
   const [currentPage, setCurrentPage] = useState(1);
 
@@ -70,6 +76,9 @@ const ArchiveView: React.FC<ArchiveViewProps> = ({
                 key={archive.id}
                 archive={archive}
                 onClick={() => onArchiveClick(archive.id)}
+                userName={userName}
+                userId={userId}
+                userPhoto={userPhoto}
               />
             ) : (
               <ArchiveCard

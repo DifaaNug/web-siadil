@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
+import Image from "next/image";
 import { FolderIcon } from "../ui/FolderIcon";
 import { useOnClickOutside } from "../../hooks/useOnClickOutside";
 
@@ -13,17 +14,20 @@ interface BreadcrumbItem {
 
 interface ModernHeaderProps {
   userName: string;
+  userPhoto?: string;
   breadcrumbItems: BreadcrumbItem[];
   onBreadcrumbClick: (id: string) => void;
 }
 
 const ModernHeader: React.FC<ModernHeaderProps> = ({
   userName,
+  userPhoto,
   breadcrumbItems,
   onBreadcrumbClick,
 }) => {
   const [currentTime, setCurrentTime] = useState(new Date());
   const bannerRef = useRef<HTMLDivElement>(null);
+  const [imageError, setImageError] = useState(false);
 
   // State dan Ref untuk dropdown
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -120,8 +124,21 @@ const ModernHeader: React.FC<ModernHeaderProps> = ({
                 {/* Compact avatar with ring */}
                 <div className="relative flex-shrink-0">
                   <div className="absolute inset-0 rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 animate-pulse"></div>
-                  <div className="relative w-14 h-14 rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center text-white font-bold text-lg shadow-lg ring-2 ring-white">
-                    {userName.charAt(0).toUpperCase()}
+                  <div className="relative w-14 h-14 rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center text-white font-bold text-lg shadow-lg ring-2 ring-white overflow-hidden">
+                    {userPhoto && !imageError ? (
+                      <Image
+                        src={userPhoto}
+                        alt={userName}
+                        width={56}
+                        height={56}
+                        className="h-full w-full object-cover"
+                        onError={() => setImageError(true)}
+                      />
+                    ) : (
+                      <span className="text-white font-bold text-lg">
+                        {userName.charAt(0).toUpperCase()}
+                      </span>
+                    )}
                   </div>
                 </div>
                 <div className="min-w-0 flex-1">

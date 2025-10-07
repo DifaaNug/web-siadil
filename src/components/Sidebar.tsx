@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useState, useRef, useEffect } from "react"; // Import hooks
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { ProfileSection } from "./ProfileSection";
 
 // Props
 interface SidebarProps {
@@ -60,7 +61,8 @@ const Sidebar = ({ onCollapseChange }: SidebarProps) => {
     <div
       className="relative h-screen"
       onMouseEnter={() => setShowArrow(true)}
-      onMouseLeave={() => setShowArrow(false)}>
+      onMouseLeave={() => setShowArrow(false)}
+    >
       {/* 2. Div Sidebar Lama, sekarang hanya fokus pada layout & scroll */}
       <div
         ref={sidebarRef} // ref untuk event listener
@@ -74,7 +76,8 @@ const Sidebar = ({ onCollapseChange }: SidebarProps) => {
             <div
               className={`flex ${
                 isCollapsed ? "justify-center items-center" : "flex-col"
-              } space-y-2`}>
+              } space-y-2`}
+            >
               <Image
                 src="/logo-demplon.png"
                 alt="Demplon Logo"
@@ -89,33 +92,14 @@ const Sidebar = ({ onCollapseChange }: SidebarProps) => {
           </div>
 
           {/* Bagian Profile */}
-          <div
-            className={`${
-              isCollapsed ? "px-2" : "px-4"
-            } py-3 transition-all duration-300`}>
-            <div
-              className={`flex items-center ${
-                isCollapsed ? "justify-center" : "space-x-3"
-              }`}>
-              <div className="w-10 h-10 bg-red-500 rounded-full flex items-center justify-center shrink-0">
-                <span className="text-white font-semibold text-sm">DF</span>
-              </div>
-              {!isCollapsed && (
-                <div className="opacity-100 transition-opacity duration-300">
-                  <div className="font-medium text-gray-900 text-sm">
-                    Someone
-                  </div>
-                  <div className="text-xs text-gray-600">10122059</div>
-                </div>
-              )}
-            </div>
-          </div>
+          <ProfileSection isCollapsed={isCollapsed} />
 
           {/* Navigation Menu (TIDAK ADA PERUBAHAN DI DALAM <nav>) */}
           <nav
             className={`${
               isCollapsed ? "px-2" : "px-4"
-            } py-4 transition-all duration-300`}>
+            } py-4 transition-all duration-300`}
+          >
             {/* ... semua kode menu Anda ... */}
             {/* GENERALS Section */}
             <div>
@@ -123,7 +107,8 @@ const Sidebar = ({ onCollapseChange }: SidebarProps) => {
                 <div
                   className={`text-xs font-semibold text-gray-500 uppercase tracking-wider px-2 transition-opacity duration-200 ${
                     isCollapsed ? "opacity-0" : "opacity-100"
-                  }`}>
+                  }`}
+                >
                   GENERALS
                 </div>
               </div>
@@ -132,21 +117,24 @@ const Sidebar = ({ onCollapseChange }: SidebarProps) => {
                   href="/dashboard"
                   currentPath={pathname}
                   isCollapsed={isCollapsed}
-                  icon={<HomeIcon isCollapsed={isCollapsed} />}>
+                  icon={<HomeIcon isCollapsed={isCollapsed} />}
+                >
                   Home
                 </MenuItemLink>
                 <MenuItemLink
                   href="/dashboard/profile"
                   currentPath={pathname}
                   isCollapsed={isCollapsed}
-                  icon={<ProfileIcon isCollapsed={isCollapsed} />}>
+                  icon={<ProfileIcon isCollapsed={isCollapsed} />}
+                >
                   Profile
                 </MenuItemLink>
                 <MenuItemLink
                   href="/dashboard/employment"
                   currentPath={pathname}
                   isCollapsed={isCollapsed}
-                  icon={<EmploymentIcon isCollapsed={isCollapsed} />}>
+                  icon={<EmploymentIcon isCollapsed={isCollapsed} />}
+                >
                   Employment
                 </MenuItemLink>
                 <MenuItemLink
@@ -154,7 +142,8 @@ const Sidebar = ({ onCollapseChange }: SidebarProps) => {
                   currentPath={pathname}
                   isCollapsed={isCollapsed}
                   icon={<ClockIcon isCollapsed={isCollapsed} />}
-                  title="Kehadiran, Koreksi, Cuti, dan Dinas">
+                  title="Kehadiran, Koreksi, Cuti, dan Dinas"
+                >
                   Kehadiran, Koreksi, Cuti, dan Dinas
                 </MenuItemLink>
               </ul>
@@ -166,7 +155,8 @@ const Sidebar = ({ onCollapseChange }: SidebarProps) => {
                 <div
                   className={`text-xs font-semibold text-gray-500 uppercase tracking-wider px-2 transition-opacity duration-200 ${
                     isCollapsed ? "opacity-0" : "opacity-100"
-                  }`}>
+                  }`}
+                >
                   MAIN MENU
                 </div>
               </div>
@@ -175,28 +165,32 @@ const Sidebar = ({ onCollapseChange }: SidebarProps) => {
                   href="/dashboard/portal"
                   currentPath={pathname}
                   isCollapsed={isCollapsed}
-                  icon={<PackageIcon isCollapsed={isCollapsed} />}>
+                  icon={<PackageIcon isCollapsed={isCollapsed} />}
+                >
                   Portal Aplikasi
                 </MenuItemLink>
                 <MenuItemLink
                   href="/dashboard/kujang-ai"
                   currentPath={pathname}
                   isCollapsed={isCollapsed}
-                  icon={<SparklesIcon isCollapsed={isCollapsed} />}>
+                  icon={<SparklesIcon isCollapsed={isCollapsed} />}
+                >
                   Kujang Ai
                 </MenuItemLink>
                 <MenuItemLink
                   href="/dashboard/library"
                   currentPath={pathname}
                   isCollapsed={isCollapsed}
-                  icon={<LibraryIcon isCollapsed={isCollapsed} />}>
+                  icon={<LibraryIcon isCollapsed={isCollapsed} />}
+                >
                   Library
                 </MenuItemLink>
                 <MenuItemLink
                   href="/dashboard/shortlink"
                   currentPath={pathname}
                   isCollapsed={isCollapsed}
-                  icon={<LinkIcon isCollapsed={isCollapsed} />}>
+                  icon={<LinkIcon isCollapsed={isCollapsed} />}
+                >
                   Shortlink
                 </MenuItemLink>
               </ul>
@@ -208,7 +202,8 @@ const Sidebar = ({ onCollapseChange }: SidebarProps) => {
                 <div
                   className={`text-xs font-semibold text-gray-500 uppercase tracking-wider px-2 transition-opacity duration-200 ${
                     isCollapsed ? "opacity-0" : "opacity-100"
-                  }`}>
+                  }`}
+                >
                   APPS & FEATURE
                 </div>
               </div>
@@ -217,63 +212,72 @@ const Sidebar = ({ onCollapseChange }: SidebarProps) => {
                   href="/dashboard/e-prosedure"
                   currentPath={pathname}
                   isCollapsed={isCollapsed}
-                  icon={<EprosedureIcon isCollapsed={isCollapsed} />}>
+                  icon={<EprosedureIcon isCollapsed={isCollapsed} />}
+                >
                   E-Prosedure
                 </MenuItemLink>
                 <MenuItemLink
                   href="/dashboard/employe-directory"
                   currentPath={pathname}
                   isCollapsed={isCollapsed}
-                  icon={<EmployeDictoryIcon isCollapsed={isCollapsed} />}>
+                  icon={<EmployeDictoryIcon isCollapsed={isCollapsed} />}
+                >
                   Employee Directory
                 </MenuItemLink>
                 <MenuItemLink
                   href="/dashboard/siadil"
                   currentPath={pathname}
                   isCollapsed={isCollapsed}
-                  icon={<FileIcon isCollapsed={isCollapsed} />}>
+                  icon={<FileIcon isCollapsed={isCollapsed} />}
+                >
                   SIADIL
                 </MenuItemLink>
                 <MenuItemLink
                   href="/dashboard/test1"
                   currentPath={pathname}
                   isCollapsed={isCollapsed}
-                  icon={<SystikIccon isCollapsed={isCollapsed} />}>
+                  icon={<SystikIccon isCollapsed={isCollapsed} />}
+                >
                   SYSTIK
                 </MenuItemLink>
                 <MenuItemLink
                   href="/dashboard/test2"
                   currentPath={pathname}
                   isCollapsed={isCollapsed}
-                  icon={<KonsumsiIcon isCollapsed={isCollapsed} />}>
+                  icon={<KonsumsiIcon isCollapsed={isCollapsed} />}
+                >
                   Konsumsi
                 </MenuItemLink>
                 <MenuItemLink
                   href="/dashboard/test3"
                   currentPath={pathname}
                   isCollapsed={isCollapsed}
-                  icon={<DokumenkuIcon isCollapsed={isCollapsed} />}>
+                  icon={<DokumenkuIcon isCollapsed={isCollapsed} />}
+                >
                   DokumenKu
                 </MenuItemLink>
                 <MenuItemLink
                   href="/dashboard/test4"
                   currentPath={pathname}
                   isCollapsed={isCollapsed}
-                  icon={<MystatementIcon isCollapsed={isCollapsed} />}>
+                  icon={<MystatementIcon isCollapsed={isCollapsed} />}
+                >
                   Mystatement
                 </MenuItemLink>
                 <MenuItemLink
                   href="/dashboard/test5"
                   currentPath={pathname}
                   isCollapsed={isCollapsed}
-                  icon={<WorkAreaIcon isCollapsed={isCollapsed} />}>
+                  icon={<WorkAreaIcon isCollapsed={isCollapsed} />}
+                >
                   Work Area
                 </MenuItemLink>
                 <MenuItemLink
                   href="/dashboard/test6"
                   currentPath={pathname}
                   isCollapsed={isCollapsed}
-                  icon={<PeraturanPerundanganIcon isCollapsed={isCollapsed} />}>
+                  icon={<PeraturanPerundanganIcon isCollapsed={isCollapsed} />}
+                >
                   Peraturan Perundangan
                 </MenuItemLink>
               </ul>
@@ -288,7 +292,8 @@ const Sidebar = ({ onCollapseChange }: SidebarProps) => {
           onClick={handleCollapseToggle}
           // Posisi: di atas, dan pusat tombol tepat di garis tepi sidebar
           className={`absolute top-8 transition-all duration-300 z-30 bg-white ring-1 ring-gray-200 rounded-2xl h-8 w-8 flex items-center justify-center shadow-sm
-            ${isCollapsed ? "left-[64px]" : "left-[224px]"}`}>
+            ${isCollapsed ? "left-[64px]" : "left-[224px]"}`}
+        >
           <svg
             className={`block text-gray-800 transition-transform duration-200 ${
               isCollapsed ? "rotate-180" : ""
@@ -298,7 +303,8 @@ const Sidebar = ({ onCollapseChange }: SidebarProps) => {
             fill="none"
             stroke="currentColor"
             preserveAspectRatio="xMidYMid meet"
-            viewBox="0 0 24 24">
+            viewBox="0 0 24 24"
+          >
             <path
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -351,12 +357,12 @@ const MenuItemLink = ({
             ? "text-green-800 hover:bg-green-50"
             : "text-gray-700 hover:bg-gray-100"
         }`}
-        title={isCollapsed ? title || String(children) : ""}>
+        title={isCollapsed ? title || String(children) : ""}
+      >
         {/* Grup untuk ikon dan teks di kiri */}
         <div
-          className={`flex items-center ${
-            isCollapsed ? "" : "space-x-3 px-3"
-          }`}>
+          className={`flex items-center ${isCollapsed ? "" : "space-x-3 px-3"}`}
+        >
           {icon}
           {!isCollapsed && (
             <span className="text-left opacity-100 transition-opacity duration-300 whitespace-normal leading-snug">
@@ -400,7 +406,8 @@ const Icon = ({
     stroke="currentColor"
     strokeWidth={strokeWidth}
     strokeLinecap="round"
-    strokeLinejoin="round">
+    strokeLinejoin="round"
+  >
     {children}
   </svg>
 );
