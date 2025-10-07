@@ -151,7 +151,7 @@ export const DocumentTable = ({
     align?: "left" | "center" | "right";
   }) => (
     <th
-      className={`px-4 py-3 text-${align} sticky top-0 z-10 bg-gradient-to-r from-teal-50 to-cyan-50 dark:from-gray-800 dark:to-gray-700 border-r border-gray-200 dark:border-gray-600 last:border-r-0`}
+      className={`px-4 py-3 text-${align} sticky top-0 z-10 bg-gradient-to-r from-teal-50 to-cyan-50 dark:from-gray-800 dark:to-gray-700`}
     >
       <button
         onClick={(e) =>
@@ -172,7 +172,7 @@ export const DocumentTable = ({
           <thead className="bg-gradient-to-r from-teal-50 to-cyan-50 dark:from-gray-800 dark:to-gray-700 border-gray-200 dark:border-gray-600 sticky top-0 z-10 shadow-sm">
             <tr>
               {visibleColumns.has("actions") && (
-                <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 dark:text-gray-200 tracking-wider sticky top-0 z-10 bg-gradient-to-r from-teal-50 to-cyan-50 dark:from-gray-800 dark:to-gray-700 border-r border-gray-200 dark:border-gray-600">
+                <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 dark:text-gray-200 tracking-wider sticky top-0 z-10 bg-gradient-to-r from-teal-50 to-cyan-50 dark:from-gray-800 dark:to-gray-700">
                   Actions
                 </th>
               )}
@@ -181,7 +181,7 @@ export const DocumentTable = ({
                 <SortableHeader columnId="number" label="Number & Title" />
               )}
               {visibleColumns.has("description") && (
-                <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 dark:text-gray-200 tracking-wider sticky top-0 z-10 bg-gradient-to-r from-teal-50 to-cyan-50 dark:from-gray-800 dark:to-gray-700 border-r border-gray-200 dark:border-gray-600">
+                <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 dark:text-gray-200 tracking-wider sticky top-0 z-10 bg-gradient-to-r from-teal-50 to-cyan-50 dark:from-gray-800 dark:to-gray-700">
                   Description
                 </th>
               )}
@@ -193,7 +193,7 @@ export const DocumentTable = ({
                 />
               )}
               {visibleColumns.has("contributors") && (
-                <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 dark:text-gray-200 tracking-wider sticky top-0 z-10 bg-gradient-to-r from-teal-50 to-cyan-50 dark:from-gray-800 dark:to-gray-700 border-r border-gray-200 dark:border-gray-600">
+                <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 dark:text-gray-200 tracking-wider sticky top-0 z-10 bg-gradient-to-r from-teal-50 to-cyan-50 dark:from-gray-800 dark:to-gray-700">
                   Contributors
                 </th>
               )}
@@ -221,7 +221,7 @@ export const DocumentTable = ({
                 {visibleColumns.has("actions") && (
                   <td
                     onClick={(e) => e.stopPropagation()}
-                    className="px-4 py-4 whitespace-nowrap pl-7 text-sm font-medium relative border-r border-gray-200 dark:border-gray-600"
+                    className="px-4 py-4 whitespace-nowrap pl-7 text-sm font-medium relative"
                   >
                     <button
                       onClick={(e) => {
@@ -284,13 +284,13 @@ export const DocumentTable = ({
                     )}
                   </td>
                 )}
-                <td className="px-4 py-4 whitespace-nowrap text-sm border-r border-gray-100 dark:border-gray-700">
+                <td className="px-4 py-4 whitespace-nowrap text-sm">
                   <span className="inline-flex items-center px-3 py-1 rounded-full bg-gradient-to-r from-teal-500 to-cyan-600 text-white text-xs font-semibold shadow-sm">
                     {doc.id}
                   </span>
                 </td>
                 {visibleColumns.has("numberAndTitle") && (
-                  <td className="px-4 py-4 text-sm border-r border-gray-100 dark:border-gray-700">
+                  <td className="px-4 py-4 text-sm">
                     <div className="font-semibold text-gray-900 dark:text-white mb-1">
                       {doc.number}
                     </div>
@@ -302,7 +302,7 @@ export const DocumentTable = ({
                   </td>
                 )}
                 {visibleColumns.has("description") && (
-                  <td className="px-4 py-4 text-sm max-w-xs border-r border-gray-100 dark:border-gray-700">
+                  <td className="px-4 py-4 text-sm max-w-xs">
                     <Tooltip text={doc.description}>
                       <div className="text-gray-600 dark:text-gray-400 line-clamp-2 leading-snug">
                         {doc.description}
@@ -311,14 +311,14 @@ export const DocumentTable = ({
                   </td>
                 )}
                 {visibleColumns.has("documentDate") && (
-                  <td className="px-4 py-4 whitespace-nowrap text-sm border-r border-gray-100 dark:border-gray-700 text-center">
+                  <td className="px-4 py-4 whitespace-nowrap text-sm text-center">
                     <span className="inline-flex items-center px-3 py-1 rounded-full bg-gradient-to-r from-blue-500 to-indigo-600 text-white text-xs font-semibold shadow-sm">
                       {formatDate(doc.documentDate)}
                     </span>
                   </td>
                 )}
                 {visibleColumns.has("contributors") && (
-                  <td className="px-4 py-4 text-sm text-gray-900 dark:text-white border-r border-gray-200 dark:border-gray-600">
+                  <td className="px-4 py-4 text-sm text-gray-900 dark:text-white">
                     <div className="flex -space-x-2">
                       {doc.contributors.slice(0, 3).map((c, i) => (
                         <div
@@ -341,7 +341,7 @@ export const DocumentTable = ({
                   </td>
                 )}
                 {visibleColumns.has("archive") && (
-                  <td className="px-4 py-4 whitespace-nowrap text-sm border-r border-gray-100 dark:border-gray-700">
+                  <td className="px-4 py-4 whitespace-nowrap text-sm">
                     <span className="px-3 py-1 text-xs font-semibold rounded-full bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300">
                       {doc.archive}
                     </span>
