@@ -1,3 +1,5 @@
+"use client";
+
 import { Archive } from "../../types";
 import Image from "next/image";
 import { useState } from "react";
