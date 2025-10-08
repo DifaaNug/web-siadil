@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState, useMemo } from "react";
 import { Archive } from "../../types";
 import { ArchiveCard, PersonalArchiveCard } from "../ui/ArchiveCards";

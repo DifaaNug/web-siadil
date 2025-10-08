@@ -1,3 +1,5 @@
+"use client";
+
 import React from "react";
 import { Document } from "../../types";
 import { allArchives } from "../../data";

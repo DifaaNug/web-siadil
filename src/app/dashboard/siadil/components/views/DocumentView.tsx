@@ -1,3 +1,5 @@
+"use client";
+
 // src/app/dashboard/siadil/components/views/DocumentView.tsx
 
 import React from "react";

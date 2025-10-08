@@ -15,6 +15,7 @@ If you need interactivity, consider converting part of this to a Client Componen
 Beberapa komponen menggunakan **event handlers** (seperti `onClick`) dan **React hooks** (seperti `useState`) tetapi **tidak ditandai sebagai Client Component** dengan directive `"use client"`.
 
 Di Next.js 15, semua komponen default adalah **Server Components**. Server Components tidak bisa:
+
 - Menggunakan event handlers (`onClick`, `onChange`, dll)
 - Menggunakan React hooks (`useState`, `useEffect`, dll)
 - Menggunakan browser APIs (`window`, `document`, dll)
@@ -30,12 +31,14 @@ Tambahkan `"use client"` di baris pertama file yang menggunakan interactivity.
 ### 1. **src/app/not-found.tsx** ⭐ PENYEBAB UTAMA
 
 **Masalah:**
+
 - Menggunakan `onClick={() => window.history.back()}`
 - Tidak ada `"use client"` directive
 
 **Fix:**
+
 ```tsx
-"use client";  // ← TAMBAHKAN INI
+"use client"; // ← TAMBAHKAN INI
 
 import Link from "next/link";
 import { Home, ArrowLeft, FileQuestion } from "lucide-react";
@@ -43,7 +46,9 @@ import { Home, ArrowLeft, FileQuestion } from "lucide-react";
 export default function NotFound() {
   return (
     // ... component code
-    <button onClick={() => window.history.back()}>  {/* ← Event handler */}
+    <button onClick={() => window.history.back()}>
+      {" "}
+      {/* ← Event handler */}
       Halaman Sebelumnya
     </button>
   );
@@ -53,23 +58,25 @@ export default function NotFound() {
 ### 2. **src/app/dashboard/siadil/components/ui/ArchiveCards.tsx**
 
 **Masalah:**
+
 - Menggunakan `useState` hook
 - Menerima `onClick` props
 - Tidak ada `"use client"` directive
 
 **Fix:**
+
 ```tsx
-"use client";  // ← TAMBAHKAN INI
+"use client"; // ← TAMBAHKAN INI
 
 import { Archive } from "../../types";
 import Image from "next/image";
-import { useState } from "react";  // ← Hook
+import { useState } from "react"; // ← Hook
 
 const PersonalArchiveCard = ({
-  onClick,  // ← Event handler prop
+  onClick, // ← Event handler prop
   // ...
 }) => {
-  const [imageError, setImageError] = useState(false);  // ← State
+  const [imageError, setImageError] = useState(false); // ← State
   // ...
 };
 ```
@@ -79,17 +86,19 @@ const PersonalArchiveCard = ({
 ## 🧪 Verification
 
 ### Build Test:
+
 ```bash
 npm run build
 ```
 
 ### Expected Output:
+
 ```
 ✓ Compiled successfully
-✓ Linting and checking validity of types    
-✓ Collecting page data    
+✓ Linting and checking validity of types
+✓ Collecting page data
 ✓ Generating static pages (17/17)
-✓ Collecting build traces    
+✓ Collecting build traces
 ✓ Finalizing page optimization
 ```
 
@@ -144,17 +153,13 @@ git push origin main-baru
 
 1. **Event Handlers**
    - `onClick`, `onChange`, `onSubmit`, dll
-   
 2. **React Hooks**
    - `useState`, `useEffect`, `useRef`, dll
    - Custom hooks
-   
 3. **Browser APIs**
    - `window`, `document`, `localStorage`, dll
-   
 4. **Third-party libraries yang butuh client**
    - Libraries yang menggunakan browser APIs
-   
 5. **Context**
    - `useContext`, `createContext`
 
@@ -162,10 +167,8 @@ git push origin main-baru
 
 1. **Pure Display Component**
    - Hanya render UI tanpa interactivity
-   
 2. **Data Fetching di Server**
    - Async server components
-   
 3. **Static Content**
    - Tidak ada state atau events
 
@@ -174,6 +177,7 @@ git push origin main-baru
 ## 🔧 Next.js 15 Best Practices
 
 ### Server Component (Default):
+
 ```tsx
 // NO "use client" needed
 export default async function Page() {
@@ -183,18 +187,15 @@ export default async function Page() {
 ```
 
 ### Client Component (With Interactivity):
+
 ```tsx
-"use client";  // ← REQUIRED
+"use client"; // ← REQUIRED
 
 import { useState } from "react";
 
 export default function Page() {
   const [count, setCount] = useState(0);
-  return (
-    <button onClick={() => setCount(count + 1)}>
-      Count: {count}
-    </button>
-  );
+  return <button onClick={() => setCount(count + 1)}>Count: {count}</button>;
 }
 ```
 
@@ -203,11 +204,14 @@ export default function Page() {
 ## ⚠️ Common Pitfalls
 
 ### ❌ SALAH:
+
 ```tsx
 // not-found.tsx
 export default function NotFound() {
   return (
-    <button onClick={() => alert("Hi")}>  {/* ← ERROR! */}
+    <button onClick={() => alert("Hi")}>
+      {" "}
+      {/* ← ERROR! */}
       Click Me
     </button>
   );
@@ -215,12 +219,15 @@ export default function NotFound() {
 ```
 
 ### ✅ BENAR:
+
 ```tsx
-"use client";  // ← ADD THIS!
+"use client"; // ← ADD THIS!
 
 export default function NotFound() {
   return (
-    <button onClick={() => alert("Hi")}>  {/* ← OK! */}
+    <button onClick={() => alert("Hi")}>
+      {" "}
+      {/* ← OK! */}
       Click Me
     </button>
   );
@@ -232,12 +239,14 @@ export default function NotFound() {
 ## 📊 Build Performance
 
 ### Before Fix:
+
 ```
 ❌ Error occurred prerendering page "/_not-found"
 ❌ Export encountered errors
 ```
 
 ### After Fix:
+
 ```
 ✓ Compiled successfully in 22.8s
 ✓ Generating static pages (17/17)
@@ -245,6 +254,7 @@ export default function NotFound() {
 ```
 
 **Bundle Sizes:**
+
 - Root page: 103 kB
 - Dashboard SIADIL: 314 kB
 - Login page: 115 kB
@@ -256,7 +266,8 @@ export default function NotFound() {
 
 **Problem:** Server Components tidak bisa menggunakan event handlers  
 **Solution:** Tambahkan `"use client"` directive  
-**Files Fixed:** 
+**Files Fixed:**
+
 - ✅ `src/app/not-found.tsx` (main cause)
 - ✅ `src/app/dashboard/siadil/components/ui/ArchiveCards.tsx`
 

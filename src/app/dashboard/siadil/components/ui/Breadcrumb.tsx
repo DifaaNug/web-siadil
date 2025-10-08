@@ -1,3 +1,5 @@
+"use client";
+
 import React from "react";
 
 type BreadcrumbItem = {
@@ -22,7 +24,8 @@ const Breadcrumb: React.FC<BreadcrumbProps> = ({ items }) => {
               {!isLastItem ? (
                 <button
                   onClick={item.onClick}
-                  className="flex items-center space-x-1.5 rounded-md border border-gray-200 bg-white px-2 py-1 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700">
+                  className="flex items-center space-x-1.5 rounded-md border border-gray-200 bg-white px-2 py-1 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
+                >
                   {item.icon && (
                     <span className="flex-shrink-0">{item.icon}</span>
                   )}
@@ -31,7 +34,8 @@ const Breadcrumb: React.FC<BreadcrumbProps> = ({ items }) => {
               ) : (
                 <span
                   className="flex items-center space-x-1.5 text-sm font-semibold text-gray-800 dark:text-gray-200"
-                  aria-current="page">
+                  aria-current="page"
+                >
                   {item.icon && (
                     <span className="flex-shrink-0">{item.icon}</span>
                   )}
@@ -47,7 +51,8 @@ const Breadcrumb: React.FC<BreadcrumbProps> = ({ items }) => {
                   fill="none"
                   viewBox="0 0 24 24"
                   strokeWidth="2"
-                  stroke="currentColor">
+                  stroke="currentColor"
+                >
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"

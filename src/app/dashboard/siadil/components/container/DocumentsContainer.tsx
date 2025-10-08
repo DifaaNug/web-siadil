@@ -1,3 +1,5 @@
+"use client";
+
 import { useState, useEffect, useRef, ReactNode, ChangeEvent } from "react";
 import ReactDOM from "react-dom";
 import { useOnClickOutside } from "../../hooks/useOnClickOutside";
