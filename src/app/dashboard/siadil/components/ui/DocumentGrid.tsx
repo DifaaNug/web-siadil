@@ -1,3 +1,5 @@
+"use client";
+
 // src/app/dashboard/siadil/components/ui/DocumentGrid.tsx
 
 import { useState } from "react";

@@ -22,6 +22,7 @@ declare module "next-auth" {
         active: boolean;
       };
     } & DefaultSession["user"];
+    accessToken?: string; // Access token untuk API requests
   }
 
   interface User {
@@ -43,6 +44,7 @@ declare module "next-auth" {
       description: string;
       active: boolean;
     };
+    accessToken?: string; // Access token dari API login
   }
 }
 
@@ -66,5 +68,6 @@ declare module "next-auth/jwt" {
       description: string;
       active: boolean;
     };
+    accessToken?: string; // Access token untuk JWT
   }
 }

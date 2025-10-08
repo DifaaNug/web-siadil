@@ -4,26 +4,29 @@ import CredentialsProvider from "next-auth/providers/credentials";
 // API Response Types
 interface LoginSuccessResponse {
   success: true;
-  application: {
+  application?: {
     id: number;
     slug: string;
     name: string;
     description: string;
     active: boolean;
   };
-  roles: string[];
+  roles?: string[];
   user: {
     id: string;
     username: string;
     name: string;
     pic: string;
     email: string;
-    organization: {
+    organization?: {
       id: string;
       name: string;
       leader: boolean;
     };
   };
+  token?: string; // Access token dari API
+  access_token?: string; // Alternative nama field untuk token
+  accessToken?: string; // Alternative nama field untuk token
 }
 
 interface LoginErrorResponse {
@@ -76,6 +79,7 @@ export const authOptions: NextAuthOptions = {
                 description: "Sistem Arsip Digital",
                 active: true,
               },
+              accessToken: "mock-token-admin-" + Date.now(), // Mock token
             };
           }
 
@@ -102,6 +106,7 @@ export const authOptions: NextAuthOptions = {
                 description: "Sistem Arsip Digital",
                 active: true,
               },
+              accessToken: "mock-token-user-" + Date.now(), // Mock token
             };
           }
 
@@ -128,6 +133,9 @@ export const authOptions: NextAuthOptions = {
 
           const data = await response.json();
 
+          // Log raw response untuk debugging
+          console.log("📦 Raw API Response:", JSON.stringify(data, null, 2));
+
           // Check if login failed
           if (!response.ok || !data.success) {
             const errorData = data as LoginErrorResponse;
@@ -137,6 +145,31 @@ export const authOptions: NextAuthOptions = {
           // Login success
           const loginData = data as LoginSuccessResponse;
 
+          // Log untuk debugging
+          console.log("✅ Login successful for user:", loginData.user.username);
+          console.log(
+            "🔑 Access token from API:",
+            loginData.token ? "YES ✅" : "NO ❌"
+          );
+
+          // Cari token dari berbagai kemungkinan field
+          let accessToken =
+            loginData.token || loginData.access_token || loginData.accessToken;
+
+          if (!accessToken) {
+            console.warn(
+              "⚠️ API did not return token, generating temporary session token"
+            );
+            // Generate simple session token (untuk fallback)
+            accessToken = `session-${loginData.user.id}-${Date.now()}`;
+            console.log("🔑 Generated token:", accessToken);
+          } else {
+            console.log(
+              "🔑 Token preview:",
+              accessToken.substring(0, 50) + "..."
+            );
+          }
+
           // Return user data sesuai dengan structure yang dibutuhkan
           return {
             id: loginData.user.id,
@@ -144,19 +177,21 @@ export const authOptions: NextAuthOptions = {
             name: loginData.user.name,
             email: loginData.user.email,
             pic: loginData.user.pic,
-            roles: loginData.roles,
+            roles: loginData.roles || [],
             organization: {
-              id: loginData.user.organization.id,
-              name: loginData.user.organization.name,
-              leader: loginData.user.organization.leader,
+              id: loginData.user.organization?.id || "unknown",
+              name: loginData.user.organization?.name || "Unknown Organization",
+              leader: loginData.user.organization?.leader || false,
             },
             application: {
-              id: loginData.application.id,
-              slug: loginData.application.slug,
-              name: loginData.application.name,
-              description: loginData.application.description,
-              active: loginData.application.active,
+              id: loginData.application?.id || 1,
+              slug: loginData.application?.slug || "siadil",
+              name: loginData.application?.name || "SIADIL",
+              description:
+                loginData.application?.description || "Sistem Arsip Digital",
+              active: loginData.application?.active || true,
             },
+            accessToken: accessToken, // Simpan access token (dari API atau generated)
           };
         } catch (error) {
           console.error("❌ Login error:", error);
@@ -182,6 +217,12 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
+        console.log("📝 JWT Callback - Saving user data to token");
+        console.log(
+          "🔑 User accessToken:",
+          user.accessToken ? "EXISTS ✅" : "MISSING ❌"
+        );
+
         token.id = user.id;
         token.username = user.username;
         token.name = user.name;
@@ -190,10 +231,22 @@ export const authOptions: NextAuthOptions = {
         token.roles = user.roles;
         token.organization = user.organization;
         token.application = user.application;
+        token.accessToken = user.accessToken; // Simpan access token di JWT
+
+        console.log(
+          "🔑 Token.accessToken after save:",
+          token.accessToken ? "SAVED ✅" : "NOT SAVED ❌"
+        );
       }
       return token;
     },
     async session({ session, token }) {
+      console.log("📦 Session Callback - Building session");
+      console.log(
+        "🔑 Token.accessToken:",
+        token.accessToken ? "EXISTS ✅" : "MISSING ❌"
+      );
+
       if (token && session.user) {
         session.user.id = token.id;
         session.user.username = token.username;
@@ -203,6 +256,12 @@ export const authOptions: NextAuthOptions = {
         session.user.roles = token.roles;
         session.user.organization = token.organization;
         session.user.application = token.application;
+        session.accessToken = token.accessToken; // Masukkan access token ke session
+
+        console.log(
+          "🔑 Session.accessToken after save:",
+          session.accessToken ? "SAVED ✅" : "NOT SAVED ❌"
+        );
       }
       return session;
     },
@@ -216,6 +275,5 @@ export const authOptions: NextAuthOptions = {
     strategy: "jwt",
     maxAge: 30 * 24 * 60 * 60, // 30 days
   },
-  secret:
-    process.env.NEXTAUTH_SECRET || "your-secret-key-change-this-in-production",
+  secret: process.env.NEXTAUTH_SECRET,
 };

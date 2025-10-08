@@ -77,6 +77,11 @@ export default function SiadilPage() {
   const [pageView, setPageView] = useState<"archives" | "starred" | "trash">(
     "archives"
   );
+
+  // Log session data untuk debugging
+  console.log("Session Data:", session);
+  console.log("Access Token:", session?.accessToken);
+
   const userData = {
     name: session?.user?.name || "Guest",
     id: session?.user?.username || session?.user?.id || "000000",
